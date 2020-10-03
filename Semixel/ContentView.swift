@@ -71,14 +71,57 @@ struct ColorTab: View {
     }
 }
 
+struct EditableImage: View {
+    
+    @State var lastScaleFactor: CGFloat = 1.0
+    @State var scale: CGFloat = 1.0
+    @State var position: CGPoint = .zero
+    @State var lastPosition: CGPoint = .zero
+    
+    var drag: some Gesture {
+        DragGesture()
+            .onChanged({ event in
+                let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
+                self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
+                position = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
+            })
+            .onEnded({ delta in
+                self.lastPosition = .zero
+            })
+    }
+    
+    var zoom: some Gesture {
+        MagnificationGesture(minimumScaleDelta: 0.01)
+            .onChanged({ factor in
+                let delta = factor / self.lastScaleFactor
+                self.lastScaleFactor = factor
+                let scale = self.scale * delta
+                self.scale = max(scale, 1.0)
+            })
+            .onEnded({ factor in
+                self.lastScaleFactor = 1.0
+            })
+    }
+    
+    var body: some View {
+        Image("pixel_art")
+            .resizable()
+            .scaledToFit()
+            .scaleEffect(scale, anchor: .center)
+            .frame(maxWidth: 365, alignment: .center)
+            .offset(x: position.x, y: position.y)
+            .border(Color(.black), width: 4)
+            .gesture(zoom)
+            .simultaneousGesture(drag)
+            .mask(Rectangle().frame(width: 365, height: 365, alignment: .center))
+    }
+}
+
+
 struct ContentView: View {
     var body: some View {
         VStack(alignment: .center) {
-            Image("pixel_art")
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: 365, alignment: .center)
-                .border(Color(.systemGray5), width: 4)
+            EditableImage()
             Tools()
             HStack(spacing: 8) {
                 ColorTab(tag: 1, color: Color(.systemBlue))
