@@ -13,6 +13,9 @@
 		864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DA24B714B30000A1AB /* Assets.xcassets */; };
 		864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DD24B714B30000A1AB /* Preview Assets.xcassets */; };
 		864E74E124B714B30000A1AB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DF24B714B30000A1AB /* LaunchScreen.storyboard */; };
+		86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BDF25565AB600DC7D55 /* Coordinates.swift */; };
+		86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BE025565AB600DC7D55 /* Geometry.swift */; };
+		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		864E74DD24B714B30000A1AB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		864E74E024B714B30000A1AB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		864E74E224B714B30000A1AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		86B90BDF25565AB600DC7D55 /* Coordinates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coordinates.swift; sourceTree = "<group>"; };
+		86B90BE025565AB600DC7D55 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +48,7 @@
 			children = (
 				864E74D324B714B20000A1AB /* Semixel */,
 				864E74D224B714B20000A1AB /* Products */,
+				86B90BDC25565A1400DC7D55 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -63,6 +70,9 @@
 				864E74DF24B714B30000A1AB /* LaunchScreen.storyboard */,
 				864E74E224B714B30000A1AB /* Info.plist */,
 				864E74DC24B714B30000A1AB /* Preview Content */,
+				86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */,
+				86B90BDF25565AB600DC7D55 /* Coordinates.swift */,
+				86B90BE025565AB600DC7D55 /* Geometry.swift */,
 			);
 			path = Semixel;
 			sourceTree = "<group>";
@@ -73,6 +83,13 @@
 				864E74DD24B714B30000A1AB /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		86B90BDC25565A1400DC7D55 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,6 +108,8 @@
 			dependencies = (
 			);
 			name = Semixel;
+			packageProductDependencies = (
+			);
 			productName = Semixel;
 			productReference = 864E74D124B714B20000A1AB /* Semixel.app */;
 			productType = "com.apple.product-type.application";
@@ -147,8 +166,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				864E74D524B714B20000A1AB /* AppDelegate.swift in Sources */,
+				86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */,
 				864E74D724B714B20000A1AB /* SceneDelegate.swift in Sources */,
 				864E74D924B714B20000A1AB /* ContentView.swift in Sources */,
+				86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */,
+				86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

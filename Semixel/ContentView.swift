@@ -71,19 +71,60 @@ struct ColorTab: View {
     }
 }
 
-struct EditableImage: View {
+struct PixelGridImage: View {
+    
+    var horizontalSpacing: CGFloat = 8
+    var verticalSpacing: CGFloat = 8
+
+    var body: some View {
+        GeometryReader { geometry in
+            Path { path in
+                let numberOfHorizontalGridLines = Int(geometry.size.height / self.verticalSpacing)
+                let numberOfVerticalGridLines = Int(geometry.size.width / self.horizontalSpacing)
+                for index in 0...numberOfVerticalGridLines {
+                    let vOffset: CGFloat = CGFloat(index) * self.horizontalSpacing
+                    path.move(to: CGPoint(x: vOffset, y: 0))
+                    path.addLine(to: CGPoint(x: vOffset, y: geometry.size.height))
+                }
+                for index in 0...numberOfHorizontalGridLines {
+                    let hOffset: CGFloat = CGFloat(index) * self.verticalSpacing
+                    path.move(to: CGPoint(x: 0, y: hOffset))
+                    path.addLine(to: CGPoint(x: geometry.size.width, y: hOffset))
+                }
+            }
+            .stroke()
+        }
+    }
+}
+
+
+
+struct InteractiveImage: View {
     
     @State var lastScaleFactor: CGFloat = 1.0
-    @State var scale: CGFloat = 1.0
+    @State var scale: CGFloat
     @State var position: CGPoint = .zero
     @State var lastPosition: CGPoint = .zero
+    
+    let size: (width: Int, height: Int)
+    
+    init(width: Int, height: Int) {
+        size = (width, height)
+        _scale = State(initialValue: CGFloat(min(width, height)))
+    }
     
     var drag: some Gesture {
         DragGesture()
             .onChanged({ event in
                 let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
                 self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
-                position = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
+                
+                let newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
+                
+                if Int(newPosition.x) + Int(scale) <= size.width && Int(newPosition.y) + Int(scale) < size.height && Int(newPosition.x) >= 0 && Int(newPosition.y) >= 0 {
+                    self.position = newPosition
+                    print(self.position, scale, size)
+                }
             })
             .onEnded({ delta in
                 self.lastPosition = .zero
@@ -95,8 +136,12 @@ struct EditableImage: View {
             .onChanged({ factor in
                 let delta = factor / self.lastScaleFactor
                 self.lastScaleFactor = factor
-                let scale = self.scale * delta
-                self.scale = max(scale, 1.0)
+                let scale = max(1.0, self.scale / delta)
+                
+                if Int(position.x) + Int(scale) <= size.width && Int(position.y) + Int(scale) < size.height && Int(position.x) >= 0 && Int(position.y) >= 0 {
+                    self.scale = scale
+                    print(self.position, scale, size)
+                }
             })
             .onEnded({ factor in
                 self.lastScaleFactor = 1.0
@@ -104,16 +149,19 @@ struct EditableImage: View {
     }
     
     var body: some View {
-        Image("pixel_art")
-            .resizable()
-            .scaledToFit()
-            .scaleEffect(scale, anchor: .center)
-            .frame(maxWidth: 365, alignment: .center)
-            .offset(x: position.x, y: position.y)
-            .border(Color(.black), width: 4)
-            .gesture(zoom)
-            .simultaneousGesture(drag)
-            .mask(Rectangle().frame(width: 365, height: 365, alignment: .center))
+        ZStack {
+            PixelBufferView(origin: position, scale: scale, size: size)
+                .frame(maxWidth: 365, maxHeight: 365, alignment: .center)
+//            Image("pixel_art")
+//                .resizable()
+//                .scaledToFit()
+//            PixelGridImage(horizontalSpacing: 8, verticalSpacing: 8)
+        }
+        .frame(maxWidth: 365, alignment: .center)
+        .border(Color(.black), width: 4)
+        .gesture(zoom)
+        .simultaneousGesture(drag)
+        .mask(Rectangle().frame(width: 365, height: 365, alignment: .center))
     }
 }
 
@@ -121,7 +169,7 @@ struct EditableImage: View {
 struct ContentView: View {
     var body: some View {
         VStack(alignment: .center) {
-            EditableImage()
+            InteractiveImage(width: 64, height: 64)
             Tools()
             HStack(spacing: 8) {
                 ColorTab(tag: 1, color: Color(.systemBlue))
