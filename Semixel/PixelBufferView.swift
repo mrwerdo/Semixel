@@ -10,6 +10,8 @@ import SwiftUI
 
 struct PixelBufferView: UIViewRepresentable {
     
+    @Binding var image: PixelImage
+    
     var origin: CGPoint {
         didSet {
             if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
@@ -30,23 +32,23 @@ struct PixelBufferView: UIViewRepresentable {
     
     let size: (width: Int, height: Int)
     
-    init(origin: CGPoint, scale: CGFloat, size: (width: Int, height: Int)) {
+    init(origin: CGPoint, scale: CGFloat, size: (width: Int, height: Int), image: Binding<PixelImage>) {
         if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
             fatalError()
         }
         self.origin = origin
         self.scale = scale
         self.size = size
-        
-        
+        self._image = image
     }
     
     func updateUIView(_ view: BufferView, context: Context) {
         view.viewport = (Point2D(x: Int(origin.x), y: Int(origin.y)), Size2D(width: Int(scale), height: Int(scale)))
+        view.img = image
     }
     
     func makeUIView(context: Context) -> BufferView {
-        let view = BufferView(width: size.width, height: size.height, frame: CGRect(x: 0, y: 0, width: 128, height: 128))
+        let view = BufferView(image: image, frame: CGRect(x: 0, y: 0, width: 128, height: 128))
         view.viewport = (Point2D(x: Int(origin.x), y: Int(origin.y)), Size2D(width: Int(scale), height: Int(scale)))
         return view
     }
@@ -56,8 +58,7 @@ struct PixelBufferView: UIViewRepresentable {
     }
 }
 
-class BufferView: UIView {
-    
+struct PixelImage {
     struct RGBA {
         var red: CGFloat
         var green: CGFloat
@@ -71,23 +72,10 @@ class BufferView: UIView {
     
     var buffer: [RGBA]
     private(set) var size: Size2D
-    var viewport: (origin: Point2D, size: Size2D) {
-        didSet {
-            if !(viewport.origin.x >= 0
-                    && viewport.origin.y >= 0
-                    && size.width >= viewport.origin.x + viewport.size.width
-                    && size.height >= viewport.origin.y + viewport.size.height) {
-                fatalError()
-            }
-            setNeedsDisplay()
-        }
-    }
     
-    init(width: Int, height: Int, frame: CGRect) {
+    init(width: Int, height: Int) {
         buffer = [RGBA](repeating: .white, count: width * height)
         size = Size2D(width: width, height: height)
-        viewport = (.zero, size)
-        super.init(frame: frame)
         
         for y in 0..<size.height {
             for x in 0..<size.width {
@@ -105,6 +93,33 @@ class BufferView: UIView {
                 buffer[index] = color
             }
         }
+    }
+}
+
+class BufferView: UIView {
+    
+    var img: PixelImage {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
+    var viewport: (origin: Point2D, size: Size2D) {
+        didSet {
+            if !(viewport.origin.x >= 0
+                    && viewport.origin.y >= 0
+                    && img.size.width >= viewport.origin.x + viewport.size.width
+                    && img.size.height >= viewport.origin.y + viewport.size.height) {
+                fatalError()
+            }
+            setNeedsDisplay()
+        }
+    }
+    
+    init(image: PixelImage, frame: CGRect) {
+        viewport = (.zero, image.size)
+        img = image
+        super.init(frame: frame)
     }
     
     required init?(coder: NSCoder) {
@@ -126,7 +141,7 @@ class BufferView: UIView {
                                   y: scale.height * CGFloat(y),
                                   width: scale.width,
                                   height: scale.height)
-                let color = buffer[self.size.width * (viewport.origin.y + y) + (viewport.origin.x + x)]
+                let color = img.buffer[img.size.width * (viewport.origin.y + y) + (viewport.origin.x + x)]
                 context.setFillColor(red: color.red,
                                      green: color.green,
                                      blue: color.blue,
