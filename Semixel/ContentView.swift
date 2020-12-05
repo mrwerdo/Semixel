@@ -35,7 +35,6 @@ struct BigButton<T>: View where T: Equatable {
     
     var body: some View {
         Button(action: {
-            print("button tapped")
             state = object
         }) {
             ZStack(alignment: .center) {
@@ -92,7 +91,6 @@ struct ColorTab: View {
     
     var body: some View {
         Button(action: {
-            print("color tab tapped")
             selected?(self)
         }) {
             HStack(spacing: 0) {
@@ -202,7 +200,7 @@ struct InteractiveImage: View {
                 .frame(maxWidth: length, maxHeight: length, alignment: .center)
             Image(systemName: "pencil")
                 .renderingMode(Image.TemplateRenderingMode.template).foregroundColor(Color(.white)).border(Color(.systemBlue), width: 4)
-                .offset(x: position.x + 2, y: position.y + 2)
+                .offset(x: position.x + 6, y: position.y + 6)
         }
         .frame(maxWidth: length, alignment: .center)
         .gesture(drag)
@@ -283,20 +281,42 @@ struct ContentView: View {
     }
     
     func push() {
+        let scale = CGFloat(384 / 32.0)
+        let x = Int(round(position.x / scale)) + image.size.width/2
+        let y = Int(round(position.y / scale)) + image.size.height/2
+        var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        
+        if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
+            return
+        }
+        
+        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else {
+            print("warning: could not get rgb components from the selected color!")
+            return
+        }
+        
+        let c = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
+
         switch tool {
         case .pencil:
-            let scale = CGFloat(384 / 32.0)
-            let x = Int(round(position.x / scale)) + image.size.width/2
-            let y = Int(round(position.y / scale)) + image.size.height/2
-            var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
-            
-            if UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) {
-                image.buffer[y * image.size.width + x] = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
-            } else {
-                print("warning: could not get rgb components from the selected color!")
-            }
+            pencil(x, y, c)
+        case .brush:
+            brush(x, y, c)
         default:
             print("tool: \(tool), color: \(color)")
+        }
+    }
+    
+    func pencil(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        image[x, y] = color
+    }
+    
+    func brush(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        // actually works like a paint bucket, but who cares...
+        let oldColor = image[x, y]
+        let points = image.floodSearch(at: x, y: y) { (_, c) -> Bool in c == oldColor }
+        for point in points {
+            image[point] = color
         }
     }
 }

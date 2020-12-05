@@ -59,7 +59,7 @@ struct PixelBufferView: UIViewRepresentable {
 }
 
 struct PixelImage {
-    struct RGBA {
+    struct RGBA: Equatable {
         var red: CGFloat
         var green: CGFloat
         var blue: CGFloat
@@ -92,6 +92,50 @@ struct PixelImage {
                 
                 buffer[index] = color
             }
+        }
+    }
+    
+    func floodSearch(at x: Int, y: Int, isIncluded: (_ point: Point2D, _ color: RGBA) -> Bool) -> [Point2D] {
+        var unvisitedPoints: [Point2D] = [Point2D(x: x, y: y)]
+        var points = unvisitedPoints
+        
+        let offsets = [
+            (0, 1),
+            (0, -1),
+            (-1, 0),
+            (1, 0)
+        ].map(Point2D.init)
+        
+        while let p = unvisitedPoints.popLast() {
+            for dp in offsets {
+                let point = p + dp
+                if !points.contains(point) && isIncluded(point, self[point.x, point.y]) {
+                    points.append(point)
+                    unvisitedPoints.append(point)
+                }
+            }
+        }
+        
+        return points
+    }
+    
+    subscript(x: Int, y: Int) -> RGBA {
+        get {
+            return buffer[y * size.width + x]
+        }
+        
+        set {
+            buffer[y * size.width + x] = newValue
+        }
+    }
+    
+    subscript(point: Point2D) -> RGBA {
+        get {
+            return self[point.x, point.y]
+        }
+        
+        set {
+            self[point.x, point.y] = newValue
         }
     }
 }
