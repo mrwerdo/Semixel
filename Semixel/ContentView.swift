@@ -147,31 +147,21 @@ struct InteractiveImage: View {
     @State var lastPosition: CGPoint = .zero
     @Binding var image: PixelImage
     
+    var dragStarted: (() -> ())?
+    var dragCompleted: (() -> ())?
+    
     let size: (width: Int, height: Int)
     
-    init(image: Binding<PixelImage>, position: Binding<CGPoint>) {
+    init(image: Binding<PixelImage>, position: Binding<CGPoint>, dragStarted: (() -> ())? = nil, dragCompleted: (() -> ())? = nil) {
         _position = position
         size = (image.wrappedValue.size.width, image.wrappedValue.size.height)
         _scale = State(initialValue: CGFloat(min(size.width, size.height)))
         _image = image
+        self.dragStarted = dragStarted
+        self.dragCompleted = dragCompleted
     }
     
     var drag: some Gesture {
-//        DragGesture()
-//            .onChanged({ event in
-//                let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
-//                self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
-//
-//                let newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
-//
-//                if Int(newPosition.x) + Int(scale) <= size.width && Int(newPosition.y) + Int(scale) < size.height && Int(newPosition.x) >= 0 && Int(newPosition.y) >= 0 {
-//                    self.position = newPosition
-//                    print(self.position, scale, size)
-//                }
-//            })
-//            .onEnded({ delta in
-//                self.lastPosition = .zero
-//            })
         DragGesture()
             .onChanged({ event in
                 let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
@@ -179,9 +169,11 @@ struct InteractiveImage: View {
 
                 let newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
                 self.position = newPosition
+                dragStarted?()
             })
             .onEnded({ delta in
                 self.lastPosition = .zero
+                dragCompleted?()
             })
     }
     
@@ -202,27 +194,51 @@ struct InteractiveImage: View {
             })
     }
     
+    private let length: CGFloat = 384
+    
     var body: some View {
         ZStack {
             PixelBufferView(origin: .zero, scale: scale, size: size, image: $image)
-                .frame(maxWidth: 365, maxHeight: 365, alignment: .center)
+                .frame(maxWidth: length, maxHeight: length, alignment: .center)
             Image(systemName: "pencil")
                 .renderingMode(Image.TemplateRenderingMode.template).foregroundColor(Color(.white)).border(Color(.systemBlue), width: 4)
                 .offset(x: position.x + 2, y: position.y + 2)
-//                .position(position)
-//            Image("pixel_art")
-//                .resizable()
-//                .scaledToFit()
-//            PixelGridImage(horizontalSpacing: 8, verticalSpacing: 8)
         }
-        .frame(maxWidth: 365, alignment: .center)
-        .border(Color(.black), width: 4)
-        .gesture(zoom)
-        .simultaneousGesture(drag)
-        .mask(Rectangle().frame(width: 365, height: 365, alignment: .center))
+        .frame(maxWidth: length, alignment: .center)
+        .gesture(drag)
+        .mask(Rectangle().frame(width: length, height: length, alignment: .center))
+        .padding(2)
+        .border(Color(.secondarySystemBackground), width: 2)
     }
 }
 
+struct TouchDownButton<Label: View>: View {
+    
+    @Binding var state: Bool
+    var label: () -> Label
+    var ended: (() -> ())?
+    
+    var touchDownGesture: some Gesture {
+        
+        let touchDown = LongPressGesture(minimumDuration: 0)
+            .onEnded { _ in
+                state = true
+            }
+        
+        let touchEnded = DragGesture(minimumDistance: 0)
+            .onEnded { _ in
+                state = false
+                ended?()
+            }
+        
+        return SimultaneousGesture(touchDown, touchEnded)
+    }
+    
+    var body: some View {
+        label()
+        .gesture(touchDownGesture)
+    }
+}
 
 struct ContentView: View {
     
@@ -230,14 +246,21 @@ struct ContentView: View {
     @State var color: Color = Color(.systemBlue)
     @State var image: PixelImage = PixelImage(width: 32, height: 32)
     @State var position: CGPoint = .zero
+    @State var depressed: Bool = false
     
     func selected(_ colortab: ColorTab) {
         color = colortab.color
     }
     
+    func onDrag() {
+        if depressed {
+            push()
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .center) {
-            InteractiveImage(image: $image, position: $position)
+            InteractiveImage(image: $image, position: $position, dragStarted: onDrag)
             Tools(tool: $tool)
             HStack(spacing: 8) {
                 ColorTab(tag: 1, color: Color(.systemBlue), selected: selected)
@@ -246,29 +269,31 @@ struct ContentView: View {
                 ColorTab(tag: 4, color: Color(.systemOrange), selected: selected)
                 ColorTab(tag: 5, color: Color(.systemPink), selected: selected)
             }.padding([.bottom], 8)
-            Button(action: push, label: {
+            TouchDownButton(state: $depressed) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(.secondarySystemBackground))
                         .frame(width: 200, height: 100, alignment: .center)
                     Text("Push").font(.largeTitle)
                 }
-            })
+            } ended: {
+                push()
+            }
         }
     }
     
     func push() {
         switch tool {
         case .pencil:
-            let scale = CGFloat(365.0 / 32.0)
+            let scale = CGFloat(384 / 32.0)
             let x = Int(round(position.x / scale)) + image.size.width/2
             let y = Int(round(position.y / scale)) + image.size.height/2
             var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
             
-            
             if UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) {
-                print("tool: \(tool), position: \(x), \(y), color: \(r), \(g), \(b), \(a)")
                 image.buffer[y * image.size.width + x] = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
+            } else {
+                print("warning: could not get rgb components from the selected color!")
             }
         default:
             print("tool: \(tool), color: \(color)")
