@@ -194,13 +194,25 @@ struct InteractiveImage: View {
     
     private let length: CGFloat = 384
     
+    private var pixelPosition: CGPoint {
+        let x = round(position.x / 12)
+        let y = round(position.y / 12)
+        return CGPoint(x: x * 12 + 6, y: y * 12 + 6)
+    }
+    
     var body: some View {
         ZStack {
             PixelBufferView(origin: .zero, scale: scale, size: size, image: $image)
                 .frame(maxWidth: length, maxHeight: length, alignment: .center)
+            Rectangle()
+                .opacity(0.0)
+                .frame(width: 12, height: 12, alignment: .center)
+                .border(Color(.systemRed), width: 2)
+                .offset(x: pixelPosition.x, y: pixelPosition.y)
             Image(systemName: "pencil")
-                .renderingMode(Image.TemplateRenderingMode.template).foregroundColor(Color(.white)).border(Color(.systemBlue), width: 4)
-                .offset(x: position.x + 6, y: position.y + 6)
+                .renderingMode(Image.TemplateRenderingMode.template)
+                .foregroundColor(Color(.white))
+                .offset(x: position.x + 12, y: position.y)
         }
         .frame(maxWidth: length, alignment: .center)
         .gesture(drag)
