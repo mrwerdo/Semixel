@@ -95,6 +95,10 @@ struct PixelImage {
         }
     }
     
+    func isValid(_ point: Point2D) -> Bool {
+        return point.x >= 0 && point.x < size.width && point.y >= 0 && point.y < size.height
+    }
+    
     func floodSearch(at x: Int, y: Int, isIncluded: (_ point: Point2D, _ color: RGBA) -> Bool) -> [Point2D] {
         var unvisitedPoints: [Point2D] = [Point2D(x: x, y: y)]
         var points = unvisitedPoints
@@ -109,7 +113,7 @@ struct PixelImage {
         while let p = unvisitedPoints.popLast() {
             for dp in offsets {
                 let point = p + dp
-                if !points.contains(point) && isIncluded(point, self[point.x, point.y]) {
+                if isValid(point) && !points.contains(point) && isIncluded(point, self[point.x, point.y]) {
                     points.append(point)
                     unvisitedPoints.append(point)
                 }
