@@ -121,6 +121,40 @@ struct PixelImage {
             self[point.x, point.y] = newValue
         }
     }
+    
+    func drawLine(from p1: Point2D, to p2: Point2D, color: RGBA) -> PixelImage {
+        // move in the direction that is closest to the point
+        let offsets = [
+            (0, 1),
+            (0, -1),
+            (-1, 0),
+            (1, 0)
+        ].map(Point2D.init)
+        
+        var path: [Point2D] = [p1]
+        
+        var position = p1
+        
+        while position != p2 {
+            let nextMove = offsets.sorted { (a: Point2D, b: Point2D) -> Bool in
+                let d1: Int = (p2 - (a + position)).distanceFromOrigin
+                let d2: Int = (p2 - (b + position)).distanceFromOrigin
+                return d1 < d2
+            }.first!
+            
+            position  = position + nextMove
+            path.append(position)
+        }
+        
+        // Render path...
+        var img = self
+        
+        for point in path {
+            img[point] = color
+        }
+        
+        return img
+    }
 }
 
 class BufferView: UIView {

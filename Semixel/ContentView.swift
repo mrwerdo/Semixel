@@ -98,6 +98,7 @@ struct ContentView: View {
     @State var image: PixelImage = PixelImage(width: 32, height: 32)
     @State var position: CGPoint = .zero
     @State var depressed: Bool = false
+    @State var shapeStartPosition: Point2D? = nil
     
     @State var lastPosition: CGPoint = .zero
     
@@ -138,11 +139,30 @@ struct ContentView: View {
             })
     }
     
+    var composedImage: PixelImage {
+        if let p1 = shapeStartPosition {
+            // Render shape on top of the image.
+            guard let p2 = integerPosition else {
+                print("warning: could not get pencil position!")
+                return image
+            }
+            
+            guard let c = currentColor else {
+                print("warning: could not get current color")
+                return image
+            }
+            
+            // draw line in this case...
+            return image.drawLine(from: p1, to: p2, color: c)
+        } else {
+            return image
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .center) {
-            
             ZStack {
-                PixelBufferView(pixelSize: pixelSize, image: image)
+                PixelBufferView(pixelSize: pixelSize, image: composedImage)
                     .frame(maxWidth: size.width, maxHeight: size.height, alignment: .center)
                 PixelGridImage(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
                 Rectangle()
@@ -231,7 +251,7 @@ struct ContentView: View {
         case .brush:
             brush(p.x, p.y, c)
         case .shape:
-            circle(p.x, p.y, c)
+            drawShape(p.x, p.y, c)
         default:
             print("tool: \(tool), color: \(color)")
         }
@@ -251,7 +271,17 @@ struct ContentView: View {
     }
     
     func circle(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        shapeStartPosition = Point2D(x: x, y: y)
+    }
+    
+    func drawShape(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        guard let start = shapeStartPosition else {
+            return
+        }
         
+        image = image.drawLine(from: start, to: Point2D(x: x, y: y), color: color)
+        
+        shapeStartPosition = nil
     }
 }
 
