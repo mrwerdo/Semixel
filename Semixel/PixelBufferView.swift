@@ -10,47 +10,26 @@ import SwiftUI
 
 struct PixelBufferView: UIViewRepresentable {
     
+    var pixelSize: CGSize
     var image: PixelImage
-    
-    var origin: CGPoint {
-        didSet {
-            if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
-                print("Reverting origin from: \(origin), to old value: \(oldValue)")
-                origin = oldValue
-            }
-        }
+        
+    var size: CGSize {
+        return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
+                      height: CGFloat(image.size.height) * pixelSize.height)
     }
     
-    var scale: CGFloat {
-        didSet {
-            if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
-                print("Reverting origin from: \(scale), to old value: \(oldValue)")
-                scale = oldValue
-            }
-        }
-    }
-    
-    let size: (width: Int, height: Int)
-    
-    init(origin: CGPoint, scale: CGFloat, size: (width: Int, height: Int), image: PixelImage) {
-        if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
-            fatalError()
-        }
-        self.origin = origin
-        self.scale = scale
-        self.size = size
+    init(pixelSize: CGSize, image: PixelImage) {
+        self.pixelSize = pixelSize
         self.image = image
     }
     
     func updateUIView(_ view: BufferView, context: Context) {
-        view.viewport = (Point2D(x: Int(origin.x), y: Int(origin.y)), Size2D(width: Int(scale), height: Int(scale)))
-        view.img = image
+        view.image = image
+        view.pixelSize = pixelSize
     }
     
     func makeUIView(context: Context) -> BufferView {
-        let view = BufferView(image: image, frame: CGRect(x: 0, y: 0, width: 128, height: 128))
-        view.viewport = (Point2D(x: Int(origin.x), y: Int(origin.y)), Size2D(width: Int(scale), height: Int(scale)))
-        return view
+        return BufferView(image: image, pixelSize: pixelSize, frame: CGRect(origin: .zero, size: pixelSize))
     }
     
     func makeCoordinator() -> () {
@@ -146,27 +125,21 @@ struct PixelImage {
 
 class BufferView: UIView {
     
-    var img: PixelImage {
+    var pixelSize: CGSize {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    var viewport: (origin: Point2D, size: Size2D) {
+    var image: PixelImage {
         didSet {
-            if !(viewport.origin.x >= 0
-                    && viewport.origin.y >= 0
-                    && img.size.width >= viewport.origin.x + viewport.size.width
-                    && img.size.height >= viewport.origin.y + viewport.size.height) {
-                fatalError()
-            }
             setNeedsDisplay()
         }
     }
     
-    init(image: PixelImage, frame: CGRect) {
-        viewport = (.zero, image.size)
-        img = image
+    init(image: PixelImage, pixelSize: CGSize, frame: CGRect) {
+        self.image = image
+        self.pixelSize = pixelSize
         super.init(frame: frame)
     }
     
@@ -179,17 +152,14 @@ class BufferView: UIView {
             return
         }
         
-        let scale = CGSize(width: frame.size.width/CGFloat(viewport.size.width),
-                           height: frame.size.height/CGFloat(viewport.size.height))
-        
         // Draw the buffer in the context scaling to the desired size.
-        for y in 0..<viewport.size.height {
-            for x in 0..<viewport.size.width {
-                let rect = CGRect(x: scale.width * CGFloat(x),
-                                  y: scale.height * CGFloat(y),
-                                  width: scale.width,
-                                  height: scale.height)
-                let color = img.buffer[img.size.width * (viewport.origin.y + y) + (viewport.origin.x + x)]
+        for y in 0..<image.size.height {
+            for x in 0..<image.size.width {
+                let rect = CGRect(x: pixelSize.width * CGFloat(x),
+                                  y: pixelSize.height * CGFloat(y),
+                                  width: pixelSize.width,
+                                  height: pixelSize.height)
+                let color = image.buffer[image.size.width * y + x]
                 context.setFillColor(red: color.red,
                                      green: color.green,
                                      blue: color.blue,

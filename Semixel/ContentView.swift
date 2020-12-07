@@ -65,22 +65,24 @@ struct PixelGridImage: View {
 
 struct InteractiveImage: View {
     
-    @State var lastScaleFactor: CGFloat = 1.0
-    @State var scale: CGFloat
     @Binding var position: CGPoint
     @State var lastPosition: CGPoint = .zero
-    @Binding var image: PixelImage
+    var image: PixelImage
+    
+    var pixelSize: CGSize
+    
+    var size: CGSize {
+        return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
+                      height: CGFloat(image.size.height) * pixelSize.height)
+    }
     
     var dragStarted: (() -> ())?
     var dragCompleted: (() -> ())?
     
-    let size: (width: Int, height: Int)
-    
-    init(image: Binding<PixelImage>, position: Binding<CGPoint>, dragStarted: (() -> ())? = nil, dragCompleted: (() -> ())? = nil) {
+    init(image: PixelImage, position: Binding<CGPoint>, pixelSize: CGSize, dragStarted: (() -> ())? = nil, dragCompleted: (() -> ())? = nil) {
         _position = position
-        size = (image.wrappedValue.size.width, image.wrappedValue.size.height)
-        _scale = State(initialValue: CGFloat(min(size.width, size.height)))
-        _image = image
+        self.image = image
+        self.pixelSize = pixelSize
         self.dragStarted = dragStarted
         self.dragCompleted = dragCompleted
     }
@@ -101,48 +103,30 @@ struct InteractiveImage: View {
             })
     }
     
-    var zoom: some Gesture {
-        MagnificationGesture(minimumScaleDelta: 0.01)
-            .onChanged({ factor in
-                let delta = factor / self.lastScaleFactor
-                self.lastScaleFactor = factor
-                let scale = max(1.0, self.scale / delta)
-                
-                if Int(position.x) + Int(scale) <= size.width && Int(position.y) + Int(scale) < size.height && Int(position.x) >= 0 && Int(position.y) >= 0 {
-                    self.scale = scale
-                    print(self.position, scale, size)
-                }
-            })
-            .onEnded({ factor in
-                self.lastScaleFactor = 1.0
-            })
-    }
-    
-    private let length: CGFloat = 384
-    
     private var pixelPosition: CGPoint {
-        let x = round(position.x / 12)
-        let y = round(position.y / 12)
-        return CGPoint(x: x * 12 + 6, y: y * 12 + 6)
+        let x = round(position.x / pixelSize.width)
+        let y = round(position.y / pixelSize.height)
+        return CGPoint(x: (x + 0.5) * pixelSize.width, y: (y + 0.5) * pixelSize.height)
     }
     
     var body: some View {
         ZStack {
-            PixelBufferView(origin: .zero, scale: scale, size: size, image: image)
-                .frame(maxWidth: length, maxHeight: length, alignment: .center)
+            PixelBufferView(pixelSize: pixelSize, image: image)
+                .frame(maxWidth: size.width, maxHeight: size.height, alignment: .center)
+            PixelGridImage(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
             Rectangle()
                 .opacity(0.0)
-                .frame(width: 12, height: 12, alignment: .center)
+                .frame(width: pixelSize.width, height: pixelSize.height , alignment: .center)
                 .border(Color(.systemRed), width: 2)
                 .offset(x: pixelPosition.x, y: pixelPosition.y)
             Image(systemName: "pencil")
                 .renderingMode(Image.TemplateRenderingMode.template)
                 .foregroundColor(Color(.white))
-                .offset(x: position.x + 12, y: position.y)
+                .offset(x: position.x + pixelSize.width, y: position.y)
         }
-        .frame(maxWidth: length, maxHeight: length, alignment: .center)
+        .frame(maxWidth: size.width, maxHeight: size.height, alignment: .center)
         .gesture(drag)
-        .mask(Rectangle().frame(width: length, height: length, alignment: .center))
+        .mask(Rectangle().frame(width: size.width, height: size.height, alignment: .center))
         .padding(2)
         .border(Color(.secondarySystemBackground), width: 2)
     }
@@ -192,15 +176,19 @@ struct ContentView: View {
     
     func onDrag() {
         if depressed {
-            if tool == .pencil, let p = integerPosition, let c = currentColor {
+            if tool == .pencil, let p = pixelPosition, let c = currentColor {
                 pencil(p.x, p.y, c)
             }
         }
     }
     
+    var pixelSize: CGSize {
+        return CGSize(width: 12, height: 12)
+    }
+    
     var body: some View {
         VStack(alignment: .center) {
-            InteractiveImage(image: $image, position: $position, dragStarted: onDrag)
+            InteractiveImage(image: image, position: $position, pixelSize: pixelSize, dragStarted: onDrag)
             Tools(tool: $tool)
             HStack(spacing: 8) {
                 ColorTab(tag: 1, color: Color(.systemBlue), selected: selected)
@@ -233,10 +221,9 @@ struct ContentView: View {
         return PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
     }
     
-    var integerPosition: Point2D? {
-        let scale = CGFloat(384 / 32.0)
-        let x = Int(round(position.x / scale)) + image.size.width/2
-        let y = Int(round(position.y / scale)) + image.size.height/2
+    var pixelPosition: Point2D? {
+        let x = Int(round(position.x / pixelSize.width)) + image.size.width/2
+        let y = Int(round(position.y / pixelSize.height)) + image.size.height/2
         
         if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
             return nil
@@ -246,7 +233,7 @@ struct ContentView: View {
     }
     
     func lift() {
-        guard let p = integerPosition, let c = currentColor else {
+        guard let p = pixelPosition, let c = currentColor else {
             return
         }
         
@@ -256,7 +243,7 @@ struct ContentView: View {
     }
     
     func push() {
-        guard let p = integerPosition, let c = currentColor else {
+        guard let p = pixelPosition, let c = currentColor else {
             return
         }
         
