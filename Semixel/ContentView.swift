@@ -153,7 +153,8 @@ struct ContentView: View {
             }
             
             // draw line in this case...
-            return image.drawLine(from: p1, to: p2, color: c)
+            return image.drawEllipse(from: p1, to: p2, color: c)
+//            return image.drawLine(from: p1, to: p2, color: c)
         } else {
             return image
         }
@@ -279,7 +280,7 @@ struct ContentView: View {
             return
         }
         
-        image = image.drawLine(from: start, to: Point2D(x: x, y: y), color: color)
+        image = image.drawEllipse(from: start, to: Point2D(x: x, y: y), color: color)
         
         shapeStartPosition = nil
     }

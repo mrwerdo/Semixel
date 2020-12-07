@@ -121,7 +121,86 @@ struct PixelImage {
             self[point.x, point.y] = newValue
         }
     }
-    
+}
+
+extension PixelImage {
+    func drawEllipse(from p0: Point2D, to p1: Point2D, color: RGBA) -> PixelImage {
+        
+        var points: [Point2D] = []
+        
+        func setPixel(_ x: Int, _ y: Int) {
+            points.append(Point2D(x: x, y: y))
+        }
+        
+        var a = abs(p1.x - p0.x)
+        let b = abs(p1.y - p0.y)
+        var b1 = b & 1
+        var dx = Double(4 * (1 - a) * b * b)
+        var dy = Double(4 * (b1 + 1) * a * a)
+        var err = dx + dy + Double(b1 * a * a)
+        var e2: Double = 0.0
+        
+        var x0 = p0.x
+        var y0 = p0.y
+        var x1 = p1.x
+        var y1 = p1.y
+        
+        if (x0 > x1) {
+            x0 = x1
+            x1 += a
+        }
+        
+        if (y0 > y1) {
+            y0 = y1
+        }
+        
+        y0 += (b + 1)/2
+        y1 = y0 - b1
+        
+        a = 8*a*a
+        b1 = 8*b*b
+        
+        repeat {
+            setPixel(x1, y0)
+            setPixel(x0, y0)
+            setPixel(x0, y1)
+            setPixel(x1, y1)
+            e2 = 2*err
+            if (e2 <= dy) {
+                y0 += 1
+                y1 -= 1
+                dy += Double(a)
+                err += dy
+            }
+            
+            if (e2 >= dx || 2 * err > dy) {
+                x0 += 1
+                x1 -= 1
+                dx += Double(b1)
+                err += dx
+            }
+        } while (x0 <= x1)
+        
+        while (y0 - y1 <= b) {
+            setPixel(x0 - 1, y0)
+            setPixel(x1 + 1, y0)
+            y0 += 1
+            setPixel(x0 - 1, y1)
+            setPixel(x1 + 1, y1)
+            y1 -= 1
+        }
+        
+        var img = self
+        
+        for point in points {
+            img[point] = color
+        }
+        
+        return img
+    }
+}
+
+extension PixelImage {
     func drawLine(from p1: Point2D, to p2: Point2D, color: RGBA) -> PixelImage {
         // See the algorithm here: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
