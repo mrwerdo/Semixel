@@ -129,8 +129,11 @@ struct ContentView: View {
             .onChanged({ event in
                 let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
                 self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
-
-                let newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
+                var newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
+                
+                newPosition.x = max(-size.width/2, min(newPosition.x, size.width/2 - 12))
+                newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - 12))
+                
                 self.position = newPosition
                 onDrag()
             })
