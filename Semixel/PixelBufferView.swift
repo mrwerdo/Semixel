@@ -55,23 +55,6 @@ struct PixelImage {
     init(width: Int, height: Int) {
         buffer = [RGBA](repeating: .white, count: width * height)
         size = Size2D(width: width, height: height)
-        
-        for y in 0..<size.height {
-            for x in 0..<size.width {
-                
-                let index = y * size.width + x
-                var color = RGBA(red: 0, green: 0, blue: 0, alpha: 1)
-                if index % 3 == 0 {
-                    color.red = 1
-                } else if index % 3 == 1 {
-                    color.green = 1
-                } else if index % 3 == 2 {
-                    color.blue = 1
-                }
-                
-                buffer[index] = color
-            }
-        }
     }
     
     func isValid(_ point: Point2D) -> Bool {
