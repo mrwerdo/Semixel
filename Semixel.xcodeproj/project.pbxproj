@@ -16,6 +16,7 @@
 		86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BDF25565AB600DC7D55 /* Coordinates.swift */; };
 		86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BE025565AB600DC7D55 /* Geometry.swift */; };
 		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
+		86D15339257DAAC400A23127 /* ToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D15338257DAAC400A23127 /* ToolsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		86B90BDF25565AB600DC7D55 /* Coordinates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coordinates.swift; sourceTree = "<group>"; };
 		86B90BE025565AB600DC7D55 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
+		86D15338257DAAC400A23127 /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */,
 				86B90BDF25565AB600DC7D55 /* Coordinates.swift */,
 				86B90BE025565AB600DC7D55 /* Geometry.swift */,
+				86D15338257DAAC400A23127 /* ToolsView.swift */,
 			);
 			path = Semixel;
 			sourceTree = "<group>";
@@ -170,6 +173,7 @@
 				864E74D724B714B20000A1AB /* SceneDelegate.swift in Sources */,
 				864E74D924B714B20000A1AB /* ContentView.swift in Sources */,
 				86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */,
+				86D15339257DAAC400A23127 /* ToolsView.swift in Sources */,
 				86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
