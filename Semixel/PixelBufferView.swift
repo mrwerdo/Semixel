@@ -126,6 +126,8 @@ struct PixelImage {
 extension PixelImage {
     func drawEllipse(from p0: Point2D, to p1: Point2D, color: RGBA) -> PixelImage {
         
+        // Source: http://members.chello.at/~easyfilter/Bresenham.pdf
+        
         var points: [Point2D] = []
         
         func setPixel(_ x: Int, _ y: Int) {
