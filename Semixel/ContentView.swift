@@ -99,6 +99,8 @@ struct ContentView: View {
     @State var position: CGPoint = .zero
     @State var depressed: Bool = false
     @State var shapeStartPosition: Point2D? = nil
+    @State var shapeEndPosition: Point2D? = nil
+    @State var translation: CGPoint = .zero
     
     @State var lastPosition: CGPoint = .zero
     
@@ -107,6 +109,29 @@ struct ContentView: View {
     }
     
     
+    var adjustedShapeEndPosition: Point2D? {
+        guard let p1 = shapeStartPosition, let p2 = integerPosition else {
+            return nil
+        }
+        
+        let dx: Int
+        let dy: Int
+        
+        if p2.x >= p1.x {
+            dx = 1
+        } else {
+            dx = 0
+        }
+        
+        if p2.y >= p1.y {
+            dy = 1
+        } else {
+            dy = 0
+        }
+        
+        return Point2D(x: p2.x + dx, y: p2.y + dy)
+    }
+    
     var size: CGSize {
         return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
                       height: CGFloat(image.size.height) * pixelSize.height)
@@ -114,8 +139,15 @@ struct ContentView: View {
     
     func onDrag() {
         if depressed {
-            if tool == .pencil, let p = integerPosition, let c = currentColor {
+            guard let p = integerPosition, let c = currentColor else {
+                return
+            }
+            
+            switch tool {
+            case .pencil:
                 pencil(p.x, p.y, c)
+            default:
+                break
             }
         }
     }
@@ -135,6 +167,8 @@ struct ContentView: View {
                 newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - 12))
                 
                 self.position = newPosition
+                translation.x += delta.x
+                translation.y += delta.y
                 onDrag()
             })
             .onEnded({ delta in
@@ -143,7 +177,7 @@ struct ContentView: View {
     }
     
     var composedImage: PixelImage {
-        if let p1 = shapeStartPosition {
+        if let p1 = shapeStartPosition, tool == .shape {
             // Render shape on top of the image.
             guard let p2 = integerPosition else {
                 print("warning: could not get pencil position!")
@@ -163,12 +197,35 @@ struct ContentView: View {
         }
     }
     
+    func selectionView(p1: Point2D, p2: Point2D, offset: Point2D) -> some View {
+        
+        let x = CGFloat(p1.x + p2.x - image.size.width + 2 * offset.x)/2 * pixelSize.width
+        let y = CGFloat(p1.y + p2.y - image.size.height + 2 * offset.y)/2 * pixelSize.height
+        
+        return Rectangle()
+            .opacity(0.0)
+            .frame(width: CGFloat(abs(p2.x - p1.x)) * pixelSize.width, height: CGFloat(abs(p2.y - p1.y)) * pixelSize.height, alignment: .center)
+            .padding(2)
+            .border(Color(.gray), width: 2)
+            .offset(x: x, y: y)
+    }
+    
     var body: some View {
         VStack(alignment: .center) {
             ZStack {
                 PixelBufferView(pixelSize: pixelSize, image: composedImage)
                     .frame(maxWidth: size.width, maxHeight: size.height, alignment: .center)
                 PixelGridImage(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
+                
+                
+                if let p1 = shapeStartPosition {
+                    if let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
+                        selectionView(p1: p1, p2: p2, offset: Point2D(x: p3.x - image.size.width/2, y: p3.y - image.size.height/2))
+                    } else if let p2 = adjustedShapeEndPosition {
+                        selectionView(p1: p1, p2: p2, offset: .zero)
+                    }
+                }
+                
                 Rectangle()
                     .opacity(0.0)
                     .frame(width: pixelSize.width, height: pixelSize.height , alignment: .center)
@@ -234,6 +291,17 @@ struct ContentView: View {
         return Point2D(x: x, y: y)
     }
     
+    func convertToInteger(_ p: CGPoint) -> Point2D? {
+        let x = Int(round(p.x / pixelSize.width)) + image.size.width/2
+        let y = Int(round(p.y / pixelSize.height)) + image.size.height/2
+        
+//        if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
+//            return nil
+//        }
+        
+        return Point2D(x: x, y: y)
+    }
+    
     func lift() {
         guard let p = integerPosition, let c = currentColor else {
             return
@@ -241,6 +309,8 @@ struct ContentView: View {
         
         if tool == .shape {
             circle(p.x, p.y, c)
+        } else if tool == .selection {
+            startSelection(p.x, p.y, c)
         }
     }
     
@@ -256,6 +326,8 @@ struct ContentView: View {
             brush(p.x, p.y, c)
         case .shape:
             drawShape(p.x, p.y, c)
+        case .selection:
+            endSelection(p.x, p.y, c)
         default:
             print("tool: \(tool), color: \(color)")
         }
@@ -286,6 +358,22 @@ struct ContentView: View {
         image = image.drawEllipse(from: start, to: Point2D(x: x, y: y), color: color)
         
         shapeStartPosition = nil
+    }
+    
+    func startSelection(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        if shapeStartPosition == nil {
+            shapeStartPosition = Point2D(x: x, y: y)
+        }
+    }
+    
+    func endSelection(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        if shapeEndPosition != nil {
+            shapeEndPosition = nil
+            shapeStartPosition = nil
+        } else {
+            translation = .zero
+            shapeEndPosition = adjustedShapeEndPosition
+        }
     }
 }
 

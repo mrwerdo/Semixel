@@ -53,6 +53,7 @@ struct Tools: View {
         case pencil
         case brush
         case shape
+        case selection
         case none
     }
     
@@ -74,7 +75,7 @@ struct Tools: View {
                 ToolButton($tool, .none, image: "square.on.circle")
             }
             HStack {
-                ToolButton($tool, .none, image: "selection.pin.in.out")
+                ToolButton($tool, .selection, image: "selection.pin.in.out")
                 ToolButton($tool, .none, image: "magnifyingglass")
                 ToolButton($tool, .none, image: "arrow.uturn.left")
                 ToolButton($tool, .none, image: "arrow.uturn.right")
