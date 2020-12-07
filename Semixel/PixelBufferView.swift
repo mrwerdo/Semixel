@@ -123,27 +123,58 @@ struct PixelImage {
     }
     
     func drawLine(from p1: Point2D, to p2: Point2D, color: RGBA) -> PixelImage {
-        // move in the direction that is closest to the point
-        let offsets = [
-            (0, 1),
-            (0, -1),
-            (-1, 0),
-            (1, 0)
-        ].map(Point2D.init)
-        
+        // See the algorithm here: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
         var path: [Point2D] = [p1]
         
-        var position = p1
-        
-        while position != p2 {
-            let nextMove = offsets.sorted { (a: Point2D, b: Point2D) -> Bool in
-                let d1: Int = (p2 - (a + position)).distanceFromOrigin
-                let d2: Int = (p2 - (b + position)).distanceFromOrigin
-                return d1 < d2
-            }.first!
+        func plotLineLow(a: Point2D, b: Point2D) {
+            let dx = b.x - a.x
+            let dy = abs(b.y - a.y)
+            let yi = b.y - a.y < 0 ? -1 : 1
+            var D = 2 * dy - dx
             
-            position  = position + nextMove
-            path.append(position)
+            var y = a.y
+            for x in a.x...b.x {
+                path.append(Point2D(x: x, y: y))
+                if D > 0 {
+                    y += yi
+                    D += 2 * (dy - dx)
+                } else {
+                    D += 2 * dy
+                }
+            }
+        }
+        
+        func plotLineHigh(a: Point2D, b: Point2D) {
+            let dx = abs(b.x - a.x)
+            let dy = b.y - a.y
+            let xi = b.x - a.x < 0 ? -1 : 1
+            var D = 2 * dx - dy
+            
+            var x = a.x
+            for y in a.y...b.y {
+                path.append(Point2D(x: x, y: y))
+                if D > 0 {
+                    x += xi
+                    D += 2 * (dx - dy)
+                } else {
+                    D += 2 * dx
+                }
+            }
+        }
+        
+        if abs(p2.y - p1.y) < abs(p2.x - p1.x) {
+            if p1.x > p2.x {
+                plotLineLow(a: p2, b: p1)
+            } else {
+                plotLineLow(a: p1, b: p2)
+            }
+        } else {
+            if p1.y > p2.y {
+                plotLineHigh(a: p2, b: p1)
+            } else {
+                plotLineHigh(a: p1, b: p2)
+            }
         }
         
         // Render path...
