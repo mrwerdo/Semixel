@@ -202,7 +202,7 @@ struct InteractiveImage: View {
     
     var body: some View {
         ZStack {
-            PixelBufferView(origin: .zero, scale: scale, size: size, image: $image)
+            PixelBufferView(origin: .zero, scale: scale, size: size, image: image)
                 .frame(maxWidth: length, maxHeight: length, alignment: .center)
             Rectangle()
                 .opacity(0.0)
@@ -214,7 +214,7 @@ struct InteractiveImage: View {
                 .foregroundColor(Color(.white))
                 .offset(x: position.x + 12, y: position.y)
         }
-        .frame(maxWidth: length, alignment: .center)
+        .frame(maxWidth: length, maxHeight: length, alignment: .center)
         .gesture(drag)
         .mask(Rectangle().frame(width: length, height: length, alignment: .center))
         .padding(2)
@@ -226,6 +226,7 @@ struct TouchDownButton<Label: View>: View {
     
     @Binding var state: Bool
     var label: () -> Label
+    var started: (() -> ())?
     var ended: (() -> ())?
     
     var touchDownGesture: some Gesture {
@@ -233,6 +234,7 @@ struct TouchDownButton<Label: View>: View {
         let touchDown = LongPressGesture(minimumDuration: 0)
             .onEnded { _ in
                 state = true
+                started?()
             }
         
         let touchEnded = DragGesture(minimumDistance: 0)
@@ -264,7 +266,9 @@ struct ContentView: View {
     
     func onDrag() {
         if depressed {
-            push()
+            if tool == .pencil, let p = integerPosition, let c = currentColor {
+                pencil(p.x, p.y, c)
+            }
         }
     }
     
@@ -286,34 +290,57 @@ struct ContentView: View {
                         .frame(width: 200, height: 100, alignment: .center)
                     Text("Push").font(.largeTitle)
                 }
+            } started: {
+                lift()
             } ended: {
                 push()
             }
         }
     }
     
-    func push() {
+    var currentColor: PixelImage.RGBA? {
+        var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else {
+            print("warning: could not get rgb components from the selected color!")
+            return nil
+        }
+        return PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
+    }
+    
+    var integerPosition: Point2D? {
         let scale = CGFloat(384 / 32.0)
         let x = Int(round(position.x / scale)) + image.size.width/2
         let y = Int(round(position.y / scale)) + image.size.height/2
-        var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
         
         if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
+            return nil
+        }
+        
+        return Point2D(x: x, y: y)
+    }
+    
+    func lift() {
+        guard let p = integerPosition, let c = currentColor else {
             return
         }
         
-        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else {
-            print("warning: could not get rgb components from the selected color!")
+        if tool == .shape {
+            circle(p.x, p.y, c)
+        }
+    }
+    
+    func push() {
+        guard let p = integerPosition, let c = currentColor else {
             return
         }
         
-        let c = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
-
         switch tool {
         case .pencil:
-            pencil(x, y, c)
+            pencil(p.x, p.y, c)
         case .brush:
-            brush(x, y, c)
+            brush(p.x, p.y, c)
+        case .shape:
+            circle(p.x, p.y, c)
         default:
             print("tool: \(tool), color: \(color)")
         }
@@ -330,6 +357,10 @@ struct ContentView: View {
         for point in points {
             image[point] = color
         }
+    }
+    
+    func circle(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+        
     }
 }
 

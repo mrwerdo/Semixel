@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PixelBufferView: UIViewRepresentable {
     
-    @Binding var image: PixelImage
+    var image: PixelImage
     
     var origin: CGPoint {
         didSet {
@@ -32,14 +32,14 @@ struct PixelBufferView: UIViewRepresentable {
     
     let size: (width: Int, height: Int)
     
-    init(origin: CGPoint, scale: CGFloat, size: (width: Int, height: Int), image: Binding<PixelImage>) {
+    init(origin: CGPoint, scale: CGFloat, size: (width: Int, height: Int), image: PixelImage) {
         if !(Int(origin.x) + Int(scale) <= size.width && Int(origin.y) + Int(scale) <= size.height) {
             fatalError()
         }
         self.origin = origin
         self.scale = scale
         self.size = size
-        self._image = image
+        self.image = image
     }
     
     func updateUIView(_ view: BufferView, context: Context) {
