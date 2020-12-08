@@ -127,14 +127,14 @@ extension PixelImage {
         
         var img = self
         
-        for y in a.y..<b.y {
-            for x in a.x..<b.x {
+        for y in a.y...b.y {
+            for x in a.x...b.x {
                 img[x, y] = .white
             }
         }
         
-        for y in a.y..<b.y {
-            for x in a.x..<b.x {
+        for y in a.y...b.y {
+            for x in a.x...b.x {
                 img[x + offset.x, y + offset.y] = self[x, y]
             }
         }

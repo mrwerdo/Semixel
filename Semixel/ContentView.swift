@@ -112,29 +112,6 @@ struct ContentView: View {
         return CGSize(width: 12, height: 12)
     }
 
-    var adjustedShapeEndPosition: Point2D? {
-        guard let p1 = shapeStartPosition, let p2 = pencilGridPosition else {
-            return nil
-        }
-        
-        let dx: Int
-        let dy: Int
-        
-        if p2.x >= p1.x {
-            dx = 1
-        } else {
-            dx = 0
-        }
-        
-        if p2.y >= p1.y {
-            dy = 1
-        } else {
-            dy = 0
-        }
-        
-        return Point2D(x: p2.x + dx, y: p2.y + dy)
-    }
-
     var drag: some Gesture {
         DragGesture()
             .onChanged({ event in
@@ -190,7 +167,7 @@ struct ContentView: View {
                 if let p1 = shapeStartPosition {
                     if let p2 = shapeEndPosition {
                         selectionView(p1: p1, p2: p2, offset: convertToInteger(translation))
-                    } else if let p2 = adjustedShapeEndPosition {
+                    } else if let p2 = pencilGridPosition {
                         selectionView(p1: p1, p2: p2, offset: .zero)
                     }
                 }
@@ -246,7 +223,9 @@ struct ContentView: View {
         return p
     }
     
-    func selectionView(p1: Point2D, p2: Point2D, offset: Point2D) -> some View {
+    func selectionView(p1 a: Point2D, p2 b: Point2D, offset: Point2D) -> some View {
+        let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
+        let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
         
         let x = CGFloat(p1.x + p2.x - image.size.width + 2 * offset.x)/2 * pixelSize.width
         let y = CGFloat(p1.y + p2.y - image.size.height + 2 * offset.y)/2 * pixelSize.height
@@ -346,7 +325,7 @@ struct ContentView: View {
             shapeStartPosition = nil
         } else {
             translation = .zero
-            shapeEndPosition = adjustedShapeEndPosition
+            shapeEndPosition = pencilGridPosition
             let p = convertToInteger(position)
             position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
         }
