@@ -123,8 +123,7 @@ struct ContentView: View {
                 newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - 12))
                 
                 self.position = newPosition
-                translation.x += delta.x
-                translation.y += delta.y
+                updateTranslation(delta)
                 onDrag()
             })
             .onEnded({ delta in
@@ -223,6 +222,27 @@ struct ContentView: View {
         return p
     }
     
+    func updateTranslation(_ delta: CGPoint) {
+        // Update `translation` ensuring that the selection rectangle defined by
+        // `shapeStartPosition` and `shapeEndPosition` do not go outside of the bounds of the image.
+        // Translation is measured in terms of pixels (i.e. CGFloats) while the image is measured
+        // in terms of points (i.e. Ints)
+        
+        guard let a = shapeStartPosition, let b = shapeEndPosition else {
+            return
+        }
+        
+        let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
+        let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
+        
+        translation.x = max(CGFloat(-p1.x) * pixelSize.width,
+                            min(translation.x + delta.x,
+                                CGFloat(image.size.width - p2.x) * pixelSize.width))
+        translation.y = max(CGFloat(-p1.y) * pixelSize.height,
+                            min(translation.y + delta.y,
+                                CGFloat(image.size.height - p2.y) * pixelSize.height))
+    }
+    
     func selectionView(p1 a: Point2D, p2 b: Point2D, offset: Point2D) -> some View {
         let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
         let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
@@ -236,7 +256,6 @@ struct ContentView: View {
         return Rectangle()
             .opacity(0.0)
             .frame(width: w, height: h, alignment: .center)
-            .padding(2)
             .border(Color(.gray), width: 2)
             .offset(x: x, y: y)
     }
