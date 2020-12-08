@@ -145,7 +145,7 @@ struct ContentView: View {
             
             switch tool {
             case .pencil:
-                pencil(p.x, p.y, c)
+                pencil(p, c)
             default:
                 break
             }
@@ -192,9 +192,9 @@ struct ContentView: View {
             // draw line in this case...
             return image.drawEllipse(from: p1, to: p2, color: c)
 //            return image.drawLine(from: p1, to: p2, color: c)
-        } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
+        } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
-            return image.moveRectangle(between: p1, and: p2, by: p3 - Point2D(x: image.size.width, y: image.size.height)/2)
+            return image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation) - Point2D(x: image.size.width, y: image.size.height)/2)
         } else {
             return image
         }
@@ -284,17 +284,16 @@ struct ContentView: View {
     }
     
     var integerPosition: Point2D? {
-        let x = Int(round(position.x / pixelSize.width)) + image.size.width/2
-        let y = Int(round(position.y / pixelSize.height)) + image.size.height/2
+        let p = convertToInteger(position)
         
-        if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
+        if p.x < 0 || p.y < 0 || p.x >= image.size.width || p.y >= image.size.height {
             return nil
         }
         
-        return Point2D(x: x, y: y)
+        return p
     }
     
-    func convertToInteger(_ p: CGPoint) -> Point2D? {
+    func convertToInteger(_ p: CGPoint) -> Point2D {
         let x = Int(round(p.x / pixelSize.width)) + image.size.width/2
         let y = Int(round(p.y / pixelSize.height)) + image.size.height/2
         return Point2D(x: x, y: y)
@@ -306,9 +305,9 @@ struct ContentView: View {
         }
         
         if tool == .shape {
-            circle(p.x, p.y, c)
+            circle(p, c)
         } else if tool == .selection {
-            startSelection(p.x, p.y, c)
+            startSelection(p, c)
         }
     }
     
@@ -319,55 +318,55 @@ struct ContentView: View {
         
         switch tool {
         case .pencil:
-            pencil(p.x, p.y, c)
+            pencil(p, c)
         case .brush:
-            brush(p.x, p.y, c)
+            brush(p, c)
         case .shape:
-            drawShape(p.x, p.y, c)
+            drawShape(p, c)
         case .selection:
-            endSelection(p.x, p.y, c)
+            endSelection(p, c)
         default:
             print("tool: \(tool), color: \(color)")
         }
     }
     
-    func pencil(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
-        image[x, y] = color
+    func pencil(_ p: Point2D, _ color: PixelImage.RGBA) {
+        image[p] = color
     }
     
-    func brush(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+    func brush(_ p: Point2D, _ color: PixelImage.RGBA) {
         // actually works like a paint bucket, but who cares...
-        let oldColor = image[x, y]
-        let points = image.floodSearch(at: x, y: y) { (_, c) -> Bool in c == oldColor }
+        let oldColor = image[p]
+        let points = image.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
         for point in points {
             image[point] = color
         }
     }
     
-    func circle(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
-        shapeStartPosition = Point2D(x: x, y: y)
+    func circle(_ point: Point2D, _ color: PixelImage.RGBA) {
+        shapeStartPosition = point
     }
     
-    func drawShape(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+    func drawShape(_ point: Point2D, _ color: PixelImage.RGBA) {
         guard let start = shapeStartPosition else {
             return
         }
         
-        image = image.drawEllipse(from: start, to: Point2D(x: x, y: y), color: color)
+        image = image.drawEllipse(from: start, to: point, color: color)
         
         shapeStartPosition = nil
     }
     
-    func startSelection(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+    func startSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
         if shapeStartPosition == nil {
-            shapeStartPosition = Point2D(x: x, y: y)
+            shapeStartPosition = point
         }
     }
     
-    func endSelection(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
+    func endSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
         if shapeEndPosition != nil {
-            if let p1 = shapeStartPosition, let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
-                image = image.moveRectangle(between: p1, and: p2, by: p3 - Point2D(x: image.size.width, y: image.size.height)/2)
+            if let p1 = shapeStartPosition, let p2 = shapeEndPosition {
+                image = image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation) - Point2D(x: image.size.width, y: image.size.height)/2)
             }
             shapeEndPosition = nil
             shapeStartPosition = nil

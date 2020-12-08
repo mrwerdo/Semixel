@@ -61,8 +61,8 @@ struct PixelImage {
         return point.x >= 0 && point.x < size.width && point.y >= 0 && point.y < size.height
     }
     
-    func floodSearch(at x: Int, y: Int, isIncluded: (_ point: Point2D, _ color: RGBA) -> Bool) -> [Point2D] {
-        var unvisitedPoints: [Point2D] = [Point2D(x: x, y: y)]
+    func floodSearch(at point: Point2D, isIncluded: (_ point: Point2D, _ color: RGBA) -> Bool) -> [Point2D] {
+        var unvisitedPoints: [Point2D] = [point]
         var points = unvisitedPoints
         
         let offsets = [
