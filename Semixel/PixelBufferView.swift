@@ -107,6 +107,29 @@ struct PixelImage {
 }
 
 extension PixelImage {
+    func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D) -> PixelImage {
+        let a = Point2D(x: min(p1.x, p2.x), y: min(p1.y, p2.y))
+        let b = Point2D(x: max(p1.x, p2.x), y: max(p1.y, p2.y))
+        
+        var img = self
+        
+        for y in a.y...b.y {
+            for x in a.x...b.x {
+                img[x, y] = .white
+            }
+        }
+        
+        for y in a.y...b.y {
+            for x in a.x...b.x {
+                img[x + offset.x, y + offset.y] = self[x, y]
+            }
+        }
+        
+        return img
+    }
+}
+
+extension PixelImage {
     func drawEllipse(from p0: Point2D, to p1: Point2D, color: RGBA) -> PixelImage {
         
         // Source: http://members.chello.at/~easyfilter/Bresenham.pdf

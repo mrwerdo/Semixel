@@ -192,6 +192,9 @@ struct ContentView: View {
             // draw line in this case...
             return image.drawEllipse(from: p1, to: p2, color: c)
 //            return image.drawLine(from: p1, to: p2, color: c)
+        } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
+            // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
+            return image.moveRectangle(between: p1, and: p2, by: p3 - Point2D(x: image.size.width, y: image.size.height)/2)
         } else {
             return image
         }
@@ -294,11 +297,6 @@ struct ContentView: View {
     func convertToInteger(_ p: CGPoint) -> Point2D? {
         let x = Int(round(p.x / pixelSize.width)) + image.size.width/2
         let y = Int(round(p.y / pixelSize.height)) + image.size.height/2
-        
-//        if x < 0 || y < 0 || x >= image.size.width || y >= image.size.height {
-//            return nil
-//        }
-        
         return Point2D(x: x, y: y)
     }
     
@@ -368,8 +366,12 @@ struct ContentView: View {
     
     func endSelection(_ x: Int, _ y: Int, _ color: PixelImage.RGBA) {
         if shapeEndPosition != nil {
+            if let p1 = shapeStartPosition, let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
+                image = image.moveRectangle(between: p1, and: p2, by: p3 - Point2D(x: image.size.width, y: image.size.height)/2)
+            }
             shapeEndPosition = nil
             shapeStartPosition = nil
+            
         } else {
             translation = .zero
             shapeEndPosition = adjustedShapeEndPosition
