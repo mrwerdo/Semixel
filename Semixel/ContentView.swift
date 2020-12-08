@@ -187,7 +187,12 @@ struct ContentView: View {
             .padding(2)
             .border(Color(.secondarySystemBackground), width: 2)
             
-            Tools(tool: $tool)
+            Tools(tool: $tool) { button in
+                if button.object != tool {
+                    reset()
+                }
+            }
+            
             HStack(spacing: 8) {
                 ColorTab(tag: 1, color: Color(.systemBlue), selected: selected)
                 ColorTab(tag: 2, color: Color(.systemGreen), selected: selected)
@@ -220,6 +225,12 @@ struct ContentView: View {
         }
         
         return p
+    }
+    
+    func reset() {
+        shapeStartPosition = nil
+        shapeEndPosition = nil
+        translation = .zero
     }
     
     func updateTranslation(_ delta: CGPoint) {
@@ -342,7 +353,7 @@ struct ContentView: View {
             }
             shapeEndPosition = nil
             shapeStartPosition = nil
-        } else {
+        } else if shapeStartPosition != nil {
             translation = .zero
             shapeEndPosition = pencilGridPosition
             let p = convertToInteger(position)

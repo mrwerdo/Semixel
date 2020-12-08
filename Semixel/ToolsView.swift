@@ -12,6 +12,7 @@ import SwiftUI
 struct BigButton<T>: View where T: Equatable {
     
     
+    var action: ((BigButton<T>) -> ())?
     @Binding var state: T
     var object: T
     var image: String
@@ -20,7 +21,8 @@ struct BigButton<T>: View where T: Equatable {
         return state == object
     }
     
-    init(_ state: Binding<T>, _ object: T, image: String) {
+    init(_ action: ((BigButton<T>) -> ())?, _ state: Binding<T>, _ object: T, image: String) {
+        self.action = action
         self.object = object
         self.image = image
         _state = state
@@ -36,6 +38,7 @@ struct BigButton<T>: View where T: Equatable {
     
     var body: some View {
         Button(action: {
+            action?(self)
             state = object
         }) {
             ZStack(alignment: .center) {
@@ -59,27 +62,25 @@ struct Tools: View {
     
     @Binding var tool: ToolType
     
-    func selected(_ tool: ToolType) {
-        self.tool = tool
-    }
+    var selected: ((ToolButton) -> ())?
     
     typealias ToolButton = BigButton<ToolType>
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                ToolButton($tool, .pencil, image: "pencil.tip")
-                ToolButton($tool, .brush, image: "paintbrush")
-                ToolButton($tool, .shape, image: "circle")
-                ToolButton($tool, .none, image: "minus")
-                ToolButton($tool, .none, image: "square.on.circle")
+                ToolButton(selected, $tool, .pencil, image: "pencil.tip")
+                ToolButton(selected, $tool, .brush, image: "paintbrush")
+                ToolButton(selected, $tool, .shape, image: "circle")
+                ToolButton(selected, $tool, .none, image: "minus")
+                ToolButton(selected, $tool, .none, image: "square.on.circle")
             }
             HStack {
-                ToolButton($tool, .selection, image: "selection.pin.in.out")
-                ToolButton($tool, .none, image: "magnifyingglass")
-                ToolButton($tool, .none, image: "arrow.uturn.left")
-                ToolButton($tool, .none, image: "arrow.uturn.right")
-                ToolButton($tool, .none, image: "rotate.left")
+                ToolButton(selected, $tool, .selection, image: "selection.pin.in.out")
+                ToolButton(selected, $tool, .none, image: "magnifyingglass")
+                ToolButton(selected, $tool, .none, image: "arrow.uturn.left")
+                ToolButton(selected, $tool, .none, image: "arrow.uturn.right")
+                ToolButton(selected, $tool, .none, image: "rotate.left")
             }
         }
     }
