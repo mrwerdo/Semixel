@@ -47,6 +47,20 @@ struct PixelImage {
         static var white: RGBA {
             return RGBA(red: 1, green: 1, blue: 1, alpha: 1)
         }
+        
+        init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+            self.red = red
+            self.green = green
+            self.blue = blue
+            self.alpha = alpha
+        }
+        
+        init?(_ color: Color) {
+            red = 0; green = 0; blue = 0; alpha = 0
+            guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+                return nil
+            }
+        }
     }
     
     var buffer: [RGBA]

@@ -64,9 +64,9 @@ struct PixelGridImage: View {
 struct TouchDownButton<Label: View>: View {
     
     @Binding var state: Bool
-    var label: () -> Label
     var started: (() -> ())?
     var ended: (() -> ())?
+    var label: () -> Label
     
     var touchDownGesture: some Gesture {
         
@@ -101,16 +101,19 @@ struct ContentView: View {
     @State var shapeStartPosition: Point2D? = nil
     @State var shapeEndPosition: Point2D? = nil
     @State var translation: CGPoint = .zero
-    
     @State var lastPosition: CGPoint = .zero
     
-    func selected(_ colortab: ColorTab) {
-        color = colortab.color
+    var size: CGSize {
+        return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
+                      height: CGFloat(image.size.height) * pixelSize.height)
     }
     
-    
+    var pixelSize: CGSize {
+        return CGSize(width: 12, height: 12)
+    }
+
     var adjustedShapeEndPosition: Point2D? {
-        guard let p1 = shapeStartPosition, let p2 = integerPosition else {
+        guard let p1 = shapeStartPosition, let p2 = pencilGridPosition else {
             return nil
         }
         
@@ -131,31 +134,7 @@ struct ContentView: View {
         
         return Point2D(x: p2.x + dx, y: p2.y + dy)
     }
-    
-    var size: CGSize {
-        return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
-                      height: CGFloat(image.size.height) * pixelSize.height)
-    }
-    
-    func onDrag() {
-        if depressed {
-            guard let p = integerPosition, let c = currentColor else {
-                return
-            }
-            
-            switch tool {
-            case .pencil:
-                pencil(p, c)
-            default:
-                break
-            }
-        }
-    }
-    
-    var pixelSize: CGSize {
-        return CGSize(width: 12, height: 12)
-    }
-    
+
     var drag: some Gesture {
         DragGesture()
             .onChanged({ event in
@@ -179,12 +158,12 @@ struct ContentView: View {
     var composedImage: PixelImage {
         if let p1 = shapeStartPosition, tool == .shape {
             // Render shape on top of the image.
-            guard let p2 = integerPosition else {
+            guard let p2 = pencilGridPosition else {
                 print("warning: could not get pencil position!")
                 return image
             }
             
-            guard let c = currentColor else {
+            guard let c = PixelImage.RGBA(color) else {
                 print("warning: could not get current color")
                 return image
             }
@@ -194,23 +173,10 @@ struct ContentView: View {
 //            return image.drawLine(from: p1, to: p2, color: c)
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
-            return image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation) - Point2D(x: image.size.width, y: image.size.height)/2)
+            return image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))
         } else {
             return image
         }
-    }
-    
-    func selectionView(p1: Point2D, p2: Point2D, offset: Point2D) -> some View {
-        
-        let x = CGFloat(p1.x + p2.x - image.size.width + 2 * offset.x)/2 * pixelSize.width
-        let y = CGFloat(p1.y + p2.y - image.size.height + 2 * offset.y)/2 * pixelSize.height
-        
-        return Rectangle()
-            .opacity(0.0)
-            .frame(width: CGFloat(abs(p2.x - p1.x)) * pixelSize.width, height: CGFloat(abs(p2.y - p1.y)) * pixelSize.height, alignment: .center)
-            .padding(2)
-            .border(Color(.gray), width: 2)
-            .offset(x: x, y: y)
     }
     
     var body: some View {
@@ -222,8 +188,8 @@ struct ContentView: View {
                 
                 
                 if let p1 = shapeStartPosition {
-                    if let p2 = shapeEndPosition, let p3 = convertToInteger(translation) {
-                        selectionView(p1: p1, p2: p2, offset: Point2D(x: p3.x - image.size.width/2, y: p3.y - image.size.height/2))
+                    if let p2 = shapeEndPosition {
+                        selectionView(p1: p1, p2: p2, offset: convertToInteger(translation))
                     } else if let p2 = adjustedShapeEndPosition {
                         selectionView(p1: p1, p2: p2, offset: .zero)
                     }
@@ -233,7 +199,7 @@ struct ContentView: View {
                     .opacity(0.0)
                     .frame(width: pixelSize.width, height: pixelSize.height , alignment: .center)
                     .border(Color(.systemRed), width: 2)
-                    .offset(x: pixelPosition.x, y: pixelPosition.y)
+                    .offset(x: pencilPosition.x, y: pencilPosition.y)
                 Image(systemName: "pencil")
                     .renderingMode(Image.TemplateRenderingMode.template)
                     .foregroundColor(Color(.white))
@@ -253,38 +219,25 @@ struct ContentView: View {
                 ColorTab(tag: 4, color: Color(.systemOrange), selected: selected)
                 ColorTab(tag: 5, color: Color(.systemPink), selected: selected)
             }.padding([.bottom], 8)
-            TouchDownButton(state: $depressed) {
+            TouchDownButton(state: $depressed, started: interactionStarted, ended: interactionEnded) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(Color(.secondarySystemBackground))
                         .frame(width: 200, height: 100, alignment: .center)
                     Text("Push").font(.largeTitle)
                 }
-            } started: {
-                lift()
-            } ended: {
-                push()
             }
         }
     }
     
-    var currentColor: PixelImage.RGBA? {
-        var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
-        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else {
-            print("warning: could not get rgb components from the selected color!")
-            return nil
-        }
-        return PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
-    }
-    
-    private var pixelPosition: CGPoint {
+    private var pencilPosition: CGPoint {
         let x = round(position.x / pixelSize.width)
         let y = round(position.y / pixelSize.height)
         return CGPoint(x: (x + 0.5) * pixelSize.width, y: (y + 0.5) * pixelSize.height)
     }
     
-    var integerPosition: Point2D? {
-        let p = convertToInteger(position)
+    var pencilGridPosition: Point2D? {
+        let p = convertToInteger(position) + Point2D(x: image.size.width, y: image.size.height)/2
         
         if p.x < 0 || p.y < 0 || p.x >= image.size.width || p.y >= image.size.height {
             return nil
@@ -293,14 +246,38 @@ struct ContentView: View {
         return p
     }
     
-    func convertToInteger(_ p: CGPoint) -> Point2D {
-        let x = Int(round(p.x / pixelSize.width)) + image.size.width/2
-        let y = Int(round(p.y / pixelSize.height)) + image.size.height/2
-        return Point2D(x: x, y: y)
+    func selectionView(p1: Point2D, p2: Point2D, offset: Point2D) -> some View {
+        
+        let x = CGFloat(p1.x + p2.x - image.size.width + 2 * offset.x)/2 * pixelSize.width
+        let y = CGFloat(p1.y + p2.y - image.size.height + 2 * offset.y)/2 * pixelSize.height
+        
+        let w = CGFloat(abs(p2.x - p1.x)) * pixelSize.width
+        let h = CGFloat(abs(p2.y - p1.y)) * pixelSize.height
+        
+        return Rectangle()
+            .opacity(0.0)
+            .frame(width: w, height: h, alignment: .center)
+            .padding(2)
+            .border(Color(.gray), width: 2)
+            .offset(x: x, y: y)
     }
     
-    func lift() {
-        guard let p = integerPosition, let c = currentColor else {
+    func selected(_ colortab: ColorTab) {
+        color = colortab.color
+    }
+    
+    func onDrag() {
+        if depressed, tool == .pencil, let p = pencilGridPosition, let c = PixelImage.RGBA(color) {
+            pencil(p, c)
+        }
+    }
+    
+    func convertToInteger(_ p: CGPoint) -> Point2D {
+        return Point2D(x: Int(round(p.x / pixelSize.width)), y: Int(round(p.y / pixelSize.height)))
+    }
+    
+    func interactionStarted() {
+        guard let p = pencilGridPosition, let c = PixelImage.RGBA(color) else {
             return
         }
         
@@ -311,8 +288,8 @@ struct ContentView: View {
         }
     }
     
-    func push() {
-        guard let p = integerPosition, let c = currentColor else {
+    func interactionEnded() {
+        guard let p = pencilGridPosition, let c = PixelImage.RGBA(color) else {
             return
         }
         
@@ -366,7 +343,7 @@ struct ContentView: View {
     func endSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
         if shapeEndPosition != nil {
             if let p1 = shapeStartPosition, let p2 = shapeEndPosition {
-                image = image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation) - Point2D(x: image.size.width, y: image.size.height)/2)
+                image = image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))
             }
             shapeEndPosition = nil
             shapeStartPosition = nil
