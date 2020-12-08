@@ -103,6 +103,8 @@ struct ContentView: View {
     @State var translation: CGPoint = .zero
     @State var lastPosition: CGPoint = .zero
     
+    @State var speed: CGFloat = 0.8
+    
     var size: CGSize {
         return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
                       height: CGFloat(image.size.height) * pixelSize.height)
@@ -115,7 +117,8 @@ struct ContentView: View {
     var drag: some Gesture {
         DragGesture()
             .onChanged({ event in
-                let delta = CGPoint(x: event.translation.width - lastPosition.x, y: event.translation.height - lastPosition.y)
+                let delta = CGPoint(x: speed * (event.translation.width - lastPosition.x),
+                                    y: speed * (event.translation.height - lastPosition.y))
                 self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
                 var newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
                 
