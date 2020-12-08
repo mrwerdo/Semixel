@@ -268,7 +268,7 @@ struct ContentView: View {
     
     func onDrag() {
         if depressed, tool == .pencil, let p = pencilGridPosition, let c = PixelImage.RGBA(color) {
-            pencil(p, c)
+            applyPencil(p, c)
         }
     }
     
@@ -282,7 +282,7 @@ struct ContentView: View {
         }
         
         if tool == .shape {
-            circle(p, c)
+            startShape(p, c)
         } else if tool == .selection {
             startSelection(p, c)
         }
@@ -295,11 +295,11 @@ struct ContentView: View {
         
         switch tool {
         case .pencil:
-            pencil(p, c)
+            applyPencil(p, c)
         case .brush:
-            brush(p, c)
+            applyPaintBucket(p, c)
         case .shape:
-            drawShape(p, c)
+            endShape(p, c)
         case .selection:
             endSelection(p, c)
         default:
@@ -307,11 +307,11 @@ struct ContentView: View {
         }
     }
     
-    func pencil(_ p: Point2D, _ color: PixelImage.RGBA) {
+    func applyPencil(_ p: Point2D, _ color: PixelImage.RGBA) {
         image[p] = color
     }
     
-    func brush(_ p: Point2D, _ color: PixelImage.RGBA) {
+    func applyPaintBucket(_ p: Point2D, _ color: PixelImage.RGBA) {
         // actually works like a paint bucket, but who cares...
         let oldColor = image[p]
         let points = image.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
@@ -320,18 +320,15 @@ struct ContentView: View {
         }
     }
     
-    func circle(_ point: Point2D, _ color: PixelImage.RGBA) {
+    func startShape(_ point: Point2D, _ color: PixelImage.RGBA) {
         shapeStartPosition = point
     }
     
-    func drawShape(_ point: Point2D, _ color: PixelImage.RGBA) {
-        guard let start = shapeStartPosition else {
-            return
+    func endShape(_ point: Point2D, _ color: PixelImage.RGBA) {
+        if let start = shapeStartPosition {
+            image = image.drawEllipse(from: start, to: point, color: color)
+            shapeStartPosition = nil
         }
-        
-        image = image.drawEllipse(from: start, to: point, color: color)
-        
-        shapeStartPosition = nil
     }
     
     func startSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
@@ -341,16 +338,17 @@ struct ContentView: View {
     }
     
     func endSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
-        if shapeEndPosition != nil {
-            if let p1 = shapeStartPosition, let p2 = shapeEndPosition {
+        if let p2 = shapeEndPosition {
+            if let p1 = shapeStartPosition {
                 image = image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))
             }
             shapeEndPosition = nil
             shapeStartPosition = nil
-            
         } else {
             translation = .zero
             shapeEndPosition = adjustedShapeEndPosition
+            let p = convertToInteger(position)
+            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
         }
     }
 }
