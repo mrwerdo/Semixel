@@ -306,42 +306,25 @@ extension UIImage {
 
     private func extractPixel(_ componentLayout: CGBitmapInfo.ComponentLayout, _ dataPtr: UnsafePointer<UInt8>, _ pixelOffset: Int, _ cgImage: CGImage) -> PixelImage.RGBA {
         if componentLayout.count == 4 {
-            let components = (
-                dataPtr[pixelOffset + 0],
-                dataPtr[pixelOffset + 1],
-                dataPtr[pixelOffset + 2],
-                dataPtr[pixelOffset + 3]
-            )
-            
-            var alpha: UInt8 = 0
-            var red: UInt8 = 0
-            var green: UInt8 = 0
-            var blue: UInt8 = 0
+            let index: (r: Int, g: Int, b: Int, a: Int)
             
             switch componentLayout {
             case .bgra:
-                alpha = components.3
-                red = components.2
-                green = components.1
-                blue = components.0
+                index = (2, 1, 0, 3)
             case .abgr:
-                alpha = components.0
-                red = components.3
-                green = components.2
-                blue = components.1
+                index = (3, 2, 1, 0)
             case .argb:
-                alpha = components.0
-                red = components.1
-                green = components.2
-                blue = components.3
+                index = (1, 2, 3, 0)
             case .rgba:
-                alpha = components.3
-                red = components.0
-                green = components.1
-                blue = components.2
+                index = (0, 1, 2, 3)
             default:
                 return .clear
             }
+            
+            var red = dataPtr[pixelOffset + index.r]
+            var green = dataPtr[pixelOffset + index.g]
+            var blue = dataPtr[pixelOffset + index.b]
+            let alpha = dataPtr[pixelOffset + index.a]
             
             // If chroma components are premultiplied by alpha and the alpha is `0`,
             // keep the chroma components to their current values.
@@ -355,30 +338,21 @@ extension UIImage {
             return PixelImage.RGBA(red: red, green: green, blue: blue, alpha: alpha)
             
         } else if componentLayout.count == 3 {
-            let components = (
-                dataPtr[pixelOffset + 0],
-                dataPtr[pixelOffset + 1],
-                dataPtr[pixelOffset + 2]
-            )
-            
-            var red: UInt8 = 0
-            var green: UInt8 = 0
-            var blue: UInt8 = 0
+            let index: (r: Int, g: Int, b: Int)
             
             switch componentLayout {
             case .bgr:
-                red = components.2
-                green = components.1
-                blue = components.0
+                index = (2, 1, 0)
             case .rgb:
-                red = components.0
-                green = components.1
-                blue = components.2
+                index = (0, 1, 2)
             default:
                 return .clear
             }
             
-            return PixelImage.RGBA(red: red, green: green, blue: blue, alpha: 255)
+            return PixelImage.RGBA(red: dataPtr[pixelOffset + index.r],
+                                   green: dataPtr[pixelOffset + index.g],
+                                   blue: dataPtr[pixelOffset + index.b],
+                                   alpha: 255)
             
         } else {
             assertionFailure("Unsupported number of pixel components")
