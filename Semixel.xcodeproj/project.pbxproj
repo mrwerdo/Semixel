@@ -13,6 +13,9 @@
 		864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DA24B714B30000A1AB /* Assets.xcassets */; };
 		864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DD24B714B30000A1AB /* Preview Assets.xcassets */; };
 		864E74E124B714B30000A1AB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DF24B714B30000A1AB /* LaunchScreen.storyboard */; };
+		866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 866C99BB2581D60F00FAEF03 /* Default Artwork */; };
+		866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99BF2581D6CC00FAEF03 /* PixelImage.swift */; };
+		866C99C42581DCAD00FAEF03 /* ArtworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */; };
 		86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BDF25565AB600DC7D55 /* Coordinates.swift */; };
 		86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BE025565AB600DC7D55 /* Geometry.swift */; };
 		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
@@ -28,6 +31,9 @@
 		864E74DD24B714B30000A1AB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		864E74E024B714B30000A1AB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		864E74E224B714B30000A1AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		866C99BB2581D60F00FAEF03 /* Default Artwork */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Default Artwork"; sourceTree = "<group>"; };
+		866C99BF2581D6CC00FAEF03 /* PixelImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelImage.swift; sourceTree = "<group>"; };
+		866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkModel.swift; sourceTree = "<group>"; };
 		86B90BDF25565AB600DC7D55 /* Coordinates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coordinates.swift; sourceTree = "<group>"; };
 		86B90BE025565AB600DC7D55 /* Geometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
 		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
@@ -68,14 +74,17 @@
 				864E74D424B714B20000A1AB /* AppDelegate.swift */,
 				864E74D624B714B20000A1AB /* SceneDelegate.swift */,
 				864E74D824B714B20000A1AB /* ContentView.swift */,
+				86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */,
+				86D15338257DAAC400A23127 /* ToolsView.swift */,
+				866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */,
+				866C99BF2581D6CC00FAEF03 /* PixelImage.swift */,
+				86B90BDF25565AB600DC7D55 /* Coordinates.swift */,
+				86B90BE025565AB600DC7D55 /* Geometry.swift */,
 				864E74DA24B714B30000A1AB /* Assets.xcassets */,
 				864E74DF24B714B30000A1AB /* LaunchScreen.storyboard */,
 				864E74E224B714B30000A1AB /* Info.plist */,
+				866C99BB2581D60F00FAEF03 /* Default Artwork */,
 				864E74DC24B714B30000A1AB /* Preview Content */,
-				86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */,
-				86B90BDF25565AB600DC7D55 /* Coordinates.swift */,
-				86B90BE025565AB600DC7D55 /* Geometry.swift */,
-				86D15338257DAAC400A23127 /* ToolsView.swift */,
 			);
 			path = Semixel;
 			sourceTree = "<group>";
@@ -157,6 +166,7 @@
 			files = (
 				864E74E124B714B30000A1AB /* LaunchScreen.storyboard in Resources */,
 				864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */,
+				866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */,
 				864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -168,9 +178,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */,
 				864E74D524B714B20000A1AB /* AppDelegate.swift in Sources */,
 				86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */,
 				864E74D724B714B20000A1AB /* SceneDelegate.swift in Sources */,
+				866C99C42581DCAD00FAEF03 /* ArtworkModel.swift in Sources */,
 				864E74D924B714B20000A1AB /* ContentView.swift in Sources */,
 				86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */,
 				86D15339257DAAC400A23127 /* ToolsView.swift in Sources */,

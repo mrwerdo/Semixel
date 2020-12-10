@@ -42,21 +42,23 @@ struct PixelGridImage: View {
 
     var body: some View {
         GeometryReader { geometry in
-            Path { path in
-                let numberOfHorizontalGridLines = Int(geometry.size.height / self.verticalSpacing)
-                let numberOfVerticalGridLines = Int(geometry.size.width / self.horizontalSpacing)
-                for index in 0...numberOfVerticalGridLines {
-                    let vOffset: CGFloat = CGFloat(index) * self.horizontalSpacing
-                    path.move(to: CGPoint(x: vOffset, y: 0))
-                    path.addLine(to: CGPoint(x: vOffset, y: geometry.size.height))
+            if verticalSpacing > 1 && horizontalSpacing > 1 {
+                Path { path in
+                    let numberOfHorizontalGridLines = Int(geometry.size.height / self.verticalSpacing)
+                    let numberOfVerticalGridLines = Int(geometry.size.width / self.horizontalSpacing)
+                    for index in 0...numberOfVerticalGridLines {
+                        let vOffset: CGFloat = CGFloat(index) * self.horizontalSpacing
+                        path.move(to: CGPoint(x: vOffset, y: 0))
+                        path.addLine(to: CGPoint(x: vOffset, y: geometry.size.height))
+                    }
+                    for index in 0...numberOfHorizontalGridLines {
+                        let hOffset: CGFloat = CGFloat(index) * self.verticalSpacing
+                        path.move(to: CGPoint(x: 0, y: hOffset))
+                        path.addLine(to: CGPoint(x: geometry.size.width, y: hOffset))
+                    }
                 }
-                for index in 0...numberOfHorizontalGridLines {
-                    let hOffset: CGFloat = CGFloat(index) * self.verticalSpacing
-                    path.move(to: CGPoint(x: 0, y: hOffset))
-                    path.addLine(to: CGPoint(x: geometry.size.width, y: hOffset))
-                }
+                .stroke()
             }
-            .stroke()
         }
     }
 }
@@ -91,11 +93,22 @@ struct TouchDownButton<Label: View>: View {
     }
 }
 
-struct ContentView: View {
+struct PixelView: View {
     
     @State var tool: Tools.ToolType = .pencil
     @State var color: Color = Color(.systemBlue)
-    @State var image: PixelImage = PixelImage(width: 32, height: 32)
+    
+    @EnvironmentObject var artwork: Artwork
+    
+    var image: PixelImage {
+        get {
+            return artwork.pixelImage
+        }
+        nonmutating set {
+            artwork.pixelImage = newValue
+        }
+    }
+    
     @State var position: CGPoint = .zero
     @State var depressed: Bool = false
     @State var shapeStartPosition: Point2D? = nil
@@ -111,7 +124,7 @@ struct ContentView: View {
     }
     
     var pixelSize: CGSize {
-        return CGSize(width: 12, height: 12)
+        return CGSize(width: 384 / CGFloat(image.size.width), height: 384 / CGFloat(image.size.height))
     }
 
     var drag: some Gesture {
@@ -361,6 +374,55 @@ struct ContentView: View {
             shapeEndPosition = pencilGridPosition
             let p = convertToInteger(position)
             position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
+        }
+    }
+}
+
+
+struct ContentView: View {
+    
+    @EnvironmentObject var model: ArtworkModel
+    
+    var body: some View {
+        NavigationView {
+            List {
+                ForEach(model.artwork) { (artwork: Artwork) in
+                    let destination = PixelView().environmentObject(artwork)
+                    NavigationLink(destination: destination) {
+                        // todo: make the thumbnail preview pixel perfect
+                        artwork.image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 50, height: 50)
+                            .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
+                        VStack(alignment: .leading) {
+                            Text(artwork.name)
+                            Text("\(artwork.size.width)x\(artwork.size.height)")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+            }
+            .navigationBarTitle("Artwork")
+            .toolbar {
+                ToolbarItem {
+                    Button("Edit") {
+                        
+                    }
+                    .padding()
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                    .padding()
+                }
+            }
         }
     }
 }
