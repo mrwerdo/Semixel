@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(model.artwork) { (artwork: Artwork) in
-                    let destination = PixelView().environmentObject(artwork)
+                    let destination = PixelView().environmentObject(artwork).onDisappear(perform: save(artwork: artwork))
                     NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
                         artwork.image
@@ -47,6 +47,16 @@ struct ContentView: View {
                     }
                     .padding()
                 }
+            }
+        }
+    }
+    
+    func save(artwork: Artwork) -> (() -> Void) {
+        return {
+            do {
+                try artwork.pixelImage.write(to: artwork.url)
+            } catch {
+                print(error)
             }
         }
     }

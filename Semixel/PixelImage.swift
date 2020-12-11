@@ -291,6 +291,18 @@ extension PixelImage {
             var description: String
         }
         
+        guard let img = convertToCGImage() else {
+            throw WritingError(description: "Could not create CGImage.")
+        }
+        
+        guard let data = UIImage(cgImage: img).pngData() else {
+            throw WritingError(description: "Could not encode to png data.")
+        }
+        
+        try data.write(to: url)
+    }
+    
+    func convertToCGImage() -> CGImage? {
         var buffer = [UInt8](repeating: 0, count: size.width * size.height * 4)
         
         for y in 0..<size.height {
@@ -304,32 +316,24 @@ extension PixelImage {
         }
         
         guard let provider = CGDataProvider(data: Data(bytes: buffer, count: buffer.count) as CFData) else {
-            throw WritingError(description: "Could not create data provider.")
+            return nil
         }
-            
+        
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bpc = 8 * MemoryLayout<UInt8>.stride
         let bpp = 8 * MemoryLayout<UInt8>.stride * 4
         let bpr = size.width * 4
         
-        guard let img = CGImage(width: size.width,
-                                height: size.height,
-                                bitsPerComponent: bpc,
-                                bitsPerPixel: bpp,
-                                bytesPerRow: bpr,
-                                space: colorSpace,
-                                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                                provider: provider,
-                                decode: nil,
-                                shouldInterpolate: false, intent: .defaultIntent) else {
-            throw WritingError(description: "Could not create CGImage.")
-        }
-        
-        guard let data = UIImage(cgImage: img).pngData() else {
-            throw WritingError(description: "Could not encode to png data.")
-        }
-        
-        try data.write(to: url)
+        return CGImage(width: size.width,
+                       height: size.height,
+                       bitsPerComponent: bpc,
+                       bitsPerPixel: bpp,
+                       bytesPerRow: bpr,
+                       space: colorSpace,
+                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
+                       provider: provider,
+                       decode: nil,
+                       shouldInterpolate: false, intent: .defaultIntent)
     }
 }
 

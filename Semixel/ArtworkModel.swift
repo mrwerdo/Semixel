@@ -30,8 +30,8 @@ class Artwork: Identifiable, ObservableObject {
     }
     
     var image: Image {
-        if let img = uiImage {
-            return Image(uiImage: img)
+        if let img = pixelImage.convertToCGImage() {
+            return Image(decorative: img, scale: 1.0)
         } else {
             return Image(systemName: "questionmark")
         }
@@ -117,6 +117,7 @@ final class ArtworkModel: ObservableObject {
         do {
             let files = try FileManager.default.contentsOfDirectory(at: folderMonitor.url, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants])
             DispatchQueue.main.sync {
+                print("Updating menu.")
                 artwork = files.map { Artwork(name: $0.lastPathComponent, url: $0) }
             }
         } catch {
