@@ -12,12 +12,14 @@ struct ContentView: View {
     
     @EnvironmentObject var model: ArtworkModel
     
+    @State var selection: URL?
+    
     var body: some View {
         NavigationView {
             List {
                 ForEach(model.artwork) { (artwork: Artwork) in
                     let destination = PixelView().environmentObject(artwork)
-                    NavigationLink(destination: destination) {
+                    NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
                         artwork.image
                             .resizable()
@@ -31,27 +33,33 @@ struct ContentView: View {
                                 .foregroundColor(.gray)
                         }
                     }
-                }
+                }.onDelete(perform: delete(at:))
             }
             .navigationBarTitle("Artwork")
-            .toolbar {
-                ToolbarItem {
-                    Button("Edit") {
-                        
-                    }
-                    .padding()
-                }
-            }
+            .navigationBarItems(trailing: EditButton())
+            .listStyle(PlainListStyle())
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
                     Button {
-                        
+                        add()
                     } label: {
                         Image(systemName: "plus")
                     }
                     .padding()
                 }
             }
+        }
+    }
+    
+    func delete(at offsets: IndexSet) {
+        model.remove(at: offsets)
+    }
+    
+    func add() {
+        do {
+            selection = try model.createArtwork().url
+        } catch {
+            print(error)
         }
     }
 }

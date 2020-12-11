@@ -285,12 +285,51 @@ extension PixelImage {
         }
     }
     
-    static func load(_ name: String) -> PixelImage? {
-        guard let img = UIImage(named: name) else {
-            return nil
+    func write(to url: URL) throws {
+        
+        struct WritingError: Error, CustomStringConvertible {
+            var description: String
         }
         
-        return PixelImage(uiImage: img)
+        var buffer = [UInt8](repeating: 0, count: size.width * size.height * 4)
+        
+        for y in 0..<size.height {
+            for x in 0..<size.width {
+                let c = self[x, y]
+                buffer[4 * (y * size.width + x) + 0] = UInt8((c.red * 255).rounded())
+                buffer[4 * (y * size.width + x) + 1] = UInt8((c.green * 255).rounded())
+                buffer[4 * (y * size.width + x) + 2] = UInt8((c.blue * 255).rounded())
+                buffer[4 * (y * size.width + x) + 3] = UInt8((c.alpha * 255).rounded())
+            }
+        }
+        
+        guard let provider = CGDataProvider(data: Data(bytes: buffer, count: buffer.count) as CFData) else {
+            throw WritingError(description: "Could not create data provider.")
+        }
+            
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let bpc = 8 * MemoryLayout<UInt8>.stride
+        let bpp = 8 * MemoryLayout<UInt8>.stride * 4
+        let bpr = size.width * 4
+        
+        guard let img = CGImage(width: size.width,
+                                height: size.height,
+                                bitsPerComponent: bpc,
+                                bitsPerPixel: bpp,
+                                bytesPerRow: bpr,
+                                space: colorSpace,
+                                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
+                                provider: provider,
+                                decode: nil,
+                                shouldInterpolate: false, intent: .defaultIntent) else {
+            throw WritingError(description: "Could not create CGImage.")
+        }
+        
+        guard let data = UIImage(cgImage: img).pngData() else {
+            throw WritingError(description: "Could not encode to png data.")
+        }
+        
+        try data.write(to: url)
     }
 }
 
