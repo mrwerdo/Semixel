@@ -92,7 +92,7 @@ struct TouchDownButton<Label: View>: View {
     }
 }
 
-struct PixelView: View {
+struct PixelViewV1: View {
     
     @State var tool: Tools.ToolType = .pencil
     @State var color: Color = Color(.systemBlue)
