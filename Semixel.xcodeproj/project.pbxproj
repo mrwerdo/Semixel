@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		863959D22582F4B800618179 /* PixelViewV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863959D12582F4B800618179 /* PixelViewV1.swift */; };
+		8642B88D25845A93009E0A66 /* PixelViewV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8642B88C25845A93009E0A66 /* PixelViewV2.swift */; };
 		864E74D524B714B20000A1AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864E74D424B714B20000A1AB /* AppDelegate.swift */; };
 		864E74D724B714B20000A1AB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864E74D624B714B20000A1AB /* SceneDelegate.swift */; };
 		864E74D924B714B20000A1AB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864E74D824B714B20000A1AB /* ContentView.swift */; };
@@ -25,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		863959D12582F4B800618179 /* PixelViewV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelViewV1.swift; sourceTree = "<group>"; };
+		8642B88C25845A93009E0A66 /* PixelViewV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelViewV2.swift; sourceTree = "<group>"; };
 		864E74D124B714B20000A1AB /* Semixel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Semixel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		864E74D424B714B20000A1AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		864E74D624B714B20000A1AB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -53,6 +55,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8642B88F25845A98009E0A66 /* PixelView */ = {
+			isa = PBXGroup;
+			children = (
+				863959D12582F4B800618179 /* PixelViewV1.swift */,
+				8642B88C25845A93009E0A66 /* PixelViewV2.swift */,
+			);
+			path = PixelView;
+			sourceTree = "<group>";
+		};
 		864E74C824B714B20000A1AB = {
 			isa = PBXGroup;
 			children = (
@@ -77,7 +88,7 @@
 				864E74D624B714B20000A1AB /* SceneDelegate.swift */,
 				864E74D824B714B20000A1AB /* ContentView.swift */,
 				86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */,
-				863959D12582F4B800618179 /* PixelViewV1.swift */,
+				8642B88F25845A98009E0A66 /* PixelView */,
 				86D15338257DAAC400A23127 /* ToolsView.swift */,
 				866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */,
 				866C99BF2581D6CC00FAEF03 /* PixelImage.swift */,
@@ -181,6 +192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8642B88D25845A93009E0A66 /* PixelViewV2.swift in Sources */,
 				866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */,
 				864E74D524B714B20000A1AB /* AppDelegate.swift in Sources */,
 				86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */,

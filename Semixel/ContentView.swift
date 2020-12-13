@@ -18,7 +18,9 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(model.artwork) { (artwork: Artwork) in
-                    let destination = PixelViewV1().environmentObject(artwork).onDisappear(perform: save(artwork: artwork))
+                    let destination = PixelViewV2()
+                        .environmentObject(artwork)
+                        .onDisappear(perform: save(artwork: artwork))
                     NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
                         artwork.image

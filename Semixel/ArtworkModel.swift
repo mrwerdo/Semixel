@@ -225,7 +225,7 @@ extension ArtworkModel {
             try fm.createDirectory(at: artworkUrl, withIntermediateDirectories: false, attributes: nil)
         } catch let error as CocoaError {
             if error.code == .fileWriteFileExists {
-                return
+//                return
             } else {
                 throw error
             }
@@ -241,6 +241,9 @@ extension ArtworkModel {
             let filename = url.lastPathComponent
             let destination = artworkUrl.appendingPathComponent(filename, isDirectory: false)
             // todo: make copy atomic
+            do {
+                try fm.removeItem(at: destination)
+            } catch { }
             try fm.copyItem(at: url, to: destination)
         }
     }

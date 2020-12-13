@@ -56,7 +56,7 @@ struct PixelGridImage: View {
                         path.addLine(to: CGPoint(x: geometry.size.width, y: hOffset))
                     }
                 }
-                .stroke()
+                .stroke(Color(UIColor.darkGray))
             }
         }
     }

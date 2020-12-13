@@ -50,6 +50,8 @@ struct BigButton<T>: View where T: Equatable {
     }
 }
 
+typealias ToolType = Tools.ToolType
+
 struct Tools: View {
     
     enum ToolType: Equatable {
@@ -58,6 +60,8 @@ struct Tools: View {
         case shape
         case selection
         case none
+        case undo
+        case redo
     }
     
     @Binding var tool: ToolType

@@ -276,6 +276,49 @@ extension PixelImage {
     }
 }
 
+
+extension PixelImage.RGBA {
+    
+//    {"Flickr Pink":"f72585",
+//    "Byzantine":"b5179e",
+//    "Purple":"7209b7",
+//    "Purple 2":"560bad",
+//    "Trypan Blue":"480ca8",
+//    "Trypan Blue 2":"3a0ca3",
+//    "Persian Blue":"3f37c9",
+//    "Ultramarine Blue":"4361ee",
+//    "Dodger Blue":"4895ef",
+//    "Vivid Sky Blue":"4cc9f0"}
+    
+    /* Array */
+
+//    /* Object */
+//    {"Xiketic":"03071e","Dark Sienna":"370617","Rosewood":"6a040f","Dark Red":"9d0208","Rosso Corsa":"d00000","Vermilion":"dc2f02","Persimmon":"e85d04","Carrot Orange":"f48c06","Orange Web":"faa307","Selective Yellow":"ffba08"}
+    
+    static let defaultColorPalette: [PixelImage.RGBA] = [
+        "f72585", "b5179e", "7209b7", "560bad", "480ca8",
+        "3a0ca3", "3f37c9", "4361ee", "4895ef", "4cc9f0",
+        // Second one
+        "03071e","370617","6a040f","9d0208","d00000","dc2f02","e85d04","f48c06","faa307","ffba08",
+    ].compactMap(PixelImage.RGBA.init(hex:))
+    
+    init?(hex: String) {
+        if hex.count == 6, let value = Int(hex, radix: 16) {
+            red = CGFloat((value & 0xFF0000) >> 16) / 0xFF
+            green = CGFloat((value & 0x00FF00) >> 8) / 0xFF
+            blue = CGFloat(value & 0xFF) / 0xFF
+            alpha = 1.0
+        } else if hex.count == 3, let value = Int(hex, radix: 16) {
+            red = CGFloat((value & 0xF00) >> 8) / 0xFF
+            green = CGFloat((value & 0x0F0) >> 4) / 0xFF
+            blue = CGFloat(value & 0xF) / 0xFF
+            alpha = 1.0
+        } else {
+            return nil
+        }
+    }
+}
+
 extension PixelImage {
     
     init(uiImage: UIImage) {
