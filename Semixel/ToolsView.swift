@@ -52,6 +52,27 @@ struct BigButton<T>: View where T: Equatable {
 
 typealias ToolType = Tools.ToolType
 
+extension ToolType {
+    var iconName: String {
+        switch self {
+        case .brush:
+            return "paintbrush"
+        case .pencil:
+            return "penciltip"
+        case .redo:
+            return "arrow.uturn.right"
+        case .undo:
+            return "arrow.uturn.left"
+        case .shape:
+            return "circle"
+        case .selection:
+            return "selection.pin.in.out"
+        case .none:
+            return "questionmark"
+        }
+    }
+}
+
 struct Tools: View {
     
     enum ToolType: Equatable {

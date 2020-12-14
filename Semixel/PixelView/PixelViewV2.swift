@@ -143,78 +143,21 @@ struct ColorPalette: View {
     }
 }
 
-struct ToolButton: View {
-    
-    enum ButtonType {
-        case oneshot
-        case selectable
-    }
-    
-    var action: ((ToolButton) -> ())?
-    @Binding var state: ToolType?
-    var tool: ToolType
-    var type: ButtonType
-    var image: String
-    
-    var isSelected: Bool {
-        return state == tool
-    }
-    
-    init(_ action: ((ToolButton) -> ())?, _ state: Binding<ToolType?>, _ type: ButtonType, _ object: ToolType, image: String) {
-        self.action = action
-        self.tool = object
-        self.image = image
-        _state = state
-        self.type = type
-    }
-    
-    var background: some View {
-        if isSelected {
-            return RoundedRectangle(cornerRadius: 8).fill(Color(.systemGray4))
-        } else {
-            return RoundedRectangle(cornerRadius: 8).fill(Color(.secondarySystemBackground))
-        }
-    }
-    
-    private func update() {
-        action?(self)
-        switch type {
-        case .oneshot:
-            state = nil
-        case .selectable:
-            if state == tool {
-                state = nil
-            } else {
-                state = tool
-            }
-        }
-    }
-    
-    var body: some View {
-        Button(action: update) {
-            ZStack(alignment: .center) {
-                background
-                Image(systemName: image).font(Font.system(size: 24))
-            }
-            .frame(width: 64, height: 64, alignment: .center)
-        }
-    }
-}
-
 
 protocol ToolButtonState: Equatable {
     associatedtype Icon: View
     var image: Icon { get }
     var isSelected: Bool { get }
     
-    static var deselectedState: Self { get }
+    static var deselected: Self { get }
+    static var tool: ToolType { get }
 }
 
 struct ToolButtonV2<State: ToolButtonState>: View {
     var tool: ToolType
     @Binding var selectedTool: ToolType?
     var transition: (State) -> State
-    @SwiftUI.State var state: State = .deselectedState
+    @SwiftUI.State var state: State = .deselected
     
     init(_ selectedTool: Binding<ToolType?>, tool: ToolType, transition: @escaping (State) -> State) {
         self._selectedTool = selectedTool
@@ -224,11 +167,11 @@ struct ToolButtonV2<State: ToolButtonState>: View {
     
     private func update() {
         if tool != selectedTool {
-            state = State.deselectedState
+            state = State.deselected
         }
         let nextState = transition(state)
         state = nextState
-        selectedTool = state == State.deselectedState ? nil : tool
+        selectedTool = state == State.deselected ? nil : tool
     }
     
     private var isSelected: Bool {
@@ -247,10 +190,12 @@ struct ToolButtonV2<State: ToolButtonState>: View {
     }
 }
 
-enum PencilState: ToolButtonState {
-    case deselected
-    case selected
-    
+protocol BinaryState: ToolButtonState {
+    static var selected: Self { get }
+    static var deselected: Self { get }
+}
+
+extension BinaryState {
     var image: some View {
         return Image(systemName: "pencil.tip").font(Font.system(size: 24))
     }
@@ -258,43 +203,47 @@ enum PencilState: ToolButtonState {
     var isSelected: Bool {
         return self == .selected
     }
-    
-    static var deselectedState: PencilState {
-        return .deselected
-    }
 
-    static func pencil(_ selectedTool: Binding<ToolType?>, _ draw: @escaping () -> ()) -> ToolButtonV2<PencilState> {
-        return ToolButtonV2<PencilState>(selectedTool, tool: .pencil) { (state) -> PencilState in
+    static func create(_ selectedTool: Binding<ToolType?>, _ draw: @escaping () -> ()) -> ToolButtonV2<Self> {
+        return ToolButtonV2<Self>(selectedTool, tool: .pencil) { (state) -> Self in
             switch state {
             case .selected:
                 return .deselected
             case .deselected:
                 draw()
                 return .selected
+            default:
+                fatalError("BinaryState can have only two states.")
             }
         }
     }
 }
 
-enum SelectionState: ToolButtonState {
+enum PencilState: BinaryState {
     case deselected
-    case resizing
-    case translating
-    
+    case selected
+    static var tool: ToolType {
+        return .pencil
+    }
+}
+
+protocol TerneryState: ToolButtonState {
+    static var deselected: Self { get }
+    static var resizing: Self { get }
+    static var translating: Self { get }
+}
+
+extension TerneryState {
     var image: some View {
-        return Image(systemName: "selection.pin.in.out").font(Font.system(size: 24))
+        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
     }
     
     var isSelected: Bool {
         return self != .deselected
     }
     
-    static var deselectedState: SelectionState {
-        return .deselected
-    }
-    
-    static func selection(_ selectedTool: Binding<ToolType?>, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButtonV2<SelectionState> {
-        return ToolButtonV2<SelectionState>(selectedTool, tool: .selection) { state -> SelectionState in
+    static func create(_ selectedTool: Binding<ToolType?>, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButtonV2<Self> {
+        return ToolButtonV2<Self>(selectedTool, tool: Self.tool) { state -> Self in
             switch state {
             case .deselected:
                 resizing()
@@ -305,68 +254,77 @@ enum SelectionState: ToolButtonState {
             case .translating:
                 complete()
                 return .deselected
+            default:
+                fatalError("TerneryState should not have more than three cases.")
             }
         }
     }
 }
 
-enum ShapeState: ToolButtonState {
+enum SelectionState: TerneryState {
     case deselected
     case resizing
     case translating
     
-    var image: some View {
-        return Image(systemName: "circle").font(Font.system(size: 24))
-    }
-    
-    var isSelected: Bool {
-        return self != .deselected
-    }
-    
-    static var deselectedState: ShapeState {
-        return .deselected
-    }
-    
-    static func selection(_ selectedTool: Binding<ToolType?>, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButtonV2<ShapeState> {
-        return ToolButtonV2<ShapeState>(selectedTool, tool: .shape) { state -> ShapeState in
-            switch state {
-            case .deselected:
-                resizing()
-                return .resizing
-            case .resizing:
-                translating()
-                return .translating
-            case .translating:
-                complete()
-                return .deselected
-            }
-        }
-    }
+    static var tool: ToolType { return .selection }
 }
 
-enum OneShotState: ToolButtonState {
+enum ShapeState: TerneryState {
     case deselected
+    case resizing
+    case translating
     
+    static var tool: ToolType { return .shape }
+}
+
+protocol OneShotState: ToolButtonState { }
+
+extension OneShotState {
     var image: some View {
-        return Image(systemName: "paintbrush").font(Font.system(size: 24))
+        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
     }
     
     var isSelected: Bool {
         return false
     }
     
-    static var deselectedState: OneShotState {
-        return .deselected
-    }
-    
-    static func create(_ selectedTool: Binding<ToolType?>, selected: @escaping () -> ()) -> ToolButtonV2<OneShotState> {
-        ToolButtonV2<OneShotState>(selectedTool, tool: .brush) { state -> OneShotState in
+    static func create(_ selectedTool: Binding<ToolType?>, selected: @escaping () -> ()) -> ToolButtonV2<Self> {
+        ToolButtonV2<Self>(selectedTool, tool: Self.tool) { state -> Self in
             selected()
-            return .deselected
+            return state
         }
     }
 }
 
+struct PaintBucketState: OneShotState {
+    static var tool: ToolType {
+        return .brush
+    }
+    
+    static var deselected: PaintBucketState {
+        return PaintBucketState()
+    }
+}
+
+struct UndoState: OneShotState {
+    static var tool: ToolType {
+        return .undo
+    }
+    
+    static var deselected: UndoState {
+        return UndoState()
+    }
+}
+
+struct RedoState: OneShotState {
+    static var tool: ToolType {
+        return .redo
+    }
+    
+    static var deselected: RedoState {
+        return RedoState()
+    }
+}
 
 
 struct OverlayView: View {
@@ -458,7 +416,7 @@ struct PixelViewV2: View {
     }
     
     @State var fullScreenDragEnabled: Bool = false
-    @State var tool: Tools.ToolType? = nil
+    @State var tool: ToolType? = nil
     @State var position: CGPoint = .zero
     @State var lastPosition: CGPoint = .zero
     @State var speed: CGFloat = 0.8
@@ -557,38 +515,25 @@ struct PixelViewV2: View {
                     Spacer()
                     HStack {
                         VStack {
-                            PencilState.pencil($tool) {
+                            PencilState.create($tool) {
                                 reset()
                                 statusText = "Pencil selected."
                                 if let p = pencilGridPosition {
                                     applyPencil(p)
                                 }
                             }
-                            ShapeState.selection($tool) {
-                                reset()
-                                statusText = "Shape tool."
-                                if let point = pencilGridPosition {
-                                    shapeStartPosition = point
-                                }
-                            } translating: {
-                                statusText = "Translating..."
-                                if shapeStartPosition != nil {
-                                    translation = .zero
-                                    shapeEndPosition = pencilGridPosition
-                                    let p = convertToInteger(position)
-                                    position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
-                                }
-                            } complete: {
-                                statusText = "Complete."
-                                if let start = shapeStartPosition, let end = shapeEndPosition {
-                                    artwork.pixelImage = translatedShape(p1: start, p2: end)
-                                }
-                                shapeStartPosition = nil
+                            ShapeState.create($tool,
+                                              resizing: resizing(statusText: "Shape tool."),
+                                              translating: translating,
+                                              complete: completed { (p1, p2, offset) in
+                                    artwork.pixelImage = translatedShape(p1: p1, p2: p2)
+                            })
+                            UndoState.create($tool) {
+                                statusText = "Undone"
                             }
-                            ToolButton(selected, $tool, .oneshot, .undo, image: "arrow.uturn.left")
                         }
                         VStack {
-                            OneShotState.create($tool) {
+                            PaintBucketState.create($tool) {
                                 statusText = "Applied paint bucket."
                                 if let p = pencilGridPosition {
                                     let oldColor = artwork.pixelImage[p]
@@ -599,32 +544,17 @@ struct PixelViewV2: View {
                                 }
                             }
                             
-                            SelectionState.selection($tool) {
-                                reset()
-                                statusText = "Selection tool."
-                                if let point = pencilGridPosition {
-                                    shapeStartPosition = point
-                                }
-                            } translating: {
-                                statusText = "Translating..."
-                                if shapeStartPosition != nil {
-                                    translation = .zero
-                                    shapeEndPosition = pencilGridPosition
-                                    let p = convertToInteger(position)
-                                    position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
-                                }
-                            } complete: {
-                                statusText = "Complete."
-                                if let p2 = shapeEndPosition {
-                                    if let p1 = shapeStartPosition {
-                                        artwork.pixelImage = artwork.pixelImage.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))
-                                    }
-                                    shapeEndPosition = nil
-                                    shapeStartPosition = nil
-                                }
+                            SelectionState.create($tool,
+                                                  resizing: resizing(statusText: "Selection tool."),
+                                                  translating: translating,
+                                                  complete: completed { (p1, p2, offset) in
+                                                    artwork.pixelImage = artwork.pixelImage.moveRectangle(between: p1,
+                                                                                                          and: p2,
+                                                                                                          by: offset)
+                                                  })
+                            RedoState.create($tool) {
+                                statusText = "Redone"
                             }
-
-                            ToolButton(selected, $tool, .oneshot, .redo, image: "arrow.uturn.right")
                         }
                     }.padding([.top, .bottom, .leading])
                     ColorPalette(colors: $colors, selectedColor: $selectedColor)
@@ -641,6 +571,38 @@ struct PixelViewV2: View {
         .navigationBarTitle(artwork.name, displayMode: .inline)
     }
     
+    func resizing(statusText: String) -> () -> () {
+        return {
+            reset()
+            self.statusText = statusText
+            if let point = pencilGridPosition {
+                shapeStartPosition = point
+            }
+        }
+    }
+    
+    func translating() {
+        statusText = "Translating..."
+        if shapeStartPosition != nil {
+            translation = .zero
+            shapeEndPosition = pencilGridPosition
+            let p = convertToInteger(position)
+            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
+        }
+    }
+    
+    func completed(callback: @escaping (_ p1: Point2D, _ p2: Point2D, _ offset: Point2D) -> ()) -> () -> () {
+        return {
+            statusText = "Complete."
+            if let p2 = shapeEndPosition {
+                if let p1 = shapeStartPosition {
+                    callback(p1, p2, convertToInteger(translation))
+                }
+                shapeEndPosition = nil
+                shapeStartPosition = nil
+            }
+        }
+    }
     
     func onDrag(_ delta: CGPoint) {
         if let p = pencilGridPosition {
@@ -673,10 +635,6 @@ struct PixelViewV2: View {
         translation.y = max(CGFloat(-p1.y) * pixelSize.height,
                             min(translation.y + delta.y,
                                 CGFloat(artwork.pixelImage.size.height - p2.y) * pixelSize.height))
-    }
-    
-    func selected(_ button: ToolButton) {
-
     }
     
     func reset() {
