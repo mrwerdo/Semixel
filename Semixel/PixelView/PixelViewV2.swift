@@ -344,6 +344,29 @@ enum ShapeState: ToolButtonState {
     }
 }
 
+enum OneShotState: ToolButtonState {
+    case deselected
+    
+    var image: some View {
+        return Image(systemName: "paintbrush").font(Font.system(size: 24))
+    }
+    
+    var isSelected: Bool {
+        return false
+    }
+    
+    static var deselectedState: OneShotState {
+        return .deselected
+    }
+    
+    static func create(_ selectedTool: Binding<ToolType?>, selected: @escaping () -> ()) -> ToolButtonV2<OneShotState> {
+        ToolButtonV2<OneShotState>(selectedTool, tool: .brush) { state -> OneShotState in
+            selected()
+            return .deselected
+        }
+    }
+}
+
 
 
 struct OverlayView: View {
@@ -541,8 +564,6 @@ struct PixelViewV2: View {
                                     applyPencil(p)
                                 }
                             }
-//                            ToolButton(selected, $tool, .selectable, .pencil, image: "pencil.tip")
-                            // ToolButton(selected, $tool, .none, image: "minus")
                             ShapeState.selection($tool) {
                                 reset()
                                 statusText = "Shape tool."
@@ -564,11 +585,19 @@ struct PixelViewV2: View {
                                 }
                                 shapeStartPosition = nil
                             }
-
                             ToolButton(selected, $tool, .oneshot, .undo, image: "arrow.uturn.left")
                         }
                         VStack {
-                            ToolButton(selected, $tool, .oneshot, .brush, image: "paintbrush")
+                            OneShotState.create($tool) {
+                                statusText = "Applied paint bucket."
+                                if let p = pencilGridPosition {
+                                    let oldColor = artwork.pixelImage[p]
+                                    let points = artwork.pixelImage.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
+                                    for point in points {
+                                        artwork.pixelImage[point] = selectedColor
+                                    }
+                                }
+                            }
                             
                             SelectionState.selection($tool) {
                                 reset()
@@ -616,7 +645,7 @@ struct PixelViewV2: View {
     func onDrag(_ delta: CGPoint) {
         if let p = pencilGridPosition {
             if tool == nil {
-                showMessage("(x: \(p.x), y: \(p.y))")
+                statusText = ("(x: \(p.x), y: \(p.y))")
             }
             if tool == .pencil {
                 applyPencil(p)
@@ -647,44 +676,7 @@ struct PixelViewV2: View {
     }
     
     func selected(_ button: ToolButton) {
-        let msg: String
-        
-        if button.tool == self.tool {
-            msg = "Move selected."
-        } else {
-            switch button.tool {
-            case .pencil:
-                msg = "Pencil selected."
-            case .undo:
-                msg = "Undo."
-            case .redo:
-                msg = "Redo."
-            case .brush:
-                msg = "Applied paint bucket."
-            case .shape:
-                msg = "Draw circle."
-            case .selection:
-                msg = "Start selection."
-            default:
-                return
-            }
-        }
-        
-        showMessage(msg)
-        if let p = pencilGridPosition {
-            if self.tool == button.tool {
-                reset()
-            } else {
-                switch button.tool {
-                case .pencil:
-                    applyPencil(p)
-                case .brush:
-                    applyPaintBucket(p)
-                default:
-                    return
-                }
-            }
-        }
+
     }
     
     func reset() {
@@ -693,22 +685,8 @@ struct PixelViewV2: View {
         translation = .zero
     }
     
-    func showMessage(_ msg: String) {
-        self.statusText = msg
-    }
-    
-    
     func applyPencil(_ p: Point2D) {
         artwork.pixelImage[p] = selectedColor
-    }
-    
-    func applyPaintBucket(_ p: Point2D) {
-        // actually works like a paint bucket, but who cares...
-        let oldColor = artwork.pixelImage[p]
-        let points = artwork.pixelImage.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
-        for point in points {
-            artwork.pixelImage[point] = selectedColor
-        }
     }
 
     func convertToInteger(_ p: CGPoint) -> Point2D {
