@@ -102,14 +102,47 @@ struct SemanticColor: Equatable {
     var color: PixelImage.RGBA
 }
 
+extension SemanticColor {
+    var cgColor: CGColor {
+        get {
+            return CGColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)
+        }
+        set {
+            let rgbCGColor = newValue.converted(to: CGColorSpaceCreateDeviceRGB(),
+                                                intent: .defaultIntent,
+                                                options: nil)
+            guard let components = rgbCGColor?.components, components.count == 4 || components.count == 3 else {
+                return
+            }
+            
+            let r = components[0]
+            let b = components[1]
+            let g = components[2]
+            
+            let a = components.count == 4 ? components[3] : 1.0
+            
+            color = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
+        }
+    }
+}
+
 struct ColorPalette: View {
     @Binding var colors: [SemanticColor]
     @Binding var selectedColor: SemanticColor
     
+    @State var isAddingNewColor = false
+    
+    func addCallback() {
+        print("Adding new color...")
+    }
+    
     var body: some View {
-        CollectionView(colors: colors, selectedColor: $selectedColor)
-            .padding([.top], 12)
-            .padding([.leading, .trailing], 8)
+        VStack {
+            ColorPicker("", selection: $selectedColor.cgColor, supportsOpacity: true)
+            CollectionView(colors: colors, selectedColor: $selectedColor, addCallback: addCallback)
+        }
+        .padding([.top], 12)
+        .padding([.leading, .trailing], 8)
         .background(RoundedRectangle(cornerRadius: 8).fill(Color(UIColor.secondarySystemFill)))
     }
 }

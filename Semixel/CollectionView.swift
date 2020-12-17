@@ -13,6 +13,7 @@ struct CollectionView: UIViewControllerRepresentable {
     
     var colors: [SemanticColor]
     @Binding var selectedColor: SemanticColor
+    var addCallback: (() -> ())?
     
     class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
         var layout: UICollectionViewFlowLayout = {
@@ -25,6 +26,7 @@ struct CollectionView: UIViewControllerRepresentable {
             return layout
         }()
         
+        var addCallback: (() -> ())?
         var selectedColor: Binding<SemanticColor>?
         var colors: [SemanticColor] = []
         lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -48,8 +50,9 @@ struct CollectionView: UIViewControllerRepresentable {
         }
         
         func numberOfSections(in collectionView: UICollectionView) -> Int {
-            let quotient = colors.count / (numberOfColumns * numberOfRows)
-            let remainder = colors.count % (numberOfColumns * numberOfRows)
+            let count = colors.count + 1
+            let quotient = count / (numberOfColumns * numberOfRows)
+            let remainder = count % (numberOfColumns * numberOfRows)
             let number =  remainder > 0 ? quotient + 1 : quotient
             pageControl.numberOfPages = number
             return number
@@ -70,6 +73,10 @@ struct CollectionView: UIViewControllerRepresentable {
                     cell.isSelected = semanticColor == selectedColor?.wrappedValue
                 }
                 return view
+            } else if indexPath.section * numberOfRows * numberOfColumns + indexPath.row == colors.count {
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "add", for: indexPath) as! AddCell
+                cell.callback = addCallback
+                return cell
             } else {
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "empty", for: indexPath)
             }
@@ -101,6 +108,7 @@ struct CollectionView: UIViewControllerRepresentable {
             cv.collectionViewLayout = layout
             cv.register(Cell.self, forCellWithReuseIdentifier: "cell")
             cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "empty")
+            cv.register(AddCell.self, forCellWithReuseIdentifier: "add")
             cv.reloadData()
             cv.isScrollEnabled = true
             cv.isPagingEnabled = true
@@ -134,6 +142,7 @@ struct CollectionView: UIViewControllerRepresentable {
         let vc = ViewController()
         vc.selectedColor = _selectedColor
         vc.colors = colors
+        vc.addCallback = addCallback
         
         return vc
     }
@@ -141,9 +150,52 @@ struct CollectionView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {
         uiViewController.selectedColor = _selectedColor
         uiViewController.colors = colors
+        uiViewController.addCallback = addCallback
         uiViewController.collectionView.reloadData()
     }
 
+}
+
+private class AddCell: UICollectionViewCell {
+    
+    private var buttonView = UIButton(type: .system)
+    var callback: (() -> ())?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+    
+    @objc private func selected(_ sender: UIButton) {
+        callback?()
+    }
+    
+    private func setup() {
+        buttonView.setTitle("Add", for: .normal)
+        buttonView.translatesAutoresizingMaskIntoConstraints = false
+        buttonView.addTarget(self, action: #selector(selected(_:)), for: .primaryActionTriggered)
+        
+        contentView.addSubview(buttonView)
+        
+        buttonView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
+            .isActive = true
+        buttonView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            .isActive = true
+        buttonView.widthAnchor.constraint(equalTo: contentView.widthAnchor)
+            .isActive = true
+        buttonView.heightAnchor.constraint(equalTo: contentView.heightAnchor)
+            .isActive = true
+        
+        contentView.layer.cornerRadius = 8
+        contentView.layer.masksToBounds = true
+        contentView.isOpaque = true
+        contentView.backgroundColor = UIColor.systemGray3
+    }
 }
 
 private class Cell: UICollectionViewCell {
