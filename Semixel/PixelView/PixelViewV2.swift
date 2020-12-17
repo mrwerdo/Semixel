@@ -97,9 +97,18 @@ struct ColorTabV2: View {
     }
 }
 
-struct SemanticColor: Equatable {
+class SemanticColor: Equatable {
     var label: String
     var color: PixelImage.RGBA
+    
+    init(label: String, color: PixelImage.RGBA) {
+        self.label = label
+        self.color = color
+    }
+    
+    static func ==(lhs: SemanticColor, rhs: SemanticColor) -> Bool {
+        return lhs.label == rhs.label && lhs.color == rhs.color
+    }
 }
 
 extension SemanticColor {
@@ -108,20 +117,13 @@ extension SemanticColor {
             return CGColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)
         }
         set {
-            let rgbCGColor = newValue.converted(to: CGColorSpaceCreateDeviceRGB(),
-                                                intent: .defaultIntent,
-                                                options: nil)
-            guard let components = rgbCGColor?.components, components.count == 4 || components.count == 3 else {
-                return
+            var r: CGFloat = 0
+            var g: CGFloat = 0
+            var b: CGFloat = 0
+            var a: CGFloat = 0
+            if UIColor(cgColor: newValue).getRed(&r, green: &g, blue: &b, alpha: &a) {
+                color = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
             }
-            
-            let r = components[0]
-            let b = components[1]
-            let g = components[2]
-            
-            let a = components.count == 4 ? components[3] : 1.0
-            
-            color = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
         }
     }
 }
