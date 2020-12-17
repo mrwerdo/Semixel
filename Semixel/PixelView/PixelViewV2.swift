@@ -97,48 +97,19 @@ struct ColorTabV2: View {
     }
 }
 
+struct SemanticColor: Equatable {
+    var label: String
+    var color: PixelImage.RGBA
+}
+
 struct ColorPalette: View {
-    
-    @Binding var colors: [PixelImage.RGBA]
-    @Binding var selectedColor: PixelImage.RGBA
-    
-    let numberOfColumns: Int = 1
-    let numberOfRows: Int = 2
-    
-    func color(_ section: Int, x: Int, y: Int) -> PixelImage.RGBA? {
-        let index = section * numberOfColumns * numberOfRows + y * numberOfRows + x
-        if index < colors.count {
-            return colors[index]
-        }
-        return nil
-    }
-    
-    var numberOfSections: Int {
-        let quotient = colors.count / (numberOfColumns * numberOfRows)
-        let remainder = colors.count % (numberOfColumns * numberOfRows)
-        return remainder > 0 ? quotient + 1 : quotient
-    }
+    @Binding var colors: [SemanticColor]
+    @Binding var selectedColor: SemanticColor
     
     var body: some View {
-        TabView() {
-            ForEach(0..<numberOfSections) { section in
-                HStack(alignment: .top, spacing: 8) {
-                    ForEach(0..<numberOfColumns) { j in
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(0..<numberOfRows) { i in
-                                if let color = self.color(section, x: i, y: j) {
-                                    ColorTabV2(tag: section * numberOfColumns * numberOfRows + j * numberOfRows + i,
-                                               color: color,
-                                               state: $selectedColor)
-                                }
-                            }
-                        }.fixedSize()
-                    }
-                }
-                .padding(.bottom, 32)
-            }
-        }
-        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+        CollectionView(colors: colors, selectedColor: $selectedColor)
+            .padding([.top], 12)
+            .padding([.leading, .trailing], 8)
         .background(RoundedRectangle(cornerRadius: 8).fill(Color(UIColor.secondarySystemFill)))
     }
 }
@@ -403,8 +374,18 @@ struct OverlayView: View {
 
 struct PixelViewV2: View {
     @EnvironmentObject var artwork: Artwork
-    @State var colors: [PixelImage.RGBA] = PixelImage.RGBA.defaultColorPalette
-    @State var selectedColor: PixelImage.RGBA = PixelImage.RGBA.defaultColorPalette.first ?? PixelImage.RGBA.white
+    @State var colors: [SemanticColor] = PixelImage.RGBA
+        .defaultColorPalette
+        .enumerated()
+        .map {
+            SemanticColor(label: "\($0)", color: $1)
+        }
+    
+    var selectedColor: PixelImage.RGBA {
+        return selectedObject.color
+    }
+    
+    @State var selectedObject = SemanticColor(label: "0", color: PixelImage.RGBA.defaultColorPalette.first ?? PixelImage.RGBA.white)
     @State var statusText: String = ""
     
     var size: CGSize {
@@ -557,7 +538,7 @@ struct PixelViewV2: View {
                             }
                         }
                     }.padding([.top, .bottom, .leading])
-                    ColorPalette(colors: $colors, selectedColor: $selectedColor)
+                    ColorPalette(colors: $colors, selectedColor: $selectedObject)
                         .padding([.top, .bottom, .trailing])
                     Spacer()
                 }
