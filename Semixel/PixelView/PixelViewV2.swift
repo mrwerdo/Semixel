@@ -66,8 +66,8 @@ struct CursorDragGestureView<Content>: View {
 
 struct ColorTabV2: View {
     var tag: Int
-    var color: PixelImage.RGBA
-    @Binding var state: PixelImage.RGBA
+    var color: RGBA
+    @Binding var state: RGBA
     
     var body: some View {
         Button(action: {
@@ -99,9 +99,9 @@ struct ColorTabV2: View {
 
 class SemanticColor: Equatable {
     var label: String
-    var color: PixelImage.RGBA
+    var color: RGBA
     
-    init(label: String, color: PixelImage.RGBA) {
+    init(label: String, color: RGBA) {
         self.label = label
         self.color = color
     }
@@ -122,7 +122,7 @@ extension SemanticColor {
             var b: CGFloat = 0
             var a: CGFloat = 0
             if UIColor(cgColor: newValue).getRed(&r, green: &g, blue: &b, alpha: &a) {
-                color = PixelImage.RGBA(red: r, green: g, blue: b, alpha: a)
+                color = RGBA(red: r, green: g, blue: b, alpha: a)
             }
         }
     }
@@ -336,7 +336,7 @@ struct RedoState: OneShotState {
 struct OverlayView: View {
     
     var pixelSize: CGSize
-    var image: PixelImage
+    var image: PixelImage<RGBA>
     var position: CGPoint
     
     var shapeStartPosition: Point2D?
@@ -409,18 +409,18 @@ struct OverlayView: View {
 
 struct PixelViewV2: View {
     @EnvironmentObject var artwork: Artwork
-    @State var colors: [SemanticColor] = PixelImage.RGBA
+    @State var colors: [SemanticColor] = RGBA
         .defaultColorPalette
         .enumerated()
         .map {
             SemanticColor(label: "\($0)", color: $1)
         }
     
-    var selectedColor: PixelImage.RGBA {
+    var selectedColor: RGBA {
         return selectedObject.color
     }
     
-    @State var selectedObject = SemanticColor(label: "0", color: PixelImage.RGBA.defaultColorPalette.first ?? PixelImage.RGBA.white)
+    @State var selectedObject = SemanticColor(label: "0", color: RGBA.defaultColorPalette.first ?? RGBA.white)
     @State var statusText: String = ""
     
     var size: CGSize {
@@ -477,7 +477,7 @@ struct PixelViewV2: View {
         return !(p.x < 0 || p.y < 0 || p.x >= size.width || p.y >= size.height)
     }
     
-    func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage {
+    func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<RGBA> {
         let p3 = convertToInteger(translation)
         let a = p1 + p3
         let b = p2 + p3
@@ -489,7 +489,7 @@ struct PixelViewV2: View {
         }
     }
     
-    var composedImage: PixelImage {
+    var composedImage: PixelImage<RGBA> {
         if let p1 = shapeStartPosition, tool == .shape {
             // Render shape on top of the image.
             

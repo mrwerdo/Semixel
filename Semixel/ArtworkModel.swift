@@ -17,7 +17,7 @@ class Artwork: Identifiable, ObservableObject {
     
     var name: String
     var url: URL
-    @Published var pixelImage: PixelImage
+    @Published var pixelImage: PixelImage<RGBA>
 
     private var uiImage: UIImage? {
         return UIImage(contentsOfFile: url.path)
@@ -40,7 +40,11 @@ class Artwork: Identifiable, ObservableObject {
     init(name: String, url: URL) {
         self.name = name
         self.url = url
-        self.pixelImage = PixelImage(uiImage: UIImage(contentsOfFile: url.path)!)
+        let image = UIImage(contentsOfFile: url.path)!
+        self.pixelImage = PixelImage<RGBA>(width: image.width, height: image.height)
+        image.enumeratePixels { (x, y, color) in
+            self.pixelImage.buffer[y * pixelImage.size.width + x] = color
+        }
     }
     
 }
@@ -154,7 +158,7 @@ final class ArtworkModel: ObservableObject {
     
     func createArtwork() throws -> Artwork {
         let filename = getFilename()
-        let image = PixelImage(width: 32, height: 32)
+        let image = PixelImage<RGBA>(width: 32, height: 32)
         let url = try ArtworkModel.getArtworkUrl().appendingPathComponent(filename)
         
         try image.write(to: url)

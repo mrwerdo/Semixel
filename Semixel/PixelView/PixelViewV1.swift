@@ -99,7 +99,7 @@ struct PixelViewV1: View {
     
     @EnvironmentObject var artwork: Artwork
     
-    var image: PixelImage {
+    var image: PixelImage<RGBA> {
         get {
             return artwork.pixelImage
         }
@@ -146,7 +146,7 @@ struct PixelViewV1: View {
             })
     }
     
-    var composedImage: PixelImage {
+    var composedImage: PixelImage<RGBA> {
         if let p1 = shapeStartPosition, tool == .shape {
             // Render shape on top of the image.
             guard let p2 = pencilGridPosition else {
@@ -154,7 +154,7 @@ struct PixelViewV1: View {
                 return image
             }
             
-            guard let c = PixelImage.RGBA(color) else {
+            guard let c = RGBA(color) else {
                 print("warning: could not get current color")
                 return image
             }
@@ -291,7 +291,7 @@ struct PixelViewV1: View {
     }
     
     func onDrag() {
-        if depressed, tool == .pencil, let p = pencilGridPosition, let c = PixelImage.RGBA(color) {
+        if depressed, tool == .pencil, let p = pencilGridPosition, let c = RGBA(color) {
             applyPencil(p, c)
         }
     }
@@ -301,7 +301,7 @@ struct PixelViewV1: View {
     }
     
     func interactionStarted() {
-        guard let p = pencilGridPosition, let c = PixelImage.RGBA(color) else {
+        guard let p = pencilGridPosition, let c = RGBA(color) else {
             return
         }
         
@@ -313,7 +313,7 @@ struct PixelViewV1: View {
     }
     
     func interactionEnded() {
-        guard let p = pencilGridPosition, let c = PixelImage.RGBA(color) else {
+        guard let p = pencilGridPosition, let c = RGBA(color) else {
             return
         }
         
@@ -331,11 +331,11 @@ struct PixelViewV1: View {
         }
     }
     
-    func applyPencil(_ p: Point2D, _ color: PixelImage.RGBA) {
+    func applyPencil(_ p: Point2D, _ color: RGBA) {
         image[p] = color
     }
     
-    func applyPaintBucket(_ p: Point2D, _ color: PixelImage.RGBA) {
+    func applyPaintBucket(_ p: Point2D, _ color: RGBA) {
         // actually works like a paint bucket, but who cares...
         let oldColor = image[p]
         let points = image.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
@@ -344,24 +344,24 @@ struct PixelViewV1: View {
         }
     }
     
-    func startShape(_ point: Point2D, _ color: PixelImage.RGBA) {
+    func startShape(_ point: Point2D, _ color: RGBA) {
         shapeStartPosition = point
     }
     
-    func endShape(_ point: Point2D, _ color: PixelImage.RGBA) {
+    func endShape(_ point: Point2D, _ color: RGBA) {
         if let start = shapeStartPosition {
             image = image.drawEllipse(from: start, to: point, color: color)
             shapeStartPosition = nil
         }
     }
     
-    func startSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
+    func startSelection(_ point: Point2D, _ color: RGBA) {
         if shapeStartPosition == nil {
             shapeStartPosition = point
         }
     }
     
-    func endSelection(_ point: Point2D, _ color: PixelImage.RGBA) {
+    func endSelection(_ point: Point2D, _ color: RGBA) {
         if let p2 = shapeEndPosition {
             if let p1 = shapeStartPosition {
                 image = image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))

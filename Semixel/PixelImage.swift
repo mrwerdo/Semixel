@@ -11,45 +11,62 @@ import SwiftUI
 import UIKit
 
 
-struct PixelImage {
-    struct RGBA: Equatable {
-        var red: CGFloat
-        var green: CGFloat
-        var blue: CGFloat
-        var alpha: CGFloat
-        
-        static var white: RGBA {
-            return RGBA(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        }
-        
-        static var clear: RGBA {
-            return RGBA(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
-        }
-        
-        init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
-            self.red = red
-            self.green = green
-            self.blue = blue
-            self.alpha = alpha
-        }
-        
-        init?(_ color: Color) {
-            red = 0; green = 0; blue = 0; alpha = 0
-            guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
-                return nil
-            }
-        }
-        
-        init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
-            self.init(
-                red: CGFloat(red)/255,
-                green: CGFloat(green)/255,
-                blue: CGFloat(blue)/255,
-                alpha: CGFloat(alpha)/255)
+protocol ColorTypeProtocol {
+    static var clear: Self { get }
+    static var cgColorSpace: CGColorSpace { get }
+    func convertToCGColor() -> CGColor
+}
+
+struct RGBA: Equatable, ColorTypeProtocol {
+    func convertToCGColor() -> CGColor {
+        var components: [CGFloat] = [
+            red,
+            green,
+            blue,
+            alpha
+        ]
+        return CGColor(colorSpace: RGBA.cgColorSpace, components: &components)!
+    }
+    
+    var red: CGFloat
+    var green: CGFloat
+    var blue: CGFloat
+    var alpha: CGFloat
+    
+    static var white: RGBA {
+        return RGBA(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+    }
+    
+    static var clear: RGBA {
+        return RGBA(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
+    }
+    
+    init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        self.red = red
+        self.green = green
+        self.blue = blue
+        self.alpha = alpha
+    }
+    
+    init?(_ color: Color) {
+        red = 0; green = 0; blue = 0; alpha = 0
+        guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+            return nil
         }
     }
     
-    var buffer: [RGBA]
+    init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
+        self.init(
+            red: CGFloat(red)/255,
+            green: CGFloat(green)/255,
+            blue: CGFloat(blue)/255,
+            alpha: CGFloat(alpha)/255)
+    }
+}
+
+struct PixelImage<ColorType: ColorTypeProtocol> {
+    
+    var buffer: [ColorType]
     private(set) var size: Size2D
     
     init(copy: PixelImage) {
@@ -58,7 +75,7 @@ struct PixelImage {
     }
     
     init(width: Int, height: Int) {
-        buffer = [RGBA](repeating: .white, count: width * height)
+        buffer = [ColorType](repeating: .clear, count: width * height)
         size = Size2D(width: width, height: height)
     }
     
@@ -66,7 +83,7 @@ struct PixelImage {
         return point.x >= 0 && point.x < size.width && point.y >= 0 && point.y < size.height
     }
     
-    func floodSearch(at point: Point2D, isIncluded: (_ point: Point2D, _ color: RGBA) -> Bool) -> [Point2D] {
+    func floodSearch(at point: Point2D, isIncluded: (_ point: Point2D, _ color: ColorType) -> Bool) -> [Point2D] {
         var unvisitedPoints: [Point2D] = [point]
         var points = unvisitedPoints
         
@@ -90,7 +107,7 @@ struct PixelImage {
         return points
     }
     
-    subscript(x: Int, y: Int) -> RGBA {
+    subscript(x: Int, y: Int) -> ColorType {
         get {
             return buffer[y * size.width + x]
         }
@@ -100,7 +117,7 @@ struct PixelImage {
         }
     }
     
-    subscript(point: Point2D) -> RGBA {
+    subscript(point: Point2D) -> ColorType {
         get {
             return self[point.x, point.y]
         }
@@ -120,7 +137,7 @@ extension PixelImage {
         
         for y in a.y...b.y {
             for x in a.x...b.x {
-                img[x, y] = .white
+                img[x, y] = .clear
             }
         }
         
@@ -133,7 +150,7 @@ extension PixelImage {
         return img
     }
 
-    func drawEllipse(from p0: Point2D, to p1: Point2D, color: RGBA) -> PixelImage {
+    func drawEllipse(from p0: Point2D, to p1: Point2D, color: ColorType) -> PixelImage {
         
         // Source: http://members.chello.at/~easyfilter/Bresenham.pdf
         
@@ -210,7 +227,7 @@ extension PixelImage {
         return img
     }
 
-    func drawLine(from p1: Point2D, to p2: Point2D, color: RGBA) -> PixelImage {
+    func drawLine(from p1: Point2D, to p2: Point2D, color: ColorType) -> PixelImage {
         // See the algorithm here: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
         var path: [Point2D] = [p1]
@@ -277,7 +294,7 @@ extension PixelImage {
 }
 
 
-extension PixelImage.RGBA {
+extension RGBA {
     
 //    {"Flickr Pink":"f72585",
 //    "Byzantine":"b5179e",
@@ -295,12 +312,12 @@ extension PixelImage.RGBA {
 //    /* Object */
 //    {"Xiketic":"03071e","Dark Sienna":"370617","Rosewood":"6a040f","Dark Red":"9d0208","Rosso Corsa":"d00000","Vermilion":"dc2f02","Persimmon":"e85d04","Carrot Orange":"f48c06","Orange Web":"faa307","Selective Yellow":"ffba08"}
     
-    static let defaultColorPalette: [PixelImage.RGBA] = [
+    static let defaultColorPalette: [RGBA] = [
         "f72585", "b5179e", "7209b7", "560bad", "480ca8",
         "3a0ca3", "3f37c9", "4361ee", "4895ef", "4cc9f0",
         // Second one
         "03071e","370617","6a040f","9d0208","d00000","dc2f02","e85d04","f48c06","faa307","ffba08",
-    ].compactMap(PixelImage.RGBA.init(hex:))
+    ].compactMap(RGBA.init(hex:))
     
     init?(hex: String) {
         if hex.count == 6, let value = Int(hex, radix: 16) {
@@ -319,21 +336,28 @@ extension PixelImage.RGBA {
     }
 }
 
-extension PixelImage {
-    
-    init(uiImage: UIImage) {
-        self.init(width: uiImage.width, height: uiImage.height)
-        uiImage.enumeratePixels { (x, y, color) in
-            buffer[y * size.width + x] = color
+struct WritingError: Error, CustomStringConvertible {
+    var description: String
+}
+
+extension RGBA {
+    static var cgColorSpace: CGColorSpace {
+        get {
+            return CGColorSpaceCreateDeviceRGB()
         }
     }
+}
+
+extension PixelImage {
+    
+//    init(uiImage: UIImage) {
+//        self.init(width: uiImage.width, height: uiImage.height)
+//        uiImage.enumeratePixels { (x, y, color) in
+//            buffer[y * size.width + x] = color
+//        }
+//    }
     
     func write(to url: URL) throws {
-        
-        struct WritingError: Error, CustomStringConvertible {
-            var description: String
-        }
-        
         guard let img = convertToCGImage() else {
             throw WritingError(description: "Could not create CGImage.")
         }
@@ -348,13 +372,18 @@ extension PixelImage {
     func convertToCGImage() -> CGImage? {
         var buffer = [UInt8](repeating: 0, count: size.width * size.height * 4)
         
+        let colorSpace: CGColorSpace = ColorType.cgColorSpace
+        
         for y in 0..<size.height {
             for x in 0..<size.width {
-                let c = self[x, y]
-                buffer[4 * (y * size.width + x) + 0] = UInt8((c.red * 255).rounded())
-                buffer[4 * (y * size.width + x) + 1] = UInt8((c.green * 255).rounded())
-                buffer[4 * (y * size.width + x) + 2] = UInt8((c.blue * 255).rounded())
-                buffer[4 * (y * size.width + x) + 3] = UInt8((c.alpha * 255).rounded())
+                guard let components = self[x, y].convertToCGColor().components else {
+                    fatalError("The converted color must have accessible components.")
+                }
+                
+                let n = colorSpace.numberOfComponents
+                for (i, c) in components.enumerated() {
+                    buffer[n * (y * size.width + x) + i] = UInt8((c * 255).rounded())
+                }
             }
         }
         
@@ -362,7 +391,6 @@ extension PixelImage {
             return nil
         }
         
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bpc = 8 * MemoryLayout<UInt8>.stride
         let bpp = 8 * MemoryLayout<UInt8>.stride * 4
         let bpr = size.width * 4
@@ -376,7 +404,8 @@ extension PixelImage {
                        bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
                        provider: provider,
                        decode: nil,
-                       shouldInterpolate: false, intent: .defaultIntent)
+                       shouldInterpolate: false,
+                       intent: .defaultIntent)
     }
 }
 
@@ -390,7 +419,7 @@ extension UIImage {
         return cgImage?.height ?? 0
     }
 
-    private func extractPixel(_ componentLayout: CGBitmapInfo.ComponentLayout, _ dataPtr: UnsafePointer<UInt8>, _ pixelOffset: Int, _ cgImage: CGImage) -> PixelImage.RGBA {
+    private func extractPixel(_ componentLayout: CGBitmapInfo.ComponentLayout, _ dataPtr: UnsafePointer<UInt8>, _ pixelOffset: Int, _ cgImage: CGImage) -> RGBA {
         if componentLayout.count == 4 {
             let index: (r: Int, g: Int, b: Int, a: Int)
             
@@ -421,7 +450,7 @@ extension UIImage {
                 blue = UInt8((CGFloat(blue)*invUnitAlpha).rounded())
             }
             
-            return PixelImage.RGBA(red: red, green: green, blue: blue, alpha: alpha)
+            return RGBA(red: red, green: green, blue: blue, alpha: alpha)
             
         } else if componentLayout.count == 3 {
             let index: (r: Int, g: Int, b: Int)
@@ -435,10 +464,10 @@ extension UIImage {
                 return .clear
             }
             
-            return PixelImage.RGBA(red: dataPtr[pixelOffset + index.r],
-                                   green: dataPtr[pixelOffset + index.g],
-                                   blue: dataPtr[pixelOffset + index.b],
-                                   alpha: 255)
+            return RGBA(red: dataPtr[pixelOffset + index.r],
+                        green: dataPtr[pixelOffset + index.g],
+                        blue: dataPtr[pixelOffset + index.b],
+                        alpha: 255)
             
         } else {
             assertionFailure("Unsupported number of pixel components")
@@ -446,7 +475,7 @@ extension UIImage {
         }
     }
     
-    func pixelColor(x: Int, y: Int) -> PixelImage.RGBA {
+    func pixelColor(x: Int, y: Int) -> RGBA {
         assert(
             0..<width ~= x && 0..<height ~= y,
             "Pixel coordinates are out of bounds")
@@ -476,7 +505,7 @@ extension UIImage {
         return extractPixel(componentLayout, dataPtr, pixelOffset, cgImage)
     }
     
-    func enumeratePixels(_ closure: (_ x: Int, _ y: Int, _ color: PixelImage.RGBA) -> ()) {
+    func enumeratePixels(_ closure: (_ x: Int, _ y: Int, _ color: RGBA) -> ()) {
         guard
             let cgImage = cgImage,
             let data = cgImage.dataProvider?.data,

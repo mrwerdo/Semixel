@@ -204,7 +204,7 @@ private class Cell: UICollectionViewCell {
             update()
         }
     }
-    var color: PixelImage.RGBA = .clear {
+    var color: RGBA = .clear {
         didSet {
             update()
         }

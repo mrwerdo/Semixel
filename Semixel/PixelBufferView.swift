@@ -11,14 +11,14 @@ import SwiftUI
 struct PixelBufferView: UIViewRepresentable {
     
     var pixelSize: CGSize
-    var image: PixelImage
+    var image: PixelImage<RGBA>
         
     var size: CGSize {
         return CGSize(width: CGFloat(image.size.width) * pixelSize.width,
                       height: CGFloat(image.size.height) * pixelSize.height)
     }
     
-    init(pixelSize: CGSize, image: PixelImage) {
+    init(pixelSize: CGSize, image: PixelImage<RGBA>) {
         self.pixelSize = pixelSize
         self.image = image
     }
@@ -45,13 +45,13 @@ class BufferView: UIView {
         }
     }
     
-    var image: PixelImage {
+    var image: PixelImage<RGBA> {
         didSet {
             setNeedsDisplay()
         }
     }
     
-    init(image: PixelImage, pixelSize: CGSize, frame: CGRect) {
+    init(image: PixelImage<RGBA>, pixelSize: CGSize, frame: CGRect) {
         self.image = image
         self.pixelSize = pixelSize
         super.init(frame: frame)
