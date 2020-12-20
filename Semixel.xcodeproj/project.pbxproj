@@ -26,6 +26,7 @@
 		86F52043259015D000C19E41 /* RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F52042259015D000C19E41 /* RGBA.swift */; };
 		86F520462590164300C19E41 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520452590164300C19E41 /* FolderMonitor.swift */; };
 		86F520492590166800C19E41 /* Artwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520482590166800C19E41 /* Artwork.swift */; };
+		86F520542590190D00C19E41 /* PixelImage+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520532590190D00C19E41 /* PixelImage+UIImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		86F52042259015D000C19E41 /* RGBA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGBA.swift; sourceTree = "<group>"; };
 		86F520452590164300C19E41 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		86F520482590166800C19E41 /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
+		86F520532590190D00C19E41 /* PixelImage+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PixelImage+UIImage.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,7 +116,6 @@
 			children = (
 				86F520482590166800C19E41 /* Artwork.swift */,
 				866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */,
-				86F520452590164300C19E41 /* FolderMonitor.swift */,
 				866C99BF2581D6CC00FAEF03 /* PixelImage.swift */,
 				86F52042259015D000C19E41 /* RGBA.swift */,
 			);
@@ -157,7 +158,9 @@
 			isa = PBXGroup;
 			children = (
 				86B90BDF25565AB600DC7D55 /* Coordinates.swift */,
+				86F520452590164300C19E41 /* FolderMonitor.swift */,
 				86B90BE025565AB600DC7D55 /* Geometry.swift */,
+				86F520532590190D00C19E41 /* PixelImage+UIImage.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -248,6 +251,7 @@
 				863959D22582F4B800618179 /* PixelViewV1.swift in Sources */,
 				86F520492590166800C19E41 /* Artwork.swift in Sources */,
 				864E74D924B714B20000A1AB /* ContentView.swift in Sources */,
+				86F520542590190D00C19E41 /* PixelImage+UIImage.swift in Sources */,
 				86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */,
 				86D15339257DAAC400A23127 /* ToolsView.swift in Sources */,
 				86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */,
