@@ -380,7 +380,7 @@ extension PixelImage {
                     fatalError("The converted color must have accessible components.")
                 }
                 
-                let n = colorSpace.numberOfComponents
+                let n = colorSpace.numberOfComponents + 1
                 for (i, c) in components.enumerated() {
                     buffer[n * (y * size.width + x) + i] = UInt8((c * 255).rounded())
                 }
