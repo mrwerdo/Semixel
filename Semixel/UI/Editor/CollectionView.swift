@@ -18,7 +18,7 @@ struct CollectionView: UIViewControllerRepresentable {
     class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
         var layout: UICollectionViewFlowLayout = {
             let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: 64, height: 32)
+            layout.itemSize = CGSize(width: 26, height: 26)
             layout.minimumInteritemSpacing = 4
             layout.minimumLineSpacing = 4
             layout.scrollDirection = .horizontal
@@ -68,8 +68,6 @@ struct CollectionView: UIViewControllerRepresentable {
                 let view = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
                 if let cell = view as? Cell {
                     cell.color = semanticColor.color
-                    cell.label = semanticColor.label
-                    
                     cell.isSelected = semanticColor == selectedColor?.wrappedValue
                 }
                 return view
@@ -176,7 +174,7 @@ private class AddCell: UICollectionViewCell {
     }
     
     private func setup() {
-        buttonView.setTitle("Add", for: .normal)
+        buttonView.setTitle("+", for: .normal)
         buttonView.translatesAutoresizingMaskIntoConstraints = false
         buttonView.addTarget(self, action: #selector(selected(_:)), for: .primaryActionTriggered)
         
@@ -199,11 +197,6 @@ private class AddCell: UICollectionViewCell {
 }
 
 private class Cell: UICollectionViewCell {
-    var label: String = "" {
-        didSet {
-            update()
-        }
-    }
     var color: RGBA = .clear {
         didSet {
             update()
@@ -222,17 +215,10 @@ private class Cell: UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            if isSelected {
-                labelView.backgroundColor = UIColor.systemGray2
-                borderView.layer.borderColor = UIColor.tertiaryLabel.cgColor
-            } else {
-                labelView.backgroundColor = UIColor.systemGray3
-                borderView.layer.borderColor = UIColor.secondaryLabel.cgColor
-            }
+            borderView.isHidden = !isSelected
         }
     }
     
-    private var labelView: UILabel = UILabel()
     private var borderView: UIView = UIView()
 
     override init(frame: CGRect) {
@@ -248,35 +234,20 @@ private class Cell: UICollectionViewCell {
     }
     
     private func setup() {
-        labelView.translatesAutoresizingMaskIntoConstraints = false
-        labelView.backgroundColor = UIColor.systemGray3
-        labelView.textColor = UIColor.link
-        contentView.addSubview(labelView)
-        labelView.textAlignment = .center
-        labelView.centerXAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
-            .isActive = true
-        labelView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-            .isActive = true
-        labelView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.5)
-            .isActive = true
-        labelView.heightAnchor.constraint(equalTo: contentView.heightAnchor)
-            .isActive = true
-        
         contentView.backgroundColor = UIColor(red: color.red,
                                               green: color.green,
                                               blue: color.blue,
                                               alpha: color.alpha)
         contentView.layer.cornerRadius = 8
-        contentView.layer.masksToBounds = true
         contentView.isOpaque = true
         
         borderView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(borderView)
         borderView.isOpaque = false
         
-        borderView.layer.borderColor = UIColor.secondaryLabel.cgColor
+        borderView.layer.borderColor = UIColor.tertiaryLabel.cgColor
         let borderWidth: CGFloat = 0
-        borderView.layer.borderWidth = 3
+        borderView.layer.borderWidth = 4
         borderView.layer.cornerRadius = 8
         borderView.backgroundColor = nil
         borderView.isOpaque = false
@@ -289,10 +260,10 @@ private class Cell: UICollectionViewCell {
             .isActive = true
         borderView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -borderWidth)
             .isActive = true
+        borderView.isHidden = true
     }
     
     private func update() {
-        labelView.text = label
         contentView.backgroundColor = UIColor(red: color.red,
                                             green: color.green,
                                             blue: color.blue,

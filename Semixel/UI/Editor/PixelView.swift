@@ -113,6 +113,60 @@ struct PixelView: View {
         }
     }
     
+    @ViewBuilder
+    var tools: some View {
+        HStack {
+            ShapeState.create($tool,
+                              resizing: resizing(statusText: "Shape tool."),
+                              translating: translating,
+                              complete: completed { (p1, p2, offset) in
+                                artwork.pixelImage = translatedShape(p1: p1, p2: p2)
+                              })
+            SelectionState.create($tool,
+                                  resizing: resizing(statusText: "Selection tool."),
+                                  translating: translating,
+                                  complete: completed { (p1, p2, offset) in
+                                    artwork.pixelImage = artwork.pixelImage.moveRectangle(between: p1,
+                                                                                          and: p2,
+                                                                                          by: offset)
+                                  })
+            PaintBucketState.create($tool) {
+                statusText = "Applied paint bucket."
+                if let p = pencilGridPosition {
+                    let oldColor = artwork.pixelImage[p]
+                    let points = artwork.pixelImage.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
+                    for point in points {
+                        artwork.pixelImage[point] = selectedColor
+                    }
+                }
+            }
+            PencilState.create($tool) {
+                reset()
+                statusText = "Pencil selected."
+                if let p = pencilGridPosition {
+                    applyPencil(p)
+                }
+            }
+            UndoState.create($tool) {
+                statusText = "Undone"
+            }
+            RedoState.create($tool) {
+                statusText = "Redone"
+            }
+        }
+    }
+    
+    @State var identifier = SemanticIdentifier(id: 0, name: "Default", colorPalette: [], children: [
+        SemanticIdentifier(id: 1, name: "Grid", colorPalette: RGBA.defaultColorPalette, children: []),
+        SemanticIdentifier(id: 2, name: "Background"),
+        SemanticIdentifier(id: 3, name: "Panels", children: [
+            SemanticIdentifier(id: 4, name: "Highlight"),
+            SemanticIdentifier(id: 5, name: "Lowlight")
+        ])
+    ])
+    
+    @State var selectedSemanticIdentifier: Int = 0
+    
     var body: some View {
         VStack {
             Spacer()
@@ -127,58 +181,17 @@ struct PixelView: View {
                 .padding()
             Spacer()
             Text(statusText)
-            ZStack {
+            VStack {
+                tools.padding(.top)
                 HStack {
                     Spacer()
-                    HStack {
-                        VStack {
-                            PencilState.create($tool) {
-                                reset()
-                                statusText = "Pencil selected."
-                                if let p = pencilGridPosition {
-                                    applyPencil(p)
-                                }
-                            }
-                            ShapeState.create($tool,
-                                              resizing: resizing(statusText: "Shape tool."),
-                                              translating: translating,
-                                              complete: completed { (p1, p2, offset) in
-                                    artwork.pixelImage = translatedShape(p1: p1, p2: p2)
-                            })
-                            UndoState.create($tool) {
-                                statusText = "Undone"
-                            }
-                        }
-                        VStack {
-                            PaintBucketState.create($tool) {
-                                statusText = "Applied paint bucket."
-                                if let p = pencilGridPosition {
-                                    let oldColor = artwork.pixelImage[p]
-                                    let points = artwork.pixelImage.floodSearch(at: p) { (_, c) -> Bool in c == oldColor }
-                                    for point in points {
-                                        artwork.pixelImage[point] = selectedColor
-                                    }
-                                }
-                            }
-                            
-                            SelectionState.create($tool,
-                                                  resizing: resizing(statusText: "Selection tool."),
-                                                  translating: translating,
-                                                  complete: completed { (p1, p2, offset) in
-                                                    artwork.pixelImage = artwork.pixelImage.moveRectangle(between: p1,
-                                                                                                          and: p2,
-                                                                                                          by: offset)
-                                                  })
-                            RedoState.create($tool) {
-                                statusText = "Redone"
-                            }
-                        }
-                    }.padding([.top, .bottom, .leading])
+                    SemanticIdentifierView(root: $identifier, selection: $selectedSemanticIdentifier)
                     ColorPalette(colors: $colors, selectedColor: $selectedObject)
                         .padding([.top, .bottom, .trailing])
                     Spacer()
                 }
             }
+            .frame(height: 294)
             .fixedSize(horizontal: false, vertical: true)
             .background(Rectangle()
                             .fill(Color(UIColor.systemBackground))

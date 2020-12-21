@@ -49,7 +49,7 @@ struct ToolButton<State: ToolButtonState>: View {
                     .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
                 state.image
             }
-            .frame(width: 64, height: 64, alignment: .center)
+            .frame(width: 48, height: 48, alignment: .center)
         }
     }
 }

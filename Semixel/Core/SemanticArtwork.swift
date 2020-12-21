@@ -74,3 +74,16 @@ extension SemanticIdentifier {
     }
 }
 
+extension SemanticIdentifier: Identifiable {
+    var childrenOrNil: [SemanticIdentifier]? {
+        if children.count == 0 {
+            return nil
+        } else {
+            return children
+        }
+    }
+}
+
+extension SemanticIdentifier: Hashable {
+    
+}
