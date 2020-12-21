@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(model.artwork) { (artwork: Artwork) in
-                    let destination = PixelViewV2()
+                    let destination = PixelView()
                         .environmentObject(artwork)
                         .onDisappear(perform: save(artwork: artwork))
                     NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
