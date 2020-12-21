@@ -190,7 +190,7 @@ struct PixelView: View {
                 HStack {
                     Spacer()
                     SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
-                    ColorPalette(identifier: Binding { selectedSemanticIdentifier } set: { selectedSemanticIdentifierId = $0.id }, selectedColorIndex: $selectedColorIndex)
+                    ColorPaletteView(identifier: Binding { selectedSemanticIdentifier } set: { selectedSemanticIdentifierId = $0.id }, selectedColorIndex: $selectedColorIndex)
                         .padding([.top, .bottom, .trailing])
                     Spacer()
                 }

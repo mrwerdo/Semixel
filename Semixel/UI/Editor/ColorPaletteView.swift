@@ -69,7 +69,7 @@ struct ColorPaletteEditView: View {
     }
 }
 
-struct ColorPalette: View {
+struct ColorPaletteView: View {
     
     @Binding var identifier: SemanticIdentifier
     @Binding var selectedColorIndex: Int?

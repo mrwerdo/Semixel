@@ -25,10 +25,14 @@ class SemanticArtwork: Identifiable, ObservableObject {
     @Published
     var image: PixelImage<SemanticPixel<RGBA>>
     
+    @Published
+    var colorPalettes: ColorPaletteData
+    
     init(url: URL, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier) {
         self.url = url
         self.root = root
         self.image = image
+        self.colorPalettes = ColorPaletteData(semanticTag: 0, colors: [:])
     }
 }
 

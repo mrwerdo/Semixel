@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct PixelGridImage: View {
+struct PixelGridImageView: View {
     
     var horizontalSpacing: CGFloat = 8
     var verticalSpacing: CGFloat = 8

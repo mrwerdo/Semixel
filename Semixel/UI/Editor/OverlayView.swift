@@ -64,7 +64,7 @@ struct OverlayView: View {
     var body: some View {
         ZStack {
             PixelBufferView(pixelSize: pixelSize, image: normalImage)
-            PixelGridImage(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
+            PixelGridImageView(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
             
             if let p1 = shapeStartPosition {
                 if let p2 = shapeEndPosition {

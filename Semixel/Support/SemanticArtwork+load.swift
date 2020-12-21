@@ -9,11 +9,29 @@
 import Foundation
 import UIKit
 
+typealias SemanticTagType = Int
+typealias ColorIdType = Int
+
+struct EncodedSemanticPixel: Codable {
+    var semanticTag: SemanticTagType
+    var colorId: ColorIdType
+}
+
+struct ColorPaletteData: Codable {
+    var semanticTag: SemanticTagType
+    var colors: [ColorIdType : ColorPaletteObject]
+    
+    struct ColorPaletteObject: Codable {
+        var id: ColorIdType
+        var color: RGBA
+    }
+}
+
 struct EncodedSemanticArtwork: Codable {
     var size: Size2D
     var identifierTree: SemanticIdentifier
-    var semantics: [Int]
-    var pixels: [RGBA]
+    var colorPalettes: [Int : ColorPaletteData]
+    var pixels: [EncodedSemanticPixel]
 }
 
 func load<T: Decodable>(url: URL) throws -> T {
@@ -29,40 +47,41 @@ extension SemanticArtwork {
     }
     
     convenience init(url: URL, _ esa: EncodedSemanticArtwork) throws {
-        if esa.size.width * esa.size.height != esa.semantics.count {
-            throw DecodingError(description: "Incorrect number of semantic identifiers.")
-        }
-        
-        if esa.semantics.count != esa.pixels.count {
-            throw DecodingError(description: "Incorrect number of pixels.")
-        }
-        
-        // Check that every semantic identifier in the image is contained in semIdGraph.
-        for id in esa.semantics {
-            if !esa.identifierTree.contains(id) {
-                throw DecodingError(description: "Image contanis unknown semantic identifier.")
-            }
-        }
-
-        let buffer = zip(esa.semantics, esa.pixels).map { id, color in
-            SemanticPixel<RGBA>(id: id, color: color)
-        }
-        
-        let image = PixelImage<SemanticPixel<RGBA>>(size: esa.size, buffer: buffer)
-        self.init(url: url,
-                  image: image,
-                  root: esa.identifierTree)
+        fatalError()
+//        if esa.size.width * esa.size.height != esa.semantics.count {
+//            throw DecodingError(description: "Incorrect number of semantic identifiers.")
+//        }
+//
+//        if esa.semantics.count != esa.pixels.count {
+//            throw DecodingError(description: "Incorrect number of pixels.")
+//        }
+//
+//        // Check that every semantic identifier in the image is contained in semIdGraph.
+//        for id in esa.semantics {
+//            if !esa.identifierTree.contains(id) {
+//                throw DecodingError(description: "Image contanis unknown semantic identifier.")
+//            }
+//        }
+//
+//        let buffer = zip(esa.semantics, esa.pixels).map { id, color in
+//            SemanticPixel<RGBA>(id: id, color: color)
+//        }
+//
+//        let image = PixelImage<SemanticPixel<RGBA>>(size: esa.size, buffer: buffer)
+//        self.init(url: url,
+//                  image: image,
+//                  root: esa.identifierTree)
     }
     
     func write(to url: URL) throws {
-        let semantics = image.buffer.map { $0.id }
-        let pixels = image.buffer.map { $0.color }
-        let esa = EncodedSemanticArtwork(size: image.size,
-                                         identifierTree: root,
-                                         semantics: semantics,
-                                         pixels: pixels)
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(esa)
-        try data.write(to: url)
+//        let semantics = image.buffer.map { $0.id }
+//        let pixels = image.buffer.map { $0.color }
+//        let esa = EncodedSemanticArtwork(size: image.size,
+//                                         identifierTree: root,
+//                                         semantics: semantics,
+//                                         pixels: pixels)
+//        let encoder = JSONEncoder()
+//        let data = try encoder.encode(esa)
+//        try data.write(to: url)
     }
 }

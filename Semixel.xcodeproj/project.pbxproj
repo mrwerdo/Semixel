@@ -21,11 +21,11 @@
 		866C99C42581DCAD00FAEF03 /* ArtworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */; };
 		867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867DD94F25901A770013E03D /* SemanticArtwork.swift */; };
 		869C61312590280F00A5DD0D /* SemanticArtwork+load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C61302590280F00A5DD0D /* SemanticArtwork+load.swift */; };
-		869C823825902D7C00B0235E /* PixelGridImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImage.swift */; };
+		869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImageView.swift */; };
 		869C823C25902DD500B0235E /* ToolType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823B25902DD500B0235E /* ToolType.swift */; };
 		869C824225902E2E00B0235E /* ToolButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824125902E2E00B0235E /* ToolButton.swift */; };
 		869C824525902E5400B0235E /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824425902E5400B0235E /* OverlayView.swift */; };
-		869C824825902E6200B0235E /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824725902E6200B0235E /* ColorPalette.swift */; };
+		869C824825902E6200B0235E /* ColorPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824725902E6200B0235E /* ColorPaletteView.swift */; };
 		869C824B25902E8200B0235E /* CursorDragGestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824A25902E8200B0235E /* CursorDragGestureView.swift */; };
 		869C824E25902E9200B0235E /* SemanticColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824D25902E9200B0235E /* SemanticColor.swift */; };
 		86B90BE125565AB600DC7D55 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B90BDF25565AB600DC7D55 /* Coordinates.swift */; };
@@ -54,11 +54,11 @@
 		866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkModel.swift; sourceTree = "<group>"; };
 		867DD94F25901A770013E03D /* SemanticArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticArtwork.swift; sourceTree = "<group>"; };
 		869C61302590280F00A5DD0D /* SemanticArtwork+load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SemanticArtwork+load.swift"; sourceTree = "<group>"; };
-		869C823725902D7C00B0235E /* PixelGridImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelGridImage.swift; sourceTree = "<group>"; };
+		869C823725902D7C00B0235E /* PixelGridImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelGridImageView.swift; sourceTree = "<group>"; };
 		869C823B25902DD500B0235E /* ToolType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolType.swift; sourceTree = "<group>"; };
 		869C824125902E2E00B0235E /* ToolButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolButton.swift; sourceTree = "<group>"; };
 		869C824425902E5400B0235E /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
-		869C824725902E6200B0235E /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		869C824725902E6200B0235E /* ColorPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPaletteView.swift; sourceTree = "<group>"; };
 		869C824A25902E8200B0235E /* CursorDragGestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorDragGestureView.swift; sourceTree = "<group>"; };
 		869C824D25902E9200B0235E /* SemanticColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticColor.swift; sourceTree = "<group>"; };
 		86B90BDF25565AB600DC7D55 /* Coordinates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coordinates.swift; sourceTree = "<group>"; };
@@ -86,12 +86,11 @@
 			children = (
 				86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */,
 				860FB302258AC6460014A0E1 /* CollectionView.swift */,
-				869C824725902E6200B0235E /* ColorPalette.swift */,
+				869C824725902E6200B0235E /* ColorPaletteView.swift */,
 				869C824A25902E8200B0235E /* CursorDragGestureView.swift */,
 				869C824425902E5400B0235E /* OverlayView.swift */,
-				869C823725902D7C00B0235E /* PixelGridImage.swift */,
+				869C823725902D7C00B0235E /* PixelGridImageView.swift */,
 				8642B88C25845A93009E0A66 /* PixelView.swift */,
-				869C824D25902E9200B0235E /* SemanticColor.swift */,
 				869C824125902E2E00B0235E /* ToolButton.swift */,
 				869C823B25902DD500B0235E /* ToolType.swift */,
 			);
@@ -142,6 +141,7 @@
 				866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */,
 				866C99BF2581D6CC00FAEF03 /* PixelImage.swift */,
 				86F52042259015D000C19E41 /* RGBA.swift */,
+				869C824D25902E9200B0235E /* SemanticColor.swift */,
 				867DD94F25901A770013E03D /* SemanticArtwork.swift */,
 			);
 			path = Core;
@@ -275,11 +275,11 @@
 				869C823C25902DD500B0235E /* ToolType.swift in Sources */,
 				869C824E25902E9200B0235E /* SemanticColor.swift in Sources */,
 				869C824525902E5400B0235E /* OverlayView.swift in Sources */,
-				869C823825902D7C00B0235E /* PixelGridImage.swift in Sources */,
+				869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */,
 				869C61312590280F00A5DD0D /* SemanticArtwork+load.swift in Sources */,
 				867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */,
 				860FB303258AC6460014A0E1 /* CollectionView.swift in Sources */,
-				869C824825902E6200B0235E /* ColorPalette.swift in Sources */,
+				869C824825902E6200B0235E /* ColorPaletteView.swift in Sources */,
 				86F520492590166800C19E41 /* Artwork.swift in Sources */,
 				869C824225902E2E00B0235E /* ToolButton.swift in Sources */,
 				864E74D924B714B20000A1AB /* ContentView.swift in Sources */,
