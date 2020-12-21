@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct RGBA: Equatable, ColorTypeProtocol {
+struct RGBA: Equatable, ColorTypeProtocol, Codable {
     func convertToCGColor() -> CGColor {
         var components: [CGFloat] = [
             red,

@@ -112,7 +112,7 @@ public struct Point3D : CoordinateIn3Dimensions, CustomStringConvertible {
     }
 }
 
-public struct Size2D : CountableArea {
+public struct Size2D : CountableArea, Codable {
     public var width: Int
     public var height: Int
     

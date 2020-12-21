@@ -32,6 +32,11 @@ struct PixelImage<ColorType: ColorTypeProtocol> {
         size = Size2D(width: width, height: height)
     }
     
+    init(size: Size2D, buffer: [ColorType]) {
+        self.buffer = buffer
+        self.size = size
+    }
+    
     func isValid(_ point: Point2D) -> Bool {
         return point.x >= 0 && point.x < size.width && point.y >= 0 && point.y < size.height
     }
