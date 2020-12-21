@@ -55,6 +55,7 @@ class BufferView: UIView {
         self.image = image
         self.pixelSize = pixelSize
         super.init(frame: frame)
+        isOpaque = false
     }
     
     required init?(coder: NSCoder) {

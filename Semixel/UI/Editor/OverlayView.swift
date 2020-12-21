@@ -11,7 +11,7 @@ import SwiftUI
 struct OverlayView: View {
     
     var pixelSize: CGSize
-    var image: PixelImage<RGBA>
+    var image: PixelImage<SemanticPixel<RGBA>>
     var position: CGPoint
     
     var shapeStartPosition: Point2D?
@@ -56,9 +56,14 @@ struct OverlayView: View {
         return p
     }
     
+    private var normalImage: PixelImage<RGBA> {
+        let buffer = image.buffer.map { $0.color }
+        return PixelImage(size: image.size, buffer: buffer)
+    }
+    
     var body: some View {
         ZStack {
-            PixelBufferView(pixelSize: pixelSize, image: image)
+            PixelBufferView(pixelSize: pixelSize, image: normalImage)
             PixelGridImage(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
             
             if let p1 = shapeStartPosition {
