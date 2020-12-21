@@ -11,14 +11,14 @@ import UIKit
 
 struct CollectionView: UIViewControllerRepresentable {
     
-    var colors: [SemanticColor]
-    @Binding var selectedColor: SemanticColor
+    var colors: [RGBA]
+    @Binding var selectedColorIndex: Int?
     var addCallback: (() -> ())?
     
     class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
         var layout: UICollectionViewFlowLayout = {
             let layout = UICollectionViewFlowLayout()
-            layout.itemSize = CGSize(width: 26, height: 26)
+            layout.itemSize = CGSize(width: 32, height: 32)
             layout.minimumInteritemSpacing = 4
             layout.minimumLineSpacing = 4
             layout.scrollDirection = .horizontal
@@ -27,8 +27,8 @@ struct CollectionView: UIViewControllerRepresentable {
         }()
         
         var addCallback: (() -> ())?
-        var selectedColor: Binding<SemanticColor>?
-        var colors: [SemanticColor] = []
+        var selectedColorIndex: Binding<Int?>?
+        var colors: [RGBA] = []
         lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         var pageControl = UIPageControl()
         
@@ -41,7 +41,7 @@ struct CollectionView: UIViewControllerRepresentable {
             collectionView.scrollToItem(at: path, at: .init(), animated: true)
         }
         
-        func color(_ section: Int, row: Int) -> SemanticColor? {
+        func color(_ section: Int, row: Int) -> RGBA? {
             let index = section * numberOfColumns * numberOfRows + row
             if index < colors.count {
                 return colors[index]
@@ -67,8 +67,10 @@ struct CollectionView: UIViewControllerRepresentable {
             if let semanticColor = color(indexPath.section, row: indexPath.row) {
                 let view = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
                 if let cell = view as? Cell {
-                    cell.color = semanticColor.color
-                    cell.isSelected = semanticColor == selectedColor?.wrappedValue
+                    cell.color = semanticColor
+                    if let index = selectedColorIndex?.wrappedValue {
+                        cell.isSelected = semanticColor == colors[index]
+                    }
                 }
                 return view
             } else if indexPath.section * numberOfRows * numberOfColumns + indexPath.row == colors.count {
@@ -82,7 +84,7 @@ struct CollectionView: UIViewControllerRepresentable {
         
         func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
             let color = colors[indexPath.row]
-            selectedColor?.wrappedValue = color
+            selectedColorIndex?.wrappedValue = colors.firstIndex(of: color)
         }
         
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -138,7 +140,7 @@ struct CollectionView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> ViewController {
 
         let vc = ViewController()
-        vc.selectedColor = _selectedColor
+        vc.selectedColorIndex = _selectedColorIndex
         vc.colors = colors
         vc.addCallback = addCallback
         
@@ -146,7 +148,7 @@ struct CollectionView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {
-        uiViewController.selectedColor = _selectedColor
+        uiViewController.selectedColorIndex = _selectedColorIndex
         uiViewController.colors = colors
         uiViewController.addCallback = addCallback
         uiViewController.collectionView.reloadData()

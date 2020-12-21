@@ -9,16 +9,22 @@
 import UIKit
 
 class SemanticColor: Equatable {
-    var label: String
+    var label: Int
     var color: RGBA
     
-    init(label: String, color: RGBA) {
+    init(label: Int, color: RGBA) {
         self.label = label
         self.color = color
     }
     
     static func ==(lhs: SemanticColor, rhs: SemanticColor) -> Bool {
         return lhs.label == rhs.label && lhs.color == rhs.color
+    }
+}
+
+extension SemanticColor: Identifiable {
+    var id: String {
+        return "\(label), \(color.red), \(color.green), \(color.blue), \(color.alpha)"
     }
 }
 

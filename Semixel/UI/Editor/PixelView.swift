@@ -23,18 +23,20 @@ struct PixelView: View {
                                                             ])
                                                         ]))
     
-    @State var colors: [SemanticColor] = RGBA
-        .defaultColorPalette
-        .enumerated()
-        .map {
-            SemanticColor(label: "\($0)", color: $1)
-        }
-    
-    var selectedColor: RGBA {
-        return selectedObject.color
+    @State var selectedColorIndex: Int? = nil
+    @State var selectedSemanticIdentifierId: Int = 0
+    var selectedSemanticIdentifier: SemanticIdentifier {
+        return artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
     }
     
-    @State var selectedObject = SemanticColor(label: "0", color: RGBA.defaultColorPalette.first ?? RGBA.white)
+    var selectedColor: RGBA {
+        if let index = selectedColorIndex {
+            return selectedSemanticIdentifier.colorPalette[index]
+        } else {
+            return .clear
+        }
+    }
+    
     @State var statusText: String = ""
     
     var size: CGSize {
@@ -97,7 +99,7 @@ struct PixelView: View {
         let b = p2 + p3
         
         if isValid(a) && isValid(b) {
-            return artwork.image.drawEllipse(from: a, to: b, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifier, color: selectedColor))
+            return artwork.image.drawEllipse(from: a, to: b, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor))
         } else {
             return artwork.image
         }
@@ -110,7 +112,7 @@ struct PixelView: View {
             if let p2 = shapeEndPosition {
                 return translatedShape(p1: p1, p2: p2)
             } else if let p2 = pencilGridPosition {
-                return artwork.image.drawEllipse(from: p1, to: p2, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifier, color: selectedColor))
+                return artwork.image.drawEllipse(from: p1, to: p2, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor))
             } else {
                 print("warning: could not get pencil position!")
                 return artwork.image
@@ -147,9 +149,9 @@ struct PixelView: View {
                 statusText = "Applied paint bucket."
                 if let p = pencilGridPosition {
                     let oldColor = artwork.image[p]
-                    let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == selectedSemanticIdentifier }
+                    let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == selectedSemanticIdentifierId }
                     for point in points {
-                        artwork.image[point] = SemanticPixel<RGBA>(id: selectedSemanticIdentifier, color: selectedColor)
+                        artwork.image[point] = SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor)
                     }
                 }
             }
@@ -169,8 +171,6 @@ struct PixelView: View {
         }
     }
     
-    @State var selectedSemanticIdentifier: Int = 0
-    
     var body: some View {
         VStack {
             Spacer()
@@ -189,8 +189,8 @@ struct PixelView: View {
                 tools.padding(.top)
                 HStack {
                     Spacer()
-                    SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifier)
-                    ColorPalette(colors: $colors, selectedColor: $selectedObject)
+                    SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
+                    ColorPalette(identifier: Binding { selectedSemanticIdentifier } set: { selectedSemanticIdentifierId = $0.id }, selectedColorIndex: $selectedColorIndex)
                         .padding([.top, .bottom, .trailing])
                     Spacer()
                 }
@@ -278,7 +278,7 @@ struct PixelView: View {
     }
     
     func applyPencil(_ p: Point2D) {
-        artwork.image[p] = SemanticPixel<RGBA>(id: selectedSemanticIdentifier, color: selectedColor)
+        artwork.image[p] = SemanticPixel<RGBA>(id: selectedSemanticIdentifier.id, color: selectedColor)
     }
 
     func convertToInteger(_ p: CGPoint) -> Point2D {

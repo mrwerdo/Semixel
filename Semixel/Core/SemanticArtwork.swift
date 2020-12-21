@@ -72,6 +72,19 @@ extension SemanticIdentifier {
             return false
         }
     }
+    
+    func find(matching id: Int) -> SemanticIdentifier? {
+        if id == self.id {
+            return self
+        } else {
+            for child in children {
+                if let match = child.find(matching: id) {
+                    return match
+                }
+            }
+            return nil
+        }
+    }
 }
 
 extension SemanticIdentifier: Identifiable {

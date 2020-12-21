@@ -10,16 +10,17 @@ import SwiftUI
 
 struct ColorTab: View {
     var color: RGBA
-    @Binding var state: RGBA
+    var index: Int
+    @Binding var state: Int
     
     var body: some View {
         Button(action: {
-            state = color
+            state = index
         }) {
             ZStack() {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color(CGColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)))
-                if state == color {
+                if state == index {
                     RoundedRectangle(cornerRadius: 8)
                         .opacity(0.0)
                         .disabled(true)
@@ -31,35 +32,37 @@ struct ColorTab: View {
     }
 }
 
-extension SemanticColor: Identifiable {
-    var id: String {
-        return "\(color.red), \(color.green), \(color.blue), \(color.alpha)"
-    }
-}
-
 struct ColorPaletteEditView: View {
-    var colors: [SemanticColor]
-    @Binding var selectedColor: SemanticColor
+    @Binding var colors: [RGBA]
+    @Binding var selectedColorIndex: Int
+    
+    private var selectedColor: Binding<RGBA> {
+        Binding {
+            colors[selectedColorIndex]
+        } set: {
+            colors[selectedColorIndex] = $0
+        }
+    }
     
     var body: some View {
         VStack {
             ScrollView( .horizontal) {
                 LazyHStack(alignment: .top, spacing: 4) {
-                    ForEach(colors) { item in
-                        ColorTab(color: item.color, state: $selectedColor.color)
+                    ForEach(0..<colors.count) { index in
+                        ColorTab(color: colors[index], index: index, state: $selectedColorIndex)
                     }
                 }
             }
-            Slider(value: $selectedColor.color.red, in: 0...1.0) {
+            Slider(value: selectedColor.red, in: 0...1.0) {
                 Text("Red")
             }
-            Slider(value: $selectedColor.color.green, in: 0...1.0) {
+            Slider(value: selectedColor.green, in: 0...1.0) {
                 Text("Green")
             }
-            Slider(value: $selectedColor.color.blue, in: 0...1.0) {
+            Slider(value: selectedColor.blue, in: 0...1.0) {
                 Text("Blue")
             }
-            Slider(value: $selectedColor.color.alpha, in: 0...1.0) {
+            Slider(value: selectedColor.alpha, in: 0...1.0) {
                 Text("Alpha")
             }
         }
@@ -67,8 +70,10 @@ struct ColorPaletteEditView: View {
 }
 
 struct ColorPalette: View {
-    @Binding var colors: [SemanticColor]
-    @Binding var selectedColor: SemanticColor
+    
+    @Binding var identifier: SemanticIdentifier
+    @Binding var selectedColorIndex: Int?
+    
     @State var isEditing: Bool = false
     
     private func add() {
@@ -104,10 +109,10 @@ struct ColorPalette: View {
                 .padding(4)
             }
             .font(Font.system(size: 20))
-            if isEditing {
-                ColorPaletteEditView(colors: colors, selectedColor: $selectedColor)
+            if isEditing, selectedColorIndex != nil {
+                ColorPaletteEditView(colors: $identifier.colorPalette, selectedColorIndex: Binding { selectedColorIndex! } set: { selectedColorIndex = $0 })
             } else {
-                CollectionView(colors: colors, selectedColor: $selectedColor, addCallback: add)
+                CollectionView(colors: identifier.colorPalette, selectedColorIndex: $selectedColorIndex, addCallback: add)
             }
         }
         .padding([.top], 12)
