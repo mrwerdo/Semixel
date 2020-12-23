@@ -197,7 +197,7 @@ struct PixelView: View {
                             .ignoresSafeArea())
         }
         .background(Color(UIColor.secondarySystemBackground))
-        .navigationBarTitle(artwork.name, displayMode: .inline)
+        .navigationBarTitle(artwork.title, displayMode: .inline)
     }
     
     func resizing(statusText: String) -> () -> () {

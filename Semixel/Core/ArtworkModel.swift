@@ -66,7 +66,7 @@ final class ArtworkModel: ObservableObject {
     }
     
     private func getFilename() -> String {
-        let filenames = Set(artwork.map { $0.name })
+        let filenames = Set(artwork.map { $0.title })
         if !filenames.contains("Untitled.json") {
             return "Untitled.json"
         } else {

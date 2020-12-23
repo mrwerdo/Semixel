@@ -29,8 +29,8 @@ struct ContentView: View {
                             .frame(width: 50, height: 50)
                             .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
                         VStack(alignment: .leading) {
-                            Text(artwork.name)
-                            Text("\(artwork.image.size.width)x\(artwork.image.size.height)")
+                            Text(artwork.title)
+                            Text("\(artwork.type) - \(artwork.image.size.width)x\(artwork.image.size.height)")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }

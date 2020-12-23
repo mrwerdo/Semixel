@@ -15,9 +15,26 @@ class SemanticArtwork: Identifiable, ObservableObject {
         return url
     }
     
-    var name: String {
-        return url.lastPathComponent
+    var title: String {
+        let name = url.lastPathComponent
+        if name.starts(with: ".") {
+            return name
+        } else {
+            let index = name.index(name.startIndex,
+                                   offsetBy: name.count - url.pathExtension.count - 1,
+                                   limitedBy: name.endIndex) ?? name.endIndex
+            return String(name[name.startIndex..<index])
+        }
     }
+    
+    var type: String {
+        if url.pathExtension == "json" {
+            return "semantic"
+        } else {
+            return "bitmap"
+        }
+    }
+    
     var url: URL
     
     @Published
