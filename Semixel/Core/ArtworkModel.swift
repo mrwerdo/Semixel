@@ -67,11 +67,11 @@ final class ArtworkModel: ObservableObject {
     
     private func getFilename() -> String {
         let filenames = Set(artwork.map { $0.title })
-        if !filenames.contains("Untitled.json") {
-            return "Untitled.json"
+        if !filenames.contains("Untitled") {
+            return "Untitled"
         } else {
             var i = 0
-            while filenames.contains("Untitled \(i).json") {
+            while filenames.contains("Untitled \(i)") {
                 i += 1
             }
             return "Untitled \(i).json"
