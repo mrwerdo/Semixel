@@ -46,16 +46,15 @@ class SemanticArtwork: Identifiable, ObservableObject {
     @Published
     var colorPalettes: [Int : ColorPalette]
     
-    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier) {
+    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
         self.url = url
         self.root = root
         self.image = image
         self.colorPalettes = [:]
         
-        root.enumerateChildren { (semid) in
-            let colors = semid.colorPalette.map { IdentifiableColor(color: $0, id: UUID()) }
-            colorPalettes[semid.id] = ColorPalette(colors: colors)
-        }
+        for (key, colors) in colorPalettes {
+            self.colorPalettes[key] = ColorPalette(colors: colors.map { IdentifiableColor(color: $0, id: UUID()) })
+        }        
     }
     
     init(url: URL, image: PixelImage<SemanticPixel<RGBA>>) {
@@ -113,7 +112,6 @@ extension SemanticPixel: ColorTypeProtocol {
 struct SemanticIdentifier: Codable {
     var id: Int
     var name: String
-    var colorPalette: [RGBA] = [.white]
     var children: [SemanticIdentifier] = []
 }
 

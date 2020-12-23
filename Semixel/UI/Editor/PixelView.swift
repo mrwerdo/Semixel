@@ -32,7 +32,13 @@ struct PixelView: View {
     
     var selectedColorPalette: ColorPalette {
         let identifier = artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
-        return artwork.colorPalettes[identifier.id]!
+        if let palette = artwork.colorPalettes[identifier.id] {
+            return palette
+        } else {
+            let palette = ColorPalette(colors: [IdentifiableColor(color: .white, id: UUID())])
+            artwork.colorPalettes[identifier.id] = palette
+            return palette
+        }
     }
     
     var size: CGSize {
@@ -145,7 +151,7 @@ struct PixelView: View {
                 statusText = "Applied paint bucket."
                 if let p = pencilGridPosition {
                     let oldColor = artwork.image[p]
-                    let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == selectedSemanticIdentifierId }
+                    let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
                     for point in points {
                         artwork.image[point] = getCurrentSemanticPixel()
                     }

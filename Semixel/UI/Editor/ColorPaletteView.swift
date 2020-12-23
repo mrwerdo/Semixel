@@ -80,7 +80,16 @@ struct ColorPaletteView: View {
     }
     
     private func replace() {
-        print(#function)
+        
+        let index = colorPalette.colors.firstIndex(of: selectedColor)
+        
+        colorPalette.colors.removeAll { (color) -> Bool in
+            selectedColor == color
+        }
+        
+        if let i = index, colorPalette.colors.count > 0 {
+            selectedColor = colorPalette.colors[max(min(i, colorPalette.colors.count-1), 0)]
+        }
     }
     
     var body: some View {

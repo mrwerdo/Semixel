@@ -42,12 +42,24 @@ struct ContentView: View {
             .listStyle(PlainListStyle())
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
-                    Button {
-                        add()
-                    } label: {
-                        Image(systemName: "plus")
+                    HStack {
+                        Button {
+                            add()
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .padding()
+                        Button {
+                            do {
+                                try ArtworkModel.initializeDirectory()
+                            } catch {
+                                print(error)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                        }.padding()
+                        Spacer()
                     }
-                    .padding()
                 }
             }
         }

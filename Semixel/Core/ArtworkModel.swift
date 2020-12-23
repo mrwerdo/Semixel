@@ -51,7 +51,7 @@ final class ArtworkModel: ObservableObject {
                 pixelImage.buffer[y * pixelImage.size.width + x] = SemanticPixel(id: 0, color: color)
             }
             
-            let semanticArtwork = SemanticArtwork(url: url, image: pixelImage)
+            let semanticArtwork = SemanticArtwork(url: newUrl, image: pixelImage)
             
             try semanticArtwork.write(to: newUrl)
             try FileManager.default.removeItem(at: url)
@@ -66,12 +66,12 @@ final class ArtworkModel: ObservableObject {
     }
     
     private func getFilename() -> String {
-        let filenames = Set(artwork.map { $0.title })
-        if !filenames.contains("Untitled") {
-            return "Untitled"
+        let filenames = Set(artwork.map { $0.url.lastPathComponent })
+        if !filenames.contains("Untitled.json") {
+            return "Untitled.json"
         } else {
             var i = 0
-            while filenames.contains("Untitled \(i)") {
+            while filenames.contains("Untitled \(i).json") {
                 i += 1
             }
             return "Untitled \(i).json"
@@ -97,9 +97,10 @@ final class ArtworkModel: ObservableObject {
         let filename = getFilename()
         let image = PixelImage<SemanticPixel<RGBA>>(width: 32, height: 32)
         let url = artworkDirectory.appendingPathComponent(filename)
-        let tree = SemanticIdentifier(id: 0, name: "Default")
+        var tree = SemanticIdentifier(id: -1, name: "Root")
+        tree.children.append(SemanticIdentifier(id: 0, name: "Default"))
         
-        let artwork = SemanticArtwork(url: url, image: image, root: tree)
+        let artwork = SemanticArtwork(url: url, image: image, root: tree, colorPalettes: [0: [.white]])
         try artwork.write(to: url)
         return artwork
     }

@@ -12,6 +12,7 @@ import UIKit
 struct EncodedSemanticArtwork: Codable {
     var size: Size2D
     var identifierTree: SemanticIdentifier
+    var colorPalettes: [Int: [RGBA]]
     var semantics: [Int]
     var pixels: [RGBA]
 }
@@ -51,14 +52,21 @@ extension SemanticArtwork {
         let image = PixelImage<SemanticPixel<RGBA>>(size: esa.size, buffer: buffer)
         self.init(url: url,
                   image: image,
-                  root: esa.identifierTree)
+                  root: esa.identifierTree,
+                  colorPalettes: esa.colorPalettes)
     }
     
     func write(to url: URL) throws {
         let semantics = image.buffer.map { $0.id }
         let pixels = image.buffer.map { $0.color }
+        
+//        for (id, palette) in colorPalettes {
+//            root[id].colorPalette = palette.colors.map { $0.color }
+//        }
+        
         let esa = EncodedSemanticArtwork(size: image.size,
                                          identifierTree: root,
+                                         colorPalettes: colorPalettes.mapValues { $0.colors.map { $0.color } },
                                          semantics: semantics,
                                          pixels: pixels)
         let encoder = JSONEncoder()
