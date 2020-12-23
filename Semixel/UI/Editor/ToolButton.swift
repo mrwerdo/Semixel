@@ -54,27 +54,29 @@ struct ToolButton<State: ToolButtonState>: View {
     }
 }
 
+extension ToolButtonState {
+    var image: some View {
+        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
+    }
+}
+
 protocol BinaryState: ToolButtonState {
     static var selected: Self { get }
     static var deselected: Self { get }
 }
 
 extension BinaryState {
-    var image: some View {
-        return Image(systemName: "pencil.tip").font(Font.system(size: 24))
-    }
-    
     var isSelected: Bool {
         return self == .selected
     }
 
-    static func create(_ selectedTool: Binding<ToolType?>, _ draw: @escaping () -> ()) -> ToolButton<Self> {
-        return ToolButton<Self>(selectedTool, tool: .pencil) { (state) -> Self in
+    static func create(_ selectedTool: Binding<ToolType?>, _ deselected: @escaping () -> ()) -> ToolButton<Self> {
+        return ToolButton<Self>(selectedTool, tool: Self.tool) { (state) -> Self in
             switch state {
             case .selected:
                 return .deselected
             case .deselected:
-                draw()
+                deselected()
                 return .selected
             default:
                 fatalError("BinaryState can have only two states.")
@@ -91,6 +93,15 @@ enum PencilState: BinaryState {
     }
 }
 
+enum SettingsState: BinaryState {
+    case deselected
+    case selected
+    
+    static var tool: ToolType {
+        return .settings
+    }
+}
+
 protocol TerneryState: ToolButtonState {
     static var deselected: Self { get }
     static var resizing: Self { get }
@@ -98,10 +109,6 @@ protocol TerneryState: ToolButtonState {
 }
 
 extension TerneryState {
-    var image: some View {
-        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
-    }
-    
     var isSelected: Bool {
         return self != .deselected
     }
@@ -144,10 +151,6 @@ enum ShapeState: TerneryState {
 protocol OneShotState: ToolButtonState { }
 
 extension OneShotState {
-    var image: some View {
-        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
-    }
-    
     var isSelected: Bool {
         return false
     }

@@ -16,13 +16,14 @@ enum ToolType: Equatable {
     case none
     case undo
     case redo
+    case settings
     
     var iconName: String {
         switch self {
         case .brush:
             return "paintbrush"
         case .pencil:
-            return "penciltip"
+            return "pencil.tip"
         case .redo:
             return "arrow.uturn.right"
         case .undo:
@@ -30,9 +31,11 @@ enum ToolType: Equatable {
         case .shape:
             return "circle"
         case .selection:
-            return "selection.pin.in.out"
+            return "cursorarrow"
         case .none:
             return "questionmark"
+        case .settings:
+            return "square.3.stack.3d"
         }
     }
 }
