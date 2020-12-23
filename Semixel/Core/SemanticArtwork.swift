@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 class SemanticArtwork: Identifiable, ObservableObject {
     var id: URL {
@@ -37,6 +38,37 @@ class SemanticArtwork: Identifiable, ObservableObject {
         root.enumerateChildren { (semid) in
             let colors = semid.colorPalette.map { IdentifiableColor(color: $0, id: UUID()) }
             colorPalettes[semid.id] = ColorPalette(colors: colors)
+        }
+    }
+    
+    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>) {
+        self.url = url
+        self.root = SemanticIdentifier(id: -1, name: "Root")
+        self.image = image
+        self.colorPalettes = [:]
+        
+        for pixel in image.buffer {
+            if let palette = colorPalettes[pixel.id] {
+                if !palette.colors.contains(where: { $0.color == pixel.color }) {
+                    let color = IdentifiableColor(color: pixel.color, id: UUID())
+                    palette.colors.append(color)
+                }
+            } else {
+                let palette = ColorPalette(colors: [IdentifiableColor(color: pixel.color, id: UUID())])
+                colorPalettes[pixel.id] = palette
+            }
+        }
+        
+        root.children.append(SemanticIdentifier(id: 0, name: "Default"))
+    }
+}
+
+extension SemanticArtwork {
+    var icon: Image {
+        if let img = image.convertToCGImage() {
+            return Image(decorative: img, scale: 1.0)
+        } else {
+            return Image(systemName: "questionmark")
         }
     }
 }

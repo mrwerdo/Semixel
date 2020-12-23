@@ -12,17 +12,7 @@ struct PixelView: View {
     
     typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
 
-    @ObservedObject
-    var artwork: SemanticArtwork = SemanticArtwork(url: URL(string: "/image.png")!,
-                                                   image: PixelImage<SemanticPixel<RGBA>>(width: 32, height: 32),
-                                                   root:  SemanticIdentifier(id: 0, name: "Default", colorPalette: [], children: [
-                                                    SemanticIdentifier(id: 1, name: "Grid", colorPalette: RGBA.defaultColorPalette, children: []),
-                                                    SemanticIdentifier(id: 2, name: "Background"),
-                                                    SemanticIdentifier(id: 3, name: "Panels", children: [
-                                                        SemanticIdentifier(id: 4, name: "Highlight"),
-                                                        SemanticIdentifier(id: 5, name: "Lowlight")
-                                                    ])
-                                                   ]))
+    @EnvironmentObject var artwork: SemanticArtwork
     
     @State var _selectedColor: IdentifiableColor = IdentifiableColor(color: .white, id: UUID())
     @State var selectedSemanticIdentifierId: Int = 0

@@ -11,7 +11,9 @@ import SwiftUI
 @main
 struct SemixelApp: App {
     
-    @StateObject var artworkModel = try! ArtworkModel()
+    static let artworkDirectory: URL = try! ArtworkModel.getArtworkUrl()
+    
+    @StateObject var artworkModel = try! ArtworkModel(artworkDirectory)
     
     var body: some Scene {
         WindowGroup {

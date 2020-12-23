@@ -11,46 +11,70 @@ import SwiftUI
 import UIKit
 
 final class ArtworkModel: ObservableObject {
-    @Published var artwork: [Artwork] = []
+    @Published var artwork: [SemanticArtwork] = []
     
     private var folderMonitor: FolderMonitor
     
-    init() throws {
-        folderMonitor = FolderMonitor(url: try ArtworkModel.getArtworkUrl())
+    let artworkDirectory: URL
+    
+    init(_ artworkDirectory: URL) throws {
+        self.artworkDirectory = artworkDirectory
+        folderMonitor = FolderMonitor(url: artworkDirectory)
         
-        folderMonitor.folderDidChange = { [weak self] in
-            self?.handleChanges()
+        folderMonitor.$files.map { (files: [URL]) in
+            files.compactMap { (file: URL) in
+                do {
+                    return try self.convert(url: file)
+                } catch {
+                    print(error)
+                    return nil
+                }
+            }
         }
+        .receive(on: RunLoop.main)
+        .assign(to: &$artwork)
         
-        folderMonitor.startMonitoring()
-        
-        artwork = FileManager.default.files(in: try ArtworkModel.getArtworkUrl()).map {
-            Artwork(name: $0.lastPathComponent, url: $0)
-        }
+        try folderMonitor.startMonitoring()
     }
     
-    private func handleChanges() {
-        do {
-            let files = try FileManager.default.contentsOfDirectory(at: folderMonitor.url, includingPropertiesForKeys: nil, options: [.skipsSubdirectoryDescendants])
-            DispatchQueue.main.sync {
-                print("Updating menu.")
-                artwork = files.map { Artwork(name: $0.lastPathComponent, url: $0) }
+    private func convert(url: URL) throws -> SemanticArtwork? {
+        if url.pathExtension == "png" {
+            let newUrl = url.deletingPathExtension().appendingPathExtension("json")
+            
+            // convert file...
+            guard let image = UIImage(contentsOfFile: url.path) else {
+                return nil
             }
-        } catch {
-            print(error)
+            
+            var pixelImage = PixelImage<SemanticPixel<RGBA>>(width: image.width, height: image.height)
+            image.enumeratePixels { (x, y, color) in
+                pixelImage.buffer[y * pixelImage.size.width + x] = SemanticPixel(id: 0, color: color)
+            }
+            
+            let semanticArtwork = SemanticArtwork(url: url, image: pixelImage)
+            
+            try semanticArtwork.write(to: newUrl)
+            try FileManager.default.removeItem(at: url)
+            
+            semanticArtwork.url = newUrl
+            
+            return semanticArtwork
+        } else {
+            let esa: EncodedSemanticArtwork = try load(url: url)
+            return try SemanticArtwork(url: url, esa)
         }
     }
     
     private func getFilename() -> String {
         let filenames = Set(artwork.map { $0.name })
-        if !filenames.contains("Untitled.png") {
-            return "Untitled.png"
+        if !filenames.contains("Untitled.json") {
+            return "Untitled.json"
         } else {
             var i = 0
-            while filenames.contains("Untitled \(i).png") {
+            while filenames.contains("Untitled \(i).json") {
                 i += 1
             }
-            return "Untitled \(i).png"
+            return "Untitled \(i).json"
         }
     }
     
@@ -59,6 +83,7 @@ final class ArtworkModel: ObservableObject {
         for offset in offsets {
             let a = artwork[offset]
             do {
+                print("Removing: \(a.url.lastPathComponent)")
                 try FileManager.default.removeItem(at: a.url)
             } catch {
                 print(error)
@@ -68,25 +93,19 @@ final class ArtworkModel: ObservableObject {
         artwork.remove(atOffsets: offsets)
     }
     
-    func createArtwork() throws -> Artwork {
+    func createArtwork() throws -> SemanticArtwork {
         let filename = getFilename()
-        let image = PixelImage<RGBA>(width: 32, height: 32)
-        let url = try ArtworkModel.getArtworkUrl().appendingPathComponent(filename)
+        let image = PixelImage<SemanticPixel<RGBA>>(width: 32, height: 32)
+        let url = artworkDirectory.appendingPathComponent(filename)
+        let tree = SemanticIdentifier(id: 0, name: "Default")
         
-        try image.write(to: url)
-        
-        return Artwork(name: url.lastPathComponent, url: url)        
+        let artwork = SemanticArtwork(url: url, image: image, root: tree)
+        try artwork.write(to: url)
+        return artwork
     }
 }
 
 extension ArtworkModel {
-    
-    static func load() throws -> [Artwork] {
-        return FileManager.default.files(in: try getArtworkUrl()).map { url in
-            print(url)
-            return Artwork(name: url.lastPathComponent, url: url)
-        }
-    }
     
     private struct LoadingError: Error, CustomStringConvertible {
         var description: String

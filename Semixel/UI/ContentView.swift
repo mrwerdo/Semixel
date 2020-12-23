@@ -17,20 +17,20 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(model.artwork) { (artwork: Artwork) in
+                ForEach(model.artwork) { (artwork: SemanticArtwork) in
                     let destination = PixelView()
                         .environmentObject(artwork)
                         .onDisappear(perform: save(artwork: artwork))
                     NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
-                        artwork.image
+                        artwork.icon
                             .resizable()
                             .scaledToFit()
                             .frame(width: 50, height: 50)
                             .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
                         VStack(alignment: .leading) {
                             Text(artwork.name)
-                            Text("\(artwork.size.width)x\(artwork.size.height)")
+                            Text("\(artwork.image.size.width)x\(artwork.image.size.height)")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -53,10 +53,10 @@ struct ContentView: View {
         }
     }
     
-    func save(artwork: Artwork) -> (() -> Void) {
+    func save(artwork: SemanticArtwork) -> (() -> Void) {
         return {
             do {
-                try artwork.pixelImage.write(to: artwork.url)
+                try artwork.write(to: artwork.url)
             } catch {
                 print(error)
             }
