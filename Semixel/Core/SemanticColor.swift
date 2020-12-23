@@ -7,40 +7,18 @@
 //
 
 import UIKit
+import Combine
 
-class SemanticColor: Equatable {
-    var label: Int
+struct IdentifiableColor: Identifiable, Equatable {
     var color: RGBA
-    
-    init(label: Int, color: RGBA) {
-        self.label = label
-        self.color = color
-    }
-    
-    static func ==(lhs: SemanticColor, rhs: SemanticColor) -> Bool {
-        return lhs.label == rhs.label && lhs.color == rhs.color
-    }
+    var id: UUID
 }
 
-extension SemanticColor: Identifiable {
-    var id: String {
-        return "\(label), \(color.red), \(color.green), \(color.blue), \(color.alpha)"
-    }
-}
-
-extension SemanticColor {
-    var cgColor: CGColor {
-        get {
-            return CGColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)
-        }
-        set {
-            var r: CGFloat = 0
-            var g: CGFloat = 0
-            var b: CGFloat = 0
-            var a: CGFloat = 0
-            if UIColor(cgColor: newValue).getRed(&r, green: &g, blue: &b, alpha: &a) {
-                color = RGBA(red: r, green: g, blue: b, alpha: a)
-            }
-        }
+class ColorPalette: ObservableObject {
+    @Published
+    var colors: [IdentifiableColor]
+    
+    init(colors: [IdentifiableColor]) {
+        self.colors = colors
     }
 }

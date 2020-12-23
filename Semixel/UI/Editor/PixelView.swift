@@ -12,32 +12,38 @@ struct PixelView: View {
     
     typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
 
-    @State var artwork: SemanticArtwork = SemanticArtwork(url: URL(string: "/image.png")!,
-                                                          image: PixelImage<SemanticPixel<RGBA>>(width: 32, height: 32),
-                                                          root:  SemanticIdentifier(id: 0, name: "Default", colorPalette: [], children: [
-                                                            SemanticIdentifier(id: 1, name: "Grid", colorPalette: RGBA.defaultColorPalette, children: []),
-                                                            SemanticIdentifier(id: 2, name: "Background"),
-                                                            SemanticIdentifier(id: 3, name: "Panels", children: [
-                                                                SemanticIdentifier(id: 4, name: "Highlight"),
-                                                                SemanticIdentifier(id: 5, name: "Lowlight")
-                                                            ])
-                                                        ]))
+    @ObservedObject
+    var artwork: SemanticArtwork = SemanticArtwork(url: URL(string: "/image.png")!,
+                                                   image: PixelImage<SemanticPixel<RGBA>>(width: 32, height: 32),
+                                                   root:  SemanticIdentifier(id: 0, name: "Default", colorPalette: [], children: [
+                                                    SemanticIdentifier(id: 1, name: "Grid", colorPalette: RGBA.defaultColorPalette, children: []),
+                                                    SemanticIdentifier(id: 2, name: "Background"),
+                                                    SemanticIdentifier(id: 3, name: "Panels", children: [
+                                                        SemanticIdentifier(id: 4, name: "Highlight"),
+                                                        SemanticIdentifier(id: 5, name: "Lowlight")
+                                                    ])
+                                                   ]))
     
-    @State var selectedColorIndex: Int? = nil
+    @State var _selectedColor: IdentifiableColor = IdentifiableColor(color: .white, id: UUID())
     @State var selectedSemanticIdentifierId: Int = 0
-    var selectedSemanticIdentifier: SemanticIdentifier {
-        return artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
-    }
+    @State var statusText: String = ""
     
-    var selectedColor: RGBA {
-        if let index = selectedColorIndex {
-            return selectedSemanticIdentifier.colorPalette[index]
-        } else {
-            return .clear
+    var selectedColor: Binding<IdentifiableColor> {
+        Binding<IdentifiableColor> {
+            _selectedColor
+        } set: { newValue in
+            if let index = selectedColorPalette.colors.firstIndex(where: { $0.id == newValue.id }) {
+                selectedColorPalette.colors[index].color = newValue.color
+            }
+            _selectedColor = newValue
         }
     }
     
-    @State var statusText: String = ""
+    
+    var selectedColorPalette: ColorPalette {
+        let identifier = artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
+        return artwork.colorPalettes[identifier.id]!
+    }
     
     var size: CGSize {
         return CGSize(width: 32 * 12, height: 32 * 12)
@@ -99,7 +105,7 @@ struct PixelView: View {
         let b = p2 + p3
         
         if isValid(a) && isValid(b) {
-            return artwork.image.drawEllipse(from: a, to: b, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor))
+            return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
         } else {
             return artwork.image
         }
@@ -112,7 +118,7 @@ struct PixelView: View {
             if let p2 = shapeEndPosition {
                 return translatedShape(p1: p1, p2: p2)
             } else if let p2 = pencilGridPosition {
-                return artwork.image.drawEllipse(from: p1, to: p2, color: SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor))
+                return artwork.image.drawEllipse(from: p1, to: p2, color: getCurrentSemanticPixel())
             } else {
                 print("warning: could not get pencil position!")
                 return artwork.image
@@ -151,7 +157,7 @@ struct PixelView: View {
                     let oldColor = artwork.image[p]
                     let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == selectedSemanticIdentifierId }
                     for point in points {
-                        artwork.image[point] = SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor)
+                        artwork.image[point] = getCurrentSemanticPixel()
                     }
                 }
             }
@@ -190,7 +196,7 @@ struct PixelView: View {
                 HStack {
                     Spacer()
                     SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
-                    ColorPaletteView(identifier: Binding { selectedSemanticIdentifier } set: { selectedSemanticIdentifierId = $0.id }, selectedColorIndex: $selectedColorIndex)
+                    ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor)
                         .padding([.top, .bottom, .trailing])
                     Spacer()
                 }
@@ -278,11 +284,15 @@ struct PixelView: View {
     }
     
     func applyPencil(_ p: Point2D) {
-        artwork.image[p] = SemanticPixel<RGBA>(id: selectedSemanticIdentifier.id, color: selectedColor)
+        artwork.image[p] = getCurrentSemanticPixel()
     }
 
     func convertToInteger(_ p: CGPoint) -> Point2D {
         return Point2D(x: Int(round(p.x / pixelSize.width)), y: Int(round(p.y / pixelSize.height)))
+    }
+    
+    func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {
+        return SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: _selectedColor.color)
     }
 }
 

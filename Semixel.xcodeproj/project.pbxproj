@@ -424,8 +424,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Semixel/Other/Preview Content\"";
 				DEVELOPMENT_TEAM = 63J747E7ZH;
 				ENABLE_PREVIEWS = YES;
@@ -446,8 +444,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Semixel/Other/Preview Content\"";
 				DEVELOPMENT_TEAM = 63J747E7ZH;
 				ENABLE_PREVIEWS = YES;

@@ -8,11 +8,17 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 struct CollectionView: UIViewControllerRepresentable {
     
-    var colors: [RGBA]
-    @Binding var selectedColorIndex: Int?
+    
+    @ObservedObject
+    var colorPalette: ColorPalette
+    
+    @Binding
+    var selectedColor: IdentifiableColor
+    
     var addCallback: (() -> ())?
     
     class ViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
@@ -27,9 +33,46 @@ struct CollectionView: UIViewControllerRepresentable {
         }()
         
         var addCallback: (() -> ())?
-        var selectedColorIndex: Binding<Int?>?
-        var colors: [RGBA] = []
+        
+        @Binding
+        var selectedColor: IdentifiableColor
+        
+        @ObservedObject
+        var colorPalette: ColorPalette {
+            didSet {
+                cancellable?.cancel()
+                cancellable = colorPalette.$colors.sink { (newColors) in
+                    self.colors = newColors
+                }
+            }
+        }
+        
+        var colors: [IdentifiableColor] = [] {
+            didSet {
+                collectionView.reloadData()
+            }
+        }
+        
+        var cancellable: AnyCancellable? = nil
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        init(colorPalette: ColorPalette, selectedColor: Binding<IdentifiableColor>) {
+            self._selectedColor = selectedColor
+            self.colorPalette = colorPalette
+            self.colors = colorPalette.colors
+            
+            super.init(nibName: nil, bundle: nil)
+            
+            cancellable = colorPalette.$colors.sink { (newColors) in
+                self.colors = newColors
+            }
+        }
+        
         lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
         var pageControl = UIPageControl()
         
         let numberOfColumns: Int = 3
@@ -41,16 +84,17 @@ struct CollectionView: UIViewControllerRepresentable {
             collectionView.scrollToItem(at: path, at: .init(), animated: true)
         }
         
-        func color(_ section: Int, row: Int) -> RGBA? {
+        func color(_ section: Int, row: Int) -> IdentifiableColor? {
             let index = section * numberOfColumns * numberOfRows + row
-            if index < colors.count {
-                return colors[index]
-            }
+            let p = colorPalette
+                if index < p.colors.count {
+                    return p.colors[index]
+                }
             return nil
         }
         
         func numberOfSections(in collectionView: UICollectionView) -> Int {
-            let count = colors.count + 1
+            let count = colorPalette.colors.count + 1
             let quotient = count / (numberOfColumns * numberOfRows)
             let remainder = count % (numberOfColumns * numberOfRows)
             let number =  remainder > 0 ? quotient + 1 : quotient
@@ -63,17 +107,14 @@ struct CollectionView: UIViewControllerRepresentable {
         }
         
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            
             if let semanticColor = color(indexPath.section, row: indexPath.row) {
                 let view = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
                 if let cell = view as? Cell {
-                    cell.color = semanticColor
-                    if let index = selectedColorIndex?.wrappedValue {
-                        cell.isSelected = semanticColor == colors[index]
-                    }
+                    cell.color = semanticColor.color
+                    cell.isSelected = selectedColor.id == semanticColor.id
                 }
                 return view
-            } else if indexPath.section * numberOfRows * numberOfColumns + indexPath.row == colors.count {
+            } else if indexPath.section * numberOfRows * numberOfColumns + indexPath.row == colorPalette.colors.count {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "add", for: indexPath) as! AddCell
                 cell.callback = addCallback
                 return cell
@@ -83,8 +124,8 @@ struct CollectionView: UIViewControllerRepresentable {
         }
         
         func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            let color = colors[indexPath.row]
-            selectedColorIndex?.wrappedValue = colors.firstIndex(of: color)
+            let color = colorPalette.colors[indexPath.row]
+            selectedColor = color
         }
         
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -138,18 +179,13 @@ struct CollectionView: UIViewControllerRepresentable {
     }
     
     func makeUIViewController(context: Context) -> ViewController {
-
-        let vc = ViewController()
-        vc.selectedColorIndex = _selectedColorIndex
-        vc.colors = colors
+        let vc = ViewController(colorPalette: colorPalette, selectedColor: $selectedColor)
         vc.addCallback = addCallback
-        
         return vc
     }
     
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {
-        uiViewController.selectedColorIndex = _selectedColorIndex
-        uiViewController.colors = colors
+        uiViewController.colorPalette = colorPalette
         uiViewController.addCallback = addCallback
         uiViewController.collectionView.reloadData()
     }
@@ -247,7 +283,7 @@ private class Cell: UICollectionViewCell {
         contentView.addSubview(borderView)
         borderView.isOpaque = false
         
-        borderView.layer.borderColor = UIColor.tertiaryLabel.cgColor
+        borderView.layer.borderColor = UIColor.secondaryLabel.cgColor
         let borderWidth: CGFloat = 0
         borderView.layer.borderWidth = 4
         borderView.layer.cornerRadius = 8

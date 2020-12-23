@@ -8,10 +8,10 @@
 
 import SwiftUI
 
-struct ColorTab: View {
+struct ColorTab<T: Equatable>: View {
     var color: RGBA
-    var index: Int
-    @Binding var state: Int
+    var index: T
+    @Binding var state: T
     
     var body: some View {
         Button(action: {
@@ -22,9 +22,8 @@ struct ColorTab: View {
                     .fill(Color(CGColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)))
                 if state == index {
                     RoundedRectangle(cornerRadius: 8)
-                        .opacity(0.0)
+                        .strokeBorder(Color.secondary, lineWidth: 4)
                         .disabled(true)
-                        .border(Color.secondary, width: 4)
                 }
             }
             .frame(width: 32, height: 32)
@@ -33,36 +32,28 @@ struct ColorTab: View {
 }
 
 struct ColorPaletteEditView: View {
-    @Binding var colors: [RGBA]
-    @Binding var selectedColorIndex: Int
-    
-    private var selectedColor: Binding<RGBA> {
-        Binding {
-            colors[selectedColorIndex]
-        } set: {
-            colors[selectedColorIndex] = $0
-        }
-    }
+    @ObservedObject var colorPalette: ColorPalette
+    @Binding var selectedColor: IdentifiableColor
     
     var body: some View {
         VStack {
             ScrollView( .horizontal) {
                 LazyHStack(alignment: .top, spacing: 4) {
-                    ForEach(0..<colors.count) { index in
-                        ColorTab(color: colors[index], index: index, state: $selectedColorIndex)
+                    ForEach(colorPalette.colors) { item in
+                        ColorTab(color: item.color, index: item, state: $selectedColor)
                     }
                 }
             }
-            Slider(value: selectedColor.red, in: 0...1.0) {
+            Slider(value: $selectedColor.color.red, in: 0...1.0) {
                 Text("Red")
             }
-            Slider(value: selectedColor.green, in: 0...1.0) {
+            Slider(value: $selectedColor.color.green, in: 0...1.0) {
                 Text("Green")
             }
-            Slider(value: selectedColor.blue, in: 0...1.0) {
+            Slider(value: $selectedColor.color.blue, in: 0...1.0) {
                 Text("Blue")
             }
-            Slider(value: selectedColor.alpha, in: 0...1.0) {
+            Slider(value: $selectedColor.color.alpha, in: 0...1.0) {
                 Text("Alpha")
             }
         }
@@ -71,13 +62,13 @@ struct ColorPaletteEditView: View {
 
 struct ColorPaletteView: View {
     
-    @Binding var identifier: SemanticIdentifier
-    @Binding var selectedColorIndex: Int?
+    @ObservedObject var colorPalette: ColorPalette
+    @Binding var selectedColor: IdentifiableColor
     
     @State var isEditing: Bool = false
     
     private func add() {
-        print(#function)
+        colorPalette.colors.append(IdentifiableColor(color: selectedColor.color, id: UUID()))
     }
     
     private func eyeDropper() {
@@ -109,10 +100,10 @@ struct ColorPaletteView: View {
                 .padding(4)
             }
             .font(Font.system(size: 20))
-            if isEditing, selectedColorIndex != nil {
-                ColorPaletteEditView(colors: $identifier.colorPalette, selectedColorIndex: Binding { selectedColorIndex! } set: { selectedColorIndex = $0 })
+            if isEditing {
+                ColorPaletteEditView(colorPalette: colorPalette, selectedColor: $selectedColor)
             } else {
-                CollectionView(colors: identifier.colorPalette, selectedColorIndex: $selectedColorIndex, addCallback: add)
+                CollectionView(colorPalette: colorPalette, selectedColor: $selectedColor, addCallback: add)
             }
         }
         .padding([.top], 12)
