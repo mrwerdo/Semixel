@@ -61,6 +61,11 @@ struct OverlayView: View {
         return PixelImage(size: image.size, buffer: buffer)
     }
     
+    private var size: CGSize {
+        CGSize(width: pixelSize.width * CGFloat(image.size.width),
+               height: pixelSize.height * CGFloat(image.size.height))
+    }
+    
     var body: some View {
         ZStack {
             PixelBufferView(pixelSize: pixelSize, image: normalImage)
@@ -84,5 +89,6 @@ struct OverlayView: View {
                 .foregroundColor(Color(.white))
                 .offset(x: position.x + pixelSize.width, y: position.y)
         }
+        .frame(width: size.width, height: size.height)
     }
 }

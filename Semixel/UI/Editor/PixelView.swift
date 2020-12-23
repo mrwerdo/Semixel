@@ -186,7 +186,6 @@ struct PixelView: View {
                         shapeStartPosition: shapeStartPosition,
                         shapeEndPosition: shapeEndPosition,
                         translation: translation)
-                .frame(maxWidth: size.width, maxHeight: size.height)
                 .gesture(drag)
                 .padding()
             Spacer()
