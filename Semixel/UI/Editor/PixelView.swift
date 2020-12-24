@@ -11,12 +11,25 @@ import SwiftUI
 struct PixelView: View {
     
     typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
-
+    
     @EnvironmentObject var artwork: SemanticArtwork
     
     @State var _selectedColor: IdentifiableColor = IdentifiableColor(color: .white, id: UUID())
     @State var selectedSemanticIdentifierId: Int = 0
     @State var statusText: String = ""
+    
+    @State var fullScreenDragEnabled: Bool = false
+    @State var tool: ToolType? = nil
+    @State var position: Point2D = .zero
+    @State var speed: CGFloat = 0.8
+    
+    @State var shapeStartPosition: Point2D?
+    @State var shapeEndPosition: Point2D?
+    @State var translation: Point2D = .zero
+    
+    var pixelSize: CGSize {
+        return CGSize(width: 12, height: 12)
+    }
     
     var selectedColor: Binding<IdentifiableColor> {
         Binding<IdentifiableColor> {
@@ -29,7 +42,6 @@ struct PixelView: View {
         }
     }
     
-    
     var selectedColorPalette: ColorPalette {
         let identifier = artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
         if let palette = artwork.colorPalettes[identifier.id] {
@@ -41,33 +53,11 @@ struct PixelView: View {
         }
     }
     
-    var size: CGSize {
-        return CGSize(width: 32 * 12, height: 32 * 12)
-    }
-    
-    var pixelSize: CGSize {
-        return CGSize(width: 12, height: 12)
-    }
-    
-    @State var fullScreenDragEnabled: Bool = false
-    @State var tool: ToolType? = nil
-    @State var position: Point2D = .zero
-    @State var speed: CGFloat = 0.8
-    
-    @State var shapeStartPosition: Point2D?
-    @State var shapeEndPosition: Point2D?
-    @State var translation: Point2D = .zero
-    
-    func isValid(_ p: Point2D) -> Bool {
-        let size = artwork.image.size
-        return !(p.x < 0 || p.y < 0 || p.x >= size.width || p.y >= size.height)
-    }
-    
     func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
         let a = p1 + translation
         let b = p2 + translation
         
-        if isValid(a) && isValid(b) {
+        if artwork.image.isValid(a) && artwork.image.isValid(b) {
             return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
         } else {
             return artwork.image
@@ -94,7 +84,6 @@ struct PixelView: View {
         }
     }
     
-    @ViewBuilder
     var tools: some View {
         HStack {
             ShapeState.create($tool,
@@ -108,8 +97,8 @@ struct PixelView: View {
                                   translating: translating,
                                   complete: completed { (p1, p2, offset) in
                                     artwork.image = artwork.image.moveRectangle(between: p1,
-                                                                                          and: p2,
-                                                                                          by: offset)
+                                                                                and: p2,
+                                                                                by: offset)
                                   })
             PaintBucketState.create($tool) {
                 statusText = "Applied paint bucket."

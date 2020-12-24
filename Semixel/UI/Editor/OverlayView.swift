@@ -9,24 +9,6 @@
 import SwiftUI
 
 struct OverlayView: View {
-    init(pixelSize: CGSize,
-         image: PixelImage<SemanticPixel<RGBA>>,
-         position: Binding<Point2D>,
-         shapeStartPosition: Point2D? = nil,
-         shapeEndPosition: Point2D? = nil,
-         speed: Binding<CGFloat>,
-         translation: Binding<Point2D>,
-         onDrag: @escaping (CGPoint) -> ()) {
-        
-        self.pixelSize = pixelSize
-        self.image = image
-        self._position = position
-        self.shapeStartPosition = shapeStartPosition
-        self.shapeEndPosition = shapeEndPosition
-        self._speed = speed
-        self._translation = translation
-        self.onDrag = onDrag
-    }
     
     var pixelSize: CGSize
     var image: PixelImage<SemanticPixel<RGBA>>
@@ -112,9 +94,8 @@ struct OverlayView: View {
     }
     
     private func updatePosition() {
-        let size = image.size
         let p = convertToInteger(__position) + Point2D(x: image.size.width, y: image.size.height)/2
-        if 0..<size.width ~= p.x  && 0..<size.height ~= p.y {
+        if image.isValid(p) {
             position = p
         }
     }
