@@ -51,44 +51,12 @@ struct PixelView: View {
     
     @State var fullScreenDragEnabled: Bool = false
     @State var tool: ToolType? = nil
-    @State var position: CGPoint = .zero
-    @State var lastPosition: CGPoint = .zero
+    @State var position: Point2D = .zero
     @State var speed: CGFloat = 0.8
     
     @State var shapeStartPosition: Point2D?
     @State var shapeEndPosition: Point2D?
-    @State var translation: CGPoint = .zero
-
-    var drag: some Gesture {
-        DragGesture()
-            .onChanged({ event in
-                let delta = CGPoint(x: speed * (event.translation.width - lastPosition.x),
-                                    y: speed * (event.translation.height - lastPosition.y))
-                self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
-                var newPosition = CGPoint(x: position.x + delta.x, y: position.y + delta.y)
-                
-                newPosition.x = max(-size.width/2, min(newPosition.x, size.width/2 - 12))
-                newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - 12))
-                
-                self.position = newPosition
-                onDrag(delta)
-            })
-            .onEnded({ delta in
-                self.lastPosition = .zero
-            })
-    }
-
-    
-    var pencilGridPosition: Point2D? {
-        let size = artwork.image.size
-        let p = convertToInteger(position) + Point2D(x: size.width, y: size.height)/2
-        
-        if !isValid(p) {
-            return nil
-        }
-        
-        return p
-    }
+    @State var translation: Point2D = .zero
     
     func isValid(_ p: Point2D) -> Bool {
         let size = artwork.image.size
@@ -96,9 +64,8 @@ struct PixelView: View {
     }
     
     func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
-        let p3 = convertToInteger(translation)
-        let a = p1 + p3
-        let b = p2 + p3
+        let a = p1 + translation
+        let b = p2 + translation
         
         if isValid(a) && isValid(b) {
             return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
@@ -113,18 +80,15 @@ struct PixelView: View {
             
             if let p2 = shapeEndPosition {
                 return translatedShape(p1: p1, p2: p2)
-            } else if let p2 = pencilGridPosition {
-                return artwork.image.drawEllipse(from: p1, to: p2, color: getCurrentSemanticPixel())
             } else {
-                print("warning: could not get pencil position!")
-                return artwork.image
+                return artwork.image.drawEllipse(from: p1, to: position, color: getCurrentSemanticPixel())
             }
             
             // draw line in this case...
 //            return image.drawLine(from: p1, to: p2, color: c)
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
-            return artwork.image.moveRectangle(between: p1, and: p2, by: convertToInteger(translation))
+            return artwork.image.moveRectangle(between: p1, and: p2, by: translation)
         } else {
             return artwork.image
         }
@@ -149,20 +113,16 @@ struct PixelView: View {
                                   })
             PaintBucketState.create($tool) {
                 statusText = "Applied paint bucket."
-                if let p = pencilGridPosition {
-                    let oldColor = artwork.image[p]
-                    let points = artwork.image.floodSearch(at: p) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
-                    for point in points {
-                        artwork.image[point] = getCurrentSemanticPixel()
-                    }
+                let oldColor = artwork.image[position]
+                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
+                for point in points {
+                    artwork.image[point] = getCurrentSemanticPixel()
                 }
             }
             PencilState.create($tool) {
                 reset()
                 statusText = "Pencil selected."
-                if let p = pencilGridPosition {
-                    applyPencil(p)
-                }
+                applyPencil()
             }
             UndoState.create($tool) {
                 statusText = "Undone"
@@ -178,11 +138,12 @@ struct PixelView: View {
             Spacer()
             OverlayView(pixelSize: pixelSize,
                         image: composedImage,
-                        position: position,
+                        position: $position,
                         shapeStartPosition: shapeStartPosition,
                         shapeEndPosition: shapeEndPosition,
-                        translation: translation)
-                .gesture(drag)
+                        speed: $speed,
+                        translation: $translation,
+                        onDrag: onDrag)
                 .padding()
             Spacer()
             Text(statusText)
@@ -210,9 +171,7 @@ struct PixelView: View {
         return {
             reset()
             self.statusText = statusText
-            if let point = pencilGridPosition {
-                shapeStartPosition = point
-            }
+            shapeStartPosition = position
         }
     }
     
@@ -220,9 +179,9 @@ struct PixelView: View {
         statusText = "Translating..."
         if shapeStartPosition != nil {
             translation = .zero
-            shapeEndPosition = pencilGridPosition
-            let p = convertToInteger(position)
-            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
+            shapeEndPosition = position
+//            let p = convertToInteger(position)
+//            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
         }
     }
     
@@ -231,7 +190,7 @@ struct PixelView: View {
             statusText = "Complete."
             if let p2 = shapeEndPosition {
                 if let p1 = shapeStartPosition {
-                    callback(p1, p2, convertToInteger(translation))
+                    callback(p1, p2, translation)
                 }
                 shapeEndPosition = nil
                 shapeStartPosition = nil
@@ -240,36 +199,12 @@ struct PixelView: View {
     }
     
     func onDrag(_ delta: CGPoint) {
-        if let p = pencilGridPosition {
-            if tool == nil {
-                statusText = ("(x: \(p.x), y: \(p.y))")
-            }
-            if tool == .pencil {
-                applyPencil(p)
-            }
+        if tool == nil {
+            statusText = ("(x: \(position.x), y: \(position.y))")
         }
-        updateTranslation(delta)
-    }
-    
-    func updateTranslation(_ delta: CGPoint) {
-        // Update `translation` ensuring that the selection rectangle defined by
-        // `shapeStartPosition` and `shapeEndPosition` do not go outside of the bounds of the image.
-        // Translation is measured in terms of pixels (i.e. CGFloats) while the image is measured
-        // in terms of points (i.e. Ints)
-        
-        guard let a = shapeStartPosition, let b = shapeEndPosition else {
-            return
+        if tool == .pencil {
+            applyPencil()
         }
-        
-        let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
-        let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
-        
-        translation.x = max(CGFloat(-p1.x) * pixelSize.width,
-                            min(translation.x + delta.x,
-                                CGFloat(artwork.image.size.width - p2.x) * pixelSize.width))
-        translation.y = max(CGFloat(-p1.y) * pixelSize.height,
-                            min(translation.y + delta.y,
-                                CGFloat(artwork.image.size.height - p2.y) * pixelSize.height))
     }
     
     func reset() {
@@ -278,12 +213,8 @@ struct PixelView: View {
         translation = .zero
     }
     
-    func applyPencil(_ p: Point2D) {
-        artwork.image[p] = getCurrentSemanticPixel()
-    }
-
-    func convertToInteger(_ p: CGPoint) -> Point2D {
-        return Point2D(x: Int(round(p.x / pixelSize.width)), y: Int(round(p.y / pixelSize.height)))
+    func applyPencil() {
+        artwork.image[position] = getCurrentSemanticPixel()
     }
     
     func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {
