@@ -85,7 +85,14 @@ struct PixelView: View {
     }
     
     var tools: some View {
-        ToolsMenuV2()
+        ToolsMenuV2(tool: $tool,
+                    selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
+                    selectedColor: selectedColor,
+                    statusText: $statusText,
+                    position: $position,
+                    shapeStartPosition: $shapeStartPosition,
+                    shapeEndPosition: $shapeEndPosition,
+                    translation: $translation)
 //        HStack {
 //            ShapeState.create($tool,
 //                              resizing: resizing(statusText: "Shape tool."),
@@ -138,7 +145,9 @@ struct PixelView: View {
             Spacer()
             Text(statusText)
             VStack {
-                tools.padding(.top)
+                tools
+                    .environmentObject(artwork)
+                    .padding(.top)
                 HStack {
                     Spacer()
                     SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
@@ -157,54 +166,13 @@ struct PixelView: View {
         .navigationBarTitle(artwork.title, displayMode: .inline)
     }
     
-    func resizing(statusText: String) -> () -> () {
-        return {
-            reset()
-            self.statusText = statusText
-            shapeStartPosition = position
-        }
-    }
-    
-    func translating() {
-        statusText = "Translating..."
-        if shapeStartPosition != nil {
-            translation = .zero
-            shapeEndPosition = position
-//            let p = convertToInteger(position)
-//            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
-        }
-    }
-    
-    func completed(callback: @escaping (_ p1: Point2D, _ p2: Point2D, _ offset: Point2D) -> ()) -> () -> () {
-        return {
-            statusText = "Complete."
-            if let p2 = shapeEndPosition {
-                if let p1 = shapeStartPosition {
-                    callback(p1, p2, translation)
-                }
-                shapeEndPosition = nil
-                shapeStartPosition = nil
-            }
-        }
-    }
-    
     func onDrag(_ delta: CGPoint) {
         if tool == nil {
             statusText = ("(x: \(position.x), y: \(position.y))")
         }
         if tool == .pencil {
-            applyPencil()
+            artwork.image[position] = getCurrentSemanticPixel()
         }
-    }
-    
-    func reset() {
-        shapeStartPosition = nil
-        shapeEndPosition = nil
-        translation = .zero
-    }
-    
-    func applyPencil() {
-        artwork.image[position] = getCurrentSemanticPixel()
     }
     
     func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {

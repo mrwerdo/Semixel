@@ -49,45 +49,65 @@ struct ToolsMenuV2: View {
         case transformation
     }
     
-    @State var tool: ToolType?
     @State var menuState: MenuState = .main
     @State var selectionStarted: Bool = false
     
-    func resizing() { }
-    func translating() { }
-    func complete()  { }
+    @EnvironmentObject var artwork: SemanticArtwork
+    
+    @Binding var tool: ToolType?
+    @Binding var selectedSemanticIdentifierId: Int
+    @Binding var selectedColor: IdentifiableColor
+    @Binding var statusText: String
+    @Binding var position: Point2D
+    @Binding var shapeStartPosition: Point2D?
+    @Binding var shapeEndPosition: Point2D?
+    @Binding var translation: Point2D
     
     var main: some View {
         HStack {
             TerneryState.create($tool,
                                 tool: .shape) {
-                print("Shape tool: resizing...")
+                resizing(statusText: "Shape tool.")()
             } translating: {
-                print("Shape tool: translating...")
+                translating()
             } complete: {
-                print("Shape tool: complete.")
+                completed { (p1, p2, offset) in
+                    artwork.image = translatedShape(p1: p1, p2: p2)
+                }()
             }
             ToolMenuButton<MenuState>($menuState, state: .selection, image: "cursorarrow")
             OneShotState.create($tool, tool: .brush) {
-                print("Paint bucket")
+                statusText = "Applied paint bucket."
+                let oldColor = artwork.image[position]
+                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
+                for point in points {
+                    artwork.image[point] = getCurrentSemanticPixel()
+                }
             }
             BinaryState.create($tool, tool: .pencil) {
-                print("Pencil up")
+                reset()
+                statusText = "Pencil selected."
+                applyPencil()
             }
             OneShotState.create($tool, tool: .undo) {
-                print("Undo")
+                statusText = "Undone"
             }
             OneShotState.create($tool, tool: .redo) {
-                print("Redo")
+                statusText = "Redone"
             }
         }
     }
     
-    var nextSelectionState: MenuState {
-        if selectionStarted {
-            return .transformation
+    typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
+    
+    func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
+        let a = p1 + translation
+        let b = p2 + translation
+        
+        if artwork.image.isValid(a) && artwork.image.isValid(b) {
+            return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
         } else {
-            return .main
+            return artwork.image
         }
     }
     
@@ -102,7 +122,7 @@ struct ToolsMenuV2: View {
                 print("Select: completed.")
             }
             ToolMenuButton<MenuState>($menuState,
-                                      state: nextSelectionState,
+                                      state: selectionStarted ? .transformation : .main,
                                       image: selectionStarted ? "arrow.up.and.down.and.arrow.left.and.right" : "cursorarrow",
                                       isSelected: !selectionStarted)
             OneShotState.create($tool, tool: .wand) {
@@ -153,5 +173,59 @@ struct ToolsMenuV2: View {
         case .transformation:
             return AnyView(transformation)
         }
+    }
+    
+    func resizing(statusText: String) -> () -> () {
+        return {
+            reset()
+            self.statusText = statusText
+            shapeStartPosition = position
+        }
+    }
+    
+    func translating() {
+        statusText = "Translating..."
+        if shapeStartPosition != nil {
+            translation = .zero
+            shapeEndPosition = position
+//            let p = convertToInteger(position)
+//            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
+        }
+    }
+    
+    func completed(callback: @escaping (_ p1: Point2D, _ p2: Point2D, _ offset: Point2D) -> ()) -> () -> () {
+        return {
+            statusText = "Complete."
+            if let p2 = shapeEndPosition {
+                if let p1 = shapeStartPosition {
+                    callback(p1, p2, translation)
+                }
+                shapeEndPosition = nil
+                shapeStartPosition = nil
+            }
+        }
+    }
+    
+    func onDrag(_ delta: CGPoint) {
+        if tool == nil {
+            statusText = ("(x: \(position.x), y: \(position.y))")
+        }
+        if tool == .pencil {
+            applyPencil()
+        }
+    }
+    
+    func reset() {
+        shapeStartPosition = nil
+        shapeEndPosition = nil
+        translation = .zero
+    }
+    
+    func applyPencil() {
+        artwork.image[position] = getCurrentSemanticPixel()
+    }
+    
+    func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {
+        return SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor.color)
     }
 }
