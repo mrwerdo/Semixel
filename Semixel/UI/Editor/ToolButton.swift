@@ -9,12 +9,14 @@
 import SwiftUI
 
 protocol ToolButtonState: Equatable {
-    associatedtype Icon: View
-    var image: Icon { get }
     var isSelected: Bool { get }
-    
     static var deselected: Self { get }
-    static var tool: ToolType { get }
+}
+
+extension ToolButtonState {
+    var isSelected: Bool {
+        return self != .deselected
+    }
 }
 
 struct ToolButton<State: ToolButtonState>: View {
@@ -47,22 +49,20 @@ struct ToolButton<State: ToolButtonState>: View {
             ZStack(alignment: .center) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
-                state.image
+                image
             }
             .frame(width: 48, height: 48, alignment: .center)
         }
     }
-}
-
-extension ToolButtonState {
+    
     var image: some View {
-        return Image(systemName: Self.tool.iconName).font(Font.system(size: 24))
+        return Image(systemName: tool.iconName).font(Font.system(size: 24))
     }
 }
 
-protocol BinaryState: ToolButtonState {
-    static var selected: Self { get }
-    static var deselected: Self { get }
+enum BinaryState: ToolButtonState {
+    case selected
+    case deselected
 }
 
 extension BinaryState {
@@ -70,51 +70,30 @@ extension BinaryState {
         return self == .selected
     }
 
-    static func create(_ selectedTool: Binding<ToolType?>, _ deselected: @escaping () -> ()) -> ToolButton<Self> {
-        return ToolButton<Self>(selectedTool, tool: Self.tool) { (state) -> Self in
+    static func create(_ selectedTool: Binding<ToolType?>,
+                       tool: ToolType,
+                       _ deselected: @escaping () -> ()) -> ToolButton<Self> {
+        return ToolButton<Self>(selectedTool, tool: tool) { (state) -> Self in
             switch state {
             case .selected:
                 return .deselected
             case .deselected:
                 deselected()
                 return .selected
-            default:
-                fatalError("BinaryState can have only two states.")
             }
         }
     }
 }
 
-enum PencilState: BinaryState {
+enum TerneryState: ToolButtonState {
     case deselected
-    case selected
-    static var tool: ToolType {
-        return .pencil
-    }
-}
-
-enum SettingsState: BinaryState {
-    case deselected
-    case selected
-    
-    static var tool: ToolType {
-        return .settings
-    }
-}
-
-protocol TerneryState: ToolButtonState {
-    static var deselected: Self { get }
-    static var resizing: Self { get }
-    static var translating: Self { get }
+    case resizing
+    case translating
 }
 
 extension TerneryState {
-    var isSelected: Bool {
-        return self != .deselected
-    }
-    
-    static func create(_ selectedTool: Binding<ToolType?>, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButton<Self> {
-        return ToolButton<Self>(selectedTool, tool: Self.tool) { state -> Self in
+    static func create(_ selectedTool: Binding<ToolType?>, tool: ToolType, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButton<Self> {
+        return ToolButton<Self>(selectedTool, tool: tool) { state -> Self in
             switch state {
             case .deselected:
                 resizing()
@@ -125,70 +104,24 @@ extension TerneryState {
             case .translating:
                 complete()
                 return .deselected
-            default:
-                fatalError("TerneryState should not have more than three cases.")
             }
         }
     }
 }
 
-enum SelectionState: TerneryState {
+enum OneShotState: ToolButtonState {
     case deselected
-    case resizing
-    case translating
-    
-    static var tool: ToolType { return .selection }
 }
-
-enum ShapeState: TerneryState {
-    case deselected
-    case resizing
-    case translating
-    
-    static var tool: ToolType { return .shape }
-}
-
-protocol OneShotState: ToolButtonState { }
 
 extension OneShotState {
     var isSelected: Bool {
         return false
     }
     
-    static func create(_ selectedTool: Binding<ToolType?>, selected: @escaping () -> ()) -> ToolButton<Self> {
-        ToolButton<Self>(selectedTool, tool: Self.tool) { state -> Self in
+    static func create(_ selectedTool: Binding<ToolType?>, tool: ToolType, selected: @escaping () -> ()) -> ToolButton<Self> {
+        ToolButton<Self>(selectedTool, tool: tool) { state -> Self in
             selected()
             return state
         }
-    }
-}
-
-struct PaintBucketState: OneShotState {
-    static var tool: ToolType {
-        return .brush
-    }
-    
-    static var deselected: PaintBucketState {
-        return PaintBucketState()
-    }
-}
-
-struct UndoState: OneShotState {
-    static var tool: ToolType {
-        return .undo
-    }
-    
-    static var deselected: UndoState {
-        return UndoState()
-    }
-}
-
-struct RedoState: OneShotState {
-    static var tool: ToolType {
-        return .redo
-    }
-    
-    static var deselected: RedoState {
-        return RedoState()
     }
 }

@@ -13,10 +13,16 @@ enum ToolType: Equatable {
     case brush
     case shape
     case selection
-    case none
     case undo
     case redo
     case settings
+    case rectangularSelect
+    case wand
+    case copy
+    case cut
+    case rotate
+    case vflip
+    case hflip
     
     var iconName: String {
         switch self {
@@ -32,10 +38,22 @@ enum ToolType: Equatable {
             return "circle"
         case .selection:
             return "cursorarrow"
-        case .none:
-            return "questionmark"
         case .settings:
             return "square.3.stack.3d"
+        case .rectangularSelect:
+            return "rectangle"
+        case .wand:
+            return "wand.and.stars"
+        case .copy:
+            return "doc.on.doc"
+        case .cut:
+            return "scissors"
+        case .rotate:
+            return "rotate.left"
+        case .vflip:
+            return "arrow.up.and.down.righttriangle.up.righttriangle.down"
+        case .hflip:
+            return "arrow.left.and.right.righttriangle.left.righttriangle.right"
         }
     }
 }

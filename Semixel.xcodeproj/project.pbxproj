@@ -17,6 +17,9 @@
 		866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 866C99BB2581D60F00FAEF03 /* Default Artwork */; };
 		866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99BF2581D6CC00FAEF03 /* PixelImage.swift */; };
 		866C99C42581DCAD00FAEF03 /* ArtworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */; };
+		866DE898259421010036B3E3 /* SelectionHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE897259421010036B3E3 /* SelectionHighlighter.swift */; };
+		866DE89B259425590036B3E3 /* DisjointRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE89A259425590036B3E3 /* DisjointRegion.swift */; };
+		866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE89D2594482B0036B3E3 /* ToolsMenu.swift */; };
 		867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867DD94F25901A770013E03D /* SemanticArtwork.swift */; };
 		869C61312590280F00A5DD0D /* SemanticArtwork+load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C61302590280F00A5DD0D /* SemanticArtwork+load.swift */; };
 		869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImageView.swift */; };
@@ -47,6 +50,9 @@
 		866C99BB2581D60F00FAEF03 /* Default Artwork */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Default Artwork"; sourceTree = "<group>"; };
 		866C99BF2581D6CC00FAEF03 /* PixelImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelImage.swift; sourceTree = "<group>"; };
 		866C99C32581DCAD00FAEF03 /* ArtworkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkModel.swift; sourceTree = "<group>"; };
+		866DE897259421010036B3E3 /* SelectionHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionHighlighter.swift; sourceTree = "<group>"; };
+		866DE89A259425590036B3E3 /* DisjointRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisjointRegion.swift; sourceTree = "<group>"; };
+		866DE89D2594482B0036B3E3 /* ToolsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsMenu.swift; sourceTree = "<group>"; };
 		867DD94F25901A770013E03D /* SemanticArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticArtwork.swift; sourceTree = "<group>"; };
 		869C61302590280F00A5DD0D /* SemanticArtwork+load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SemanticArtwork+load.swift"; sourceTree = "<group>"; };
 		869C823725902D7C00B0235E /* PixelGridImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelGridImageView.swift; sourceTree = "<group>"; };
@@ -86,7 +92,9 @@
 				869C823725902D7C00B0235E /* PixelGridImageView.swift */,
 				86043AFD2592E9AB0057B747 /* PixelView.swift */,
 				869C824125902E2E00B0235E /* ToolButton.swift */,
+				866DE89D2594482B0036B3E3 /* ToolsMenu.swift */,
 				869C823B25902DD500B0235E /* ToolType.swift */,
+				866DE897259421010036B3E3 /* SelectionHighlighter.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -136,6 +144,7 @@
 				86F52042259015D000C19E41 /* RGBA.swift */,
 				869C824D25902E9200B0235E /* SemanticColor.swift */,
 				867DD94F25901A770013E03D /* SemanticArtwork.swift */,
+				866DE89A259425590036B3E3 /* DisjointRegion.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -257,9 +266,12 @@
 				866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */,
 				86043AFE2592E9AB0057B747 /* PixelView.swift in Sources */,
 				86F520462590164300C19E41 /* FolderMonitor.swift in Sources */,
+				866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */,
 				86B90BE225565AB600DC7D55 /* Geometry.swift in Sources */,
 				86F52043259015D000C19E41 /* RGBA.swift in Sources */,
 				8617E52A2592CF6600D7460B /* SemixelApp.swift in Sources */,
+				866DE89B259425590036B3E3 /* DisjointRegion.swift in Sources */,
+				866DE898259421010036B3E3 /* SelectionHighlighter.swift in Sources */,
 				866C99C42581DCAD00FAEF03 /* ArtworkModel.swift in Sources */,
 				869C823C25902DD500B0235E /* ToolType.swift in Sources */,
 				869C824E25902E9200B0235E /* SemanticColor.swift in Sources */,

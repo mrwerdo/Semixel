@@ -10,7 +10,7 @@
 // MARK: - Coordinate Concrete Types
 // -----------------------------------------------------------------------------
 
-public struct Point2D : CoordinateIn2Dimensions {
+public struct Point2D : CoordinateIn2Dimensions, Codable {
     public var x: Int
     public var y: Int
     
@@ -172,5 +172,107 @@ extension Size3D : Hashable {
             }
         }
         return cs
+    }
+}
+
+struct Rect2D: Hashable, Equatable, Codable {
+    private var lx: Int
+    private var ly: Int
+    private var ux: Int
+    private var uy: Int
+}
+
+extension Rect2D {
+    
+    init() {
+        lx = 0
+        ly = 0
+        ux = 0
+        uy = 0
+    }
+    
+    init(c1: Point2D, c2: Point2D) {
+        let lx = min(c1.x, c2.x)
+        let ly = min(c1.y, c2.y)
+        let ux = max(c1.x, c2.x)
+        let uy = max(c1.y, c2.y)
+        self.init(lx: lx, ly: ly, ux: ux, uy: uy)
+    }
+    
+    init(x: Int, y: Int, width: Int, height: Int) {
+        self.init(lx: x, ly: y, ux: y + width, uy: y + height)
+    }
+    
+    init(origin: Point2D, size: Size2D) {
+        self.init(x: origin.x, y: origin.y, width: size.width, height: size.height)
+    }
+    
+    var center: Point2D {
+        get {
+            Point2D(x: lx + ux, y: ly + uy) / 2
+        }
+    }
+    
+    var origin: Point2D {
+        get {
+            bottomLeft
+        }
+        set {
+            bottomLeft = newValue
+        }
+    }
+    
+    var size: Size2D {
+        get {
+            Size2D(width: ux - lx, height: uy - ux)
+        }
+        set {
+            ux = lx + newValue.width
+            uy = ly + newValue.height
+        }
+    }
+
+    var bottomLeft: Point2D {
+        get {
+            Point2D(x: lx, y: ly)
+        }
+        set {
+            lx = newValue.x
+            ly = newValue.y
+        }
+    }
+    
+    var bottomRight: Point2D {
+        get {
+            Point2D(x: ux, y: ly)
+        }
+        set {
+            ux = newValue.x
+            ly = newValue.y
+        }
+    }
+    
+    var topLeft: Point2D {
+        get {
+            Point2D(x: lx, y: uy)
+        }
+        set {
+            lx = newValue.x
+            uy = newValue.y
+        }
+    }
+    
+    var topRight: Point2D {
+        get {
+            Point2D(x: ux, y: uy)
+        }
+        set {
+            ux = newValue.x
+            uy = newValue.y
+        }
+    }
+    
+    static var zero: Rect2D {
+        return Rect2D()
     }
 }
