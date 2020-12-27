@@ -114,12 +114,14 @@ struct ToolsMenuV2: View {
     var selection: some View {
         HStack {
             TerneryState.create($tool, tool: .rectangularSelect) {
-                print("Select: started...")
+                resizing(statusText: "Selection tool.")()
                 selectionStarted = true
             } translating: {
-                print("Select: translating...")
+                translating()
             } complete: {
-                print("Select: completed.")
+                completed { (p1, p2, offset) in
+                    artwork.image = artwork.image.moveRectangle(between: p1, and: p2, by: offset)
+                }()
             }
             ToolMenuButton<MenuState>($menuState,
                                       state: selectionStarted ? .transformation : .main,

@@ -84,52 +84,6 @@ struct PixelView: View {
         }
     }
     
-    var tools: some View {
-        ToolsMenuV2(tool: $tool,
-                    selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
-                    selectedColor: selectedColor,
-                    statusText: $statusText,
-                    position: $position,
-                    shapeStartPosition: $shapeStartPosition,
-                    shapeEndPosition: $shapeEndPosition,
-                    translation: $translation)
-//        HStack {
-//            ShapeState.create($tool,
-//                              resizing: resizing(statusText: "Shape tool."),
-//                              translating: translating,
-//                              complete: completed { (p1, p2, offset) in
-//                                artwork.image = translatedShape(p1: p1, p2: p2)
-//                              })
-//            SelectionState.create($tool,
-//                                  resizing: resizing(statusText: "Selection tool."),
-//                                  translating: translating,
-//                                  complete: completed { (p1, p2, offset) in
-//                                    artwork.image = artwork.image.moveRectangle(between: p1,
-//                                                                                and: p2,
-//                                                                                by: offset)
-//                                  })
-//            PaintBucketState.create($tool) {
-//                statusText = "Applied paint bucket."
-//                let oldColor = artwork.image[position]
-//                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
-//                for point in points {
-//                    artwork.image[point] = getCurrentSemanticPixel()
-//                }
-//            }
-//            PencilState.create($tool) {
-//                reset()
-//                statusText = "Pencil selected."
-//                applyPencil()
-//            }
-//            UndoState.create($tool) {
-//                statusText = "Undone"
-//            }
-//            RedoState.create($tool) {
-//                statusText = "Redone"
-//            }
-//        }
-    }
-    
     var body: some View {
         VStack {
             Spacer()
@@ -145,7 +99,14 @@ struct PixelView: View {
             Spacer()
             Text(statusText)
             VStack {
-                tools
+                ToolsMenuV2(tool: $tool,
+                            selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
+                            selectedColor: selectedColor,
+                            statusText: $statusText,
+                            position: $position,
+                            shapeStartPosition: $shapeStartPosition,
+                            shapeEndPosition: $shapeEndPosition,
+                            translation: $translation)
                     .environmentObject(artwork)
                     .padding(.top)
                 HStack {

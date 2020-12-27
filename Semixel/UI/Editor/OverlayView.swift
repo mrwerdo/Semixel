@@ -22,6 +22,7 @@ struct OverlayView: View {
     @State var lastPosition: CGPoint = .zero
     @State var __position: CGPoint = .zero
     @State var __translation: CGPoint = .zero
+    @State var didSyncPosition: Bool = false
     
     var onDrag: (CGPoint) -> ()
     
@@ -139,5 +140,10 @@ struct OverlayView: View {
         }
         .frame(width: size.width, height: size.height)
         .gesture(drag)
+        .onAppear(perform: {
+            if !didSyncPosition {
+                updatePosition()
+            }
+        })
     }
 }
