@@ -14,18 +14,18 @@ struct ToolMenuButton<State>: View {
     var isSelected: Bool
     var imageName: String
     var selected: () -> ()
-    @Binding var currentState: State
+    var currentState: Binding<State>?
     
-    init(_ currentState: Binding<State>, state: State, image: String, isSelected: Bool = false, selected: @escaping () -> () = {}) {
+    init(_ currentState: Binding<State>? = nil, state: State, image: String, isSelected: Bool = false, selected: @escaping () -> () = {}) {
         self.state = state
-        self._currentState = currentState
+        self.currentState = currentState
         self.isSelected = isSelected
         self.imageName = image
         self.selected = selected
     }
     
     private func update() {
-        currentState = state
+        currentState?.wrappedValue = state
         selected()
     }
     
@@ -51,6 +51,7 @@ struct ToolsMenuV2: View {
     
     @State var menuState: MenuState = .main
     @State var selectionStarted: Bool = false
+    @State var isAppendMode: Bool = true
     
     @EnvironmentObject var artwork: SemanticArtwork
     
@@ -75,7 +76,9 @@ struct ToolsMenuV2: View {
                     artwork.image = translatedShape(p1: p1, p2: p2)
                 }()
             }
-            ToolMenuButton<MenuState>($menuState, state: .selection, image: "cursorarrow")
+            ToolMenuButton<MenuState>($menuState, state: .selection, image: "cursorarrow") {
+                isAppendMode = true
+            }
             OneShotState.create($tool, tool: .brush) {
                 statusText = "Applied paint bucket."
                 let oldColor = artwork.image[position]
@@ -131,8 +134,8 @@ struct ToolsMenuV2: View {
                 print("Wand")
                 selectionStarted = true
             }
-            BinaryState.create($tool, tool: .brush) {
-                print("Toggle Mode")
+            ToolMenuButton<Void>(state: (), image: isAppendMode ? ToolType.selectionModeAdd.iconName : ToolType.selectionModeRemove.iconName) {
+                isAppendMode.toggle()
             }
             OneShotState.create($tool, tool: .undo) {
                 print("Undo")
