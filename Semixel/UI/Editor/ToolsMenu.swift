@@ -8,6 +8,19 @@
 
 import SwiftUI
 
+/*
+ ToolsMenu could be improved to satisfy the following:
+ 1. If a tool is has multiple states, and the user selects another tool, then the original tool
+    should reset to its initial state.
+ 2. There are some tools that do not have state.
+ 3. There are some tools that operate on the selection - these should not reset the selection
+    animation.
+ 4. The selection tool has a nested menu.
+ 5. Navigating between the menus should not reset the behaviour.
+ 
+ Any improvements should enhance the readability of the implementation.
+ */
+
 struct ToolsMenu: View {
     
     typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
