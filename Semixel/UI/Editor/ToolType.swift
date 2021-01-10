@@ -26,6 +26,7 @@ enum ToolType: Equatable {
     case selectionModeAdd
     case selectionModeRemove
     case translation
+    case complete
     
     var iconName: String {
         switch self {
@@ -63,6 +64,8 @@ enum ToolType: Equatable {
             return "rectangle.badge.minus"
         case .translation:
             return "arrow.up.and.down.and.arrow.left.and.right"
+        case .complete:
+            return "checkmark.circle"
         }
     }
 }

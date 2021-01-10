@@ -19,6 +19,24 @@ extension ToolButtonState {
     }
 }
 
+struct AnyToolButton<Image: View>: View {
+    
+    var isSelected: Bool
+    var image: Image
+    var selected: () -> ()
+    
+    var body: some View {
+        Button(action: selected) {
+            ZStack(alignment: .center) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
+                image
+            }
+            .frame(width: 48, height: 48, alignment: .center)
+        }
+    }
+}
+
 struct ToolButton<State: ToolButtonState>: View {
     var tool: ToolType
     @Binding var selectedTool: ToolType?
@@ -45,14 +63,7 @@ struct ToolButton<State: ToolButtonState>: View {
     }
     
     var body: some View {
-        Button(action: update) {
-            ZStack(alignment: .center) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
-                image
-            }
-            .frame(width: 48, height: 48, alignment: .center)
-        }
+        AnyToolButton(isSelected: isSelected, image: image, selected: update)
     }
     
     var image: some View {
@@ -124,39 +135,6 @@ extension OneShotState {
         ToolButton<Self>(selectedTool, tool: tool) { state -> Self in
             selected()
             return state
-        }
-    }
-}
-
-struct ToolMenuButton<State>: View {
-    
-    var state: State
-    var isSelected: Bool
-    var imageName: String
-    var selected: () -> ()
-    var currentState: Binding<State>?
-    
-    init(_ currentState: Binding<State>? = nil, state: State, image: String, isSelected: Bool = false, selected: @escaping () -> () = {}) {
-        self.state = state
-        self.currentState = currentState
-        self.isSelected = isSelected
-        self.imageName = image
-        self.selected = selected
-    }
-    
-    private func update() {
-        currentState?.wrappedValue = state
-        selected()
-    }
-    
-    var body: some View {
-        Button(action: update) {
-            ZStack(alignment: .center) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
-                Image(systemName: imageName).font(Font.system(size: 24))
-            }
-            .frame(width: 48, height: 48, alignment: .center)
         }
     }
 }

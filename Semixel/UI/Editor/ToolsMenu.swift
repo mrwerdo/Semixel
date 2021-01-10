@@ -35,6 +35,10 @@ struct ToolsMenu: View {
     
     @Binding var selectedRegion: SelectedRegion?
     
+    func icon(for type: ToolType) -> some View {
+        Image(systemName: type.iconName).font(Font.system(size: 24))
+    }
+    
     var main: some View {
         HStack {
             TerneryState.create($tool,
@@ -47,8 +51,9 @@ struct ToolsMenu: View {
                     artwork.image = translatedShape(p1: p1, p2: p2)
                 }
             }
-            ToolMenuButton<MenuState>($menuState, state: .selection, image: "cursorarrow") {
+            AnyToolButton(isSelected: false, image: icon(for: .selection)) {
                 isAppendMode = true
+                menuState = .selection
             }
             OneShotState.create($tool, tool: .brush) {
                 statusText = "Applied paint bucket."
@@ -86,9 +91,9 @@ struct ToolsMenu: View {
     var selection: some View {
         HStack {
             BinaryState.create($tool, tool: .rectangularSelect) {
+                selectionStarted = true
                 resizing(statusText: "Selection tool.")
             } selected: {
-                selectionStarted = true
                 if selectedRegion == nil {
                     selectedRegion = SelectedRegion(size: artwork.image.size)
                 }
@@ -103,18 +108,21 @@ struct ToolsMenu: View {
                     }
                 }
             }
-            ToolMenuButton<MenuState>($menuState,
-                                      state: selectionStarted ? .transformation : .main,
-                                      image: selectionStarted ? "arrow.up.and.down.and.arrow.left.and.right" : "cursorarrow",
-                                      isSelected: !selectionStarted) {
-                tool = .translation
-                translation = .zero
+            AnyToolButton(isSelected: !selectionStarted,
+                          image: icon(for: selectionStarted ? .translation : .selection)) {
+                if selectionStarted {
+                    menuState = .transformation
+                    tool = .translation
+                    translation = .zero
+                } else {
+                    menuState = .main
+                }
             }
             OneShotState.create($tool, tool: .wand) {
                 print("Wand")
                 selectionStarted = true
             }
-            ToolMenuButton<Void>(state: (), image: isAppendMode ? ToolType.selectionModeAdd.iconName : ToolType.selectionModeRemove.iconName) {
+            AnyToolButton(isSelected: false, image: icon(for: isAppendMode ? .selectionModeAdd : .selectionModeRemove)) {
                 isAppendMode.toggle()
             }
             OneShotState.create($tool, tool: .undo) {
@@ -131,13 +139,14 @@ struct ToolsMenu: View {
             OneShotState.create($tool, tool: .rotate) {
                 print("Rotate")
             }
-            ToolMenuButton<MenuState>($menuState, state: .main, image: "checkmark.circle") {
+            AnyToolButton(isSelected: false, image: icon(for: .complete)) {
+                menuState = .main
                 if let selection = selectedRegion {
                     artwork.image = artwork.image.move(selection: selection, by: translation, background: .clear)
                 }
                 selectionStarted = false
                 reset()
-                tool = .selection
+                tool = .complete
                 selectedRegion = nil
             }
             OneShotState.create($tool, tool: .copy) {
