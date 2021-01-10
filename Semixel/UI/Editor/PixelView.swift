@@ -27,6 +27,8 @@ struct PixelView: View {
     @State var shapeEndPosition: Point2D?
     @State var translation: Point2D = .zero
     
+    @State var selectedRegion: SelectedRegion?
+    
     var pixelSize: CGSize {
         return CGSize(width: 12, height: 12)
     }
@@ -79,6 +81,8 @@ struct PixelView: View {
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
             return artwork.image.moveRectangle(between: p1, and: p2, by: translation)
+        } else if tool == .translation, let selection = self.selectedRegion {
+            return artwork.image.move(selection: selection, by: translation, background: .clear)
         } else {
             return artwork.image
         }
@@ -92,6 +96,8 @@ struct PixelView: View {
                         position: $position,
                         shapeStartPosition: shapeStartPosition,
                         shapeEndPosition: shapeEndPosition,
+                        selectedRegion: $selectedRegion,
+                        translating: tool == .translation,
                         speed: $speed,
                         translation: $translation,
                         onDrag: onDrag)
@@ -106,7 +112,8 @@ struct PixelView: View {
                             position: $position,
                             shapeStartPosition: $shapeStartPosition,
                             shapeEndPosition: $shapeEndPosition,
-                            translation: $translation)
+                            translation: $translation,
+                            selectedRegion: $selectedRegion)
                     .environmentObject(artwork)
                     .padding(.top)
                 HStack {

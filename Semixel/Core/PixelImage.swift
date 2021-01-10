@@ -250,3 +250,22 @@ extension PixelImage {
         return img
     }
 }
+
+extension PixelImage {
+    func move(selection: SelectedRegion, by offset: Point2D, background: ColorType) -> PixelImage {
+        // Everything inside of selection is translated by offset,
+        var img = PixelImage(copy: self)
+        
+        let selectedPoints = selection.selectedPoints
+        
+        for point in selectedPoints {
+            img[point] = background
+        }
+        
+        for point in selection.selectedPoints where img.isValid(point + offset) {
+            img[point + offset] = self[point]
+        }
+        
+        return img
+    }
+}

@@ -25,6 +25,7 @@ enum ToolType: Equatable {
     case hflip
     case selectionModeAdd
     case selectionModeRemove
+    case translation
     
     var iconName: String {
         switch self {
@@ -60,6 +61,8 @@ enum ToolType: Equatable {
             return "rectangle.badge.plus"
         case .selectionModeRemove:
             return "rectangle.badge.minus"
+        case .translation:
+            return "arrow.up.and.down.and.arrow.left.and.right"
         }
     }
 }

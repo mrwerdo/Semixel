@@ -276,3 +276,16 @@ extension Rect2D {
         return Rect2D()
     }
 }
+
+extension Rect2D {
+    var points: [Point2D] {
+        var p = [Point2D]()
+        p.reserveCapacity(size.width *  size.height)
+        for y in bottomLeft.y..<topLeft.y {
+            for x in bottomLeft.x..<bottomRight.x {
+                p.append(Point2D(x: x, y: y))
+            }
+        }
+        return p
+    }
+}

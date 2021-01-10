@@ -64,6 +64,8 @@ struct ToolsMenuV2: View {
     @Binding var shapeEndPosition: Point2D?
     @Binding var translation: Point2D
     
+    @Binding var selectedRegion: SelectedRegion?
+    
     var main: some View {
         HStack {
             TerneryState.create($tool,
@@ -116,20 +118,31 @@ struct ToolsMenuV2: View {
     
     var selection: some View {
         HStack {
-            TerneryState.create($tool, tool: .rectangularSelect) {
+            BinaryState.create($tool, tool: .rectangularSelect) {
                 resizing(statusText: "Selection tool.")()
+            } selected: {
                 selectionStarted = true
-            } translating: {
-                translating()
-            } complete: {
-                completed { (p1, p2, offset) in
-                    artwork.image = artwork.image.moveRectangle(between: p1, and: p2, by: offset)
+                if selectedRegion == nil {
+                    selectedRegion = SelectedRegion(size: artwork.image.size)
+                }
+                shapeEndPosition = position
+                completed { (a, b, offset) in
+                    let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
+                    let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
+                    let rect = Rect2D(c1: p1 + offset, c2: p2 + offset)
+                    if var k = selectedRegion {
+                        k.update(points: rect.points, mode: .toggle)
+                        selectedRegion = k
+                    }
                 }()
             }
             ToolMenuButton<MenuState>($menuState,
                                       state: selectionStarted ? .transformation : .main,
                                       image: selectionStarted ? "arrow.up.and.down.and.arrow.left.and.right" : "cursorarrow",
-                                      isSelected: !selectionStarted)
+                                      isSelected: !selectionStarted) {
+                tool = .translation
+                translation = .zero
+            }
             OneShotState.create($tool, tool: .wand) {
                 print("Wand")
                 selectionStarted = true
@@ -152,7 +165,13 @@ struct ToolsMenuV2: View {
                 print("Rotate")
             }
             ToolMenuButton<MenuState>($menuState, state: .main, image: "checkmark.circle") {
+                if let selection = selectedRegion {
+                    artwork.image = artwork.image.move(selection: selection, by: translation, background: .clear)
+                }
                 selectionStarted = false
+                reset()
+                tool = .selection
+                selectedRegion = nil
             }
             OneShotState.create($tool, tool: .copy) {
                 print("Copy")

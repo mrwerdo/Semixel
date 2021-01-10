@@ -72,10 +72,12 @@ extension BinaryState {
 
     static func create(_ selectedTool: Binding<ToolType?>,
                        tool: ToolType,
-                       _ deselected: @escaping () -> ()) -> ToolButton<Self> {
+                       _ deselected: @escaping () -> (),
+                       selected: @escaping () -> () = { }) -> ToolButton<Self> {
         return ToolButton<Self>(selectedTool, tool: tool) { (state) -> Self in
             switch state {
             case .selected:
+                selected()
                 return .deselected
             case .deselected:
                 deselected()

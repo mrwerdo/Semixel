@@ -16,6 +16,8 @@ struct OverlayView: View {
     
     var shapeStartPosition: Point2D?
     var shapeEndPosition: Point2D?
+    @Binding var selectedRegion: SelectedRegion?
+    var translating: Bool
     
     @Binding var speed: CGFloat
     @Binding var translation: Point2D
@@ -55,21 +57,27 @@ struct OverlayView: View {
         // Translation is measured in terms of pixels (i.e. CGFloats) while the image is measured
         // in terms of points (i.e. Ints)
         
-        guard let a = shapeStartPosition, let b = shapeEndPosition else {
-            return
+        if !translating {
+            guard let a = shapeStartPosition, let b = shapeEndPosition else {
+                return
+            }
+            
+            let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
+            let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
+            
+            __translation.x = max(CGFloat(-p1.x) * pixelSize.width,
+                                  min(__translation.x + delta.x,
+                                      CGFloat(image.size.width - p2.x) * pixelSize.width))
+            __translation.y = max(CGFloat(-p1.y) * pixelSize.height,
+                                  min(__translation.y + delta.y,
+                                      CGFloat(image.size.height - p2.y) * pixelSize.height))
+            
+            translation = convertToInteger(__translation)
+        } else {
+            __translation.x += delta.x
+            __translation.y += delta.y
+            translation = convertToInteger(__translation)
         }
-        
-        let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
-        let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
-        
-        __translation.x = max(CGFloat(-p1.x) * pixelSize.width,
-                            min(__translation.x + delta.x,
-                                CGFloat(image.size.width - p2.x) * pixelSize.width))
-        __translation.y = max(CGFloat(-p1.y) * pixelSize.height,
-                            min(__translation.y + delta.y,
-                                CGFloat(image.size.height - p2.y) * pixelSize.height))
-        
-        translation = convertToInteger(__translation)
     }
     
     var drag: some Gesture {
@@ -119,6 +127,21 @@ struct OverlayView: View {
         ZStack {
             PixelBufferView(pixelSize: pixelSize, image: normalImage)
             PixelGridImageView(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
+            
+            if let path = selectedRegion?.boundingPath {
+                if translating {
+                    Path(path)
+                        .transform(CGAffineTransform(scaleX: pixelSize.width, y: pixelSize.height))
+                        .stroke(style: StrokeStyle(lineWidth: 2, dash: [5], dashPhase: 0))
+                        .foregroundColor(Color(.lightGray))
+                        .offset(x: CGFloat(translation.x) * pixelSize.width, y: CGFloat(translation.y) * pixelSize.height)
+                } else {
+                    Path(path)
+                        .transform(CGAffineTransform(scaleX: pixelSize.width, y: pixelSize.height))
+                        .stroke(style: StrokeStyle(lineWidth: 2, dash: [5], dashPhase: 0))
+                        .foregroundColor(Color(.lightGray))
+                }
+            }
             
             if let p1 = shapeStartPosition {
                 if let p2 = shapeEndPosition {
