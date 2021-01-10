@@ -8,40 +8,9 @@
 
 import SwiftUI
 
-struct ToolMenuButton<State>: View {
+struct ToolsMenu: View {
     
-    var state: State
-    var isSelected: Bool
-    var imageName: String
-    var selected: () -> ()
-    var currentState: Binding<State>?
-    
-    init(_ currentState: Binding<State>? = nil, state: State, image: String, isSelected: Bool = false, selected: @escaping () -> () = {}) {
-        self.state = state
-        self.currentState = currentState
-        self.isSelected = isSelected
-        self.imageName = image
-        self.selected = selected
-    }
-    
-    private func update() {
-        currentState?.wrappedValue = state
-        selected()
-    }
-    
-    var body: some View {
-        Button(action: update) {
-            ZStack(alignment: .center) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color(.systemGray4) : Color(.secondarySystemBackground))
-                Image(systemName: imageName).font(Font.system(size: 24))
-            }
-            .frame(width: 48, height: 48, alignment: .center)
-        }
-    }
-}
-
-struct ToolsMenuV2: View {
+    typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
     
     enum MenuState {
         case main
@@ -70,13 +39,13 @@ struct ToolsMenuV2: View {
         HStack {
             TerneryState.create($tool,
                                 tool: .shape) {
-                resizing(statusText: "Shape tool.")()
+                resizing(statusText: "Shape tool.")
             } translating: {
                 translating()
             } complete: {
                 completed { (p1, p2, offset) in
                     artwork.image = translatedShape(p1: p1, p2: p2)
-                }()
+                }
             }
             ToolMenuButton<MenuState>($menuState, state: .selection, image: "cursorarrow") {
                 isAppendMode = true
@@ -103,8 +72,6 @@ struct ToolsMenuV2: View {
         }
     }
     
-    typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
-    
     func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
         let a = p1 + translation
         let b = p2 + translation
@@ -119,7 +86,7 @@ struct ToolsMenuV2: View {
     var selection: some View {
         HStack {
             BinaryState.create($tool, tool: .rectangularSelect) {
-                resizing(statusText: "Selection tool.")()
+                resizing(statusText: "Selection tool.")
             } selected: {
                 selectionStarted = true
                 if selectedRegion == nil {
@@ -134,7 +101,7 @@ struct ToolsMenuV2: View {
                         k.update(points: rect.points, mode: .toggle)
                         selectedRegion = k
                     }
-                }()
+                }
             }
             ToolMenuButton<MenuState>($menuState,
                                       state: selectionStarted ? .transformation : .main,
@@ -199,12 +166,10 @@ struct ToolsMenuV2: View {
         }
     }
     
-    func resizing(statusText: String) -> () -> () {
-        return {
+    func resizing(statusText: String) {
             reset()
             self.statusText = statusText
             shapeStartPosition = position
-        }
     }
     
     func translating() {
@@ -217,25 +182,14 @@ struct ToolsMenuV2: View {
         }
     }
     
-    func completed(callback: @escaping (_ p1: Point2D, _ p2: Point2D, _ offset: Point2D) -> ()) -> () -> () {
-        return {
-            statusText = "Complete."
-            if let p2 = shapeEndPosition {
-                if let p1 = shapeStartPosition {
-                    callback(p1, p2, translation)
-                }
-                shapeEndPosition = nil
-                shapeStartPosition = nil
+    func completed(callback: (_ p1: Point2D, _ p2: Point2D, _ offset: Point2D) -> ()) {
+        statusText = "Complete."
+        if let p2 = shapeEndPosition {
+            if let p1 = shapeStartPosition {
+                callback(p1, p2, translation)
             }
-        }
-    }
-    
-    func onDrag(_ delta: CGPoint) {
-        if tool == nil {
-            statusText = ("(x: \(position.x), y: \(position.y))")
-        }
-        if tool == .pencil {
-            applyPencil()
+            shapeEndPosition = nil
+            shapeStartPosition = nil
         }
     }
     

@@ -105,15 +105,15 @@ struct PixelView: View {
             Spacer()
             Text(statusText)
             VStack {
-                ToolsMenuV2(tool: $tool,
-                            selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
-                            selectedColor: selectedColor,
-                            statusText: $statusText,
-                            position: $position,
-                            shapeStartPosition: $shapeStartPosition,
-                            shapeEndPosition: $shapeEndPosition,
-                            translation: $translation,
-                            selectedRegion: $selectedRegion)
+                ToolsMenu(tool: $tool,
+                          selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
+                          selectedColor: selectedColor,
+                          statusText: $statusText,
+                          position: $position,
+                          shapeStartPosition: $shapeStartPosition,
+                          shapeEndPosition: $shapeEndPosition,
+                          translation: $translation,
+                          selectedRegion: $selectedRegion)
                     .environmentObject(artwork)
                     .padding(.top)
                 HStack {
