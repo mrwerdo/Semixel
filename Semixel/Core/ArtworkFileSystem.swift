@@ -138,6 +138,18 @@ class ArtworkFileSystem {
     }
     
     func reset() throws {
-        throw LoadingError(description: "this is an arbitrary error...")
+        let documentsUrl = try self.documentsUrl()
+        let fm = FileManager.default
+        let urls = try fm.contentsOfDirectory(at: documentsUrl,
+                                              includingPropertiesForKeys: nil,
+                                              options: [.skipsSubdirectoryDescendants, .skipsHiddenFiles])
+        
+        ignoreErrors {
+            try foreach(urls) { url in
+                try fm.removeItem(at: url)
+            }
+        }
+        
+        fileSystemMetadata = [:]
     }
 }

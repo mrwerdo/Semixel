@@ -20,13 +20,14 @@ struct ContentView: View {
                 ForEach(store.artwork) { (artwork: ArtworkMetadata) in
                     let destination = store.view(for: artwork)
                         .onDisappear(perform: { save(artwork) })
+                        .navigationBarTitle(artwork.title, displayMode: .inline)
                     NavigationLink(destination: destination, tag: artwork.id, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
-//                        artwork.preview
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: 50, height: 50)
-//                            .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
+                        store.preview(for: artwork)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 50, height: 50)
+                            .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
                         VStack(alignment: .leading) {
                             Text(artwork.title)
                             Text(artwork.subtitle)
@@ -49,10 +50,8 @@ struct ContentView: View {
                         }
                         .padding()
                         Button {
-                            do {
-                                try ArtworkModel.initializeDirectory()
-                            } catch {
-                                print(error)
+                            ignoreErrors {
+                                try store.addDefaultArtwork(force: true)
                             }
                         } label: {
                             Image(systemName: "arrow.clockwise")
@@ -82,7 +81,7 @@ struct ContentView: View {
     
     func add() {
         do {
-            _ = try store.create(.semantic)
+            _ = try store.create(.semantic, size: Size2D(width: 32, height: 32))
         } catch {
             print(error)
         }

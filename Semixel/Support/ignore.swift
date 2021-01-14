@@ -33,6 +33,11 @@ struct ErrorBuilder {
         return [expression]
     }
     
+    // foreach
+    static func buildExpression(_ expression: [Method]) -> [Method] {
+        return expression
+    }
+    
     // If statements
     static func buildOptional(_ method: [M2]?) -> [M2] {
         if let m = method {

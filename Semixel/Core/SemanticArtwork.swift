@@ -11,14 +11,8 @@ import UIKit
 import SwiftUI
 
 final class SemanticArtwork: Identifiable, ObservableObject {
-    var id: String
-    var url: URL {
-        get { fatalError() } set { }
-    }
-    
-    @Published
-    var title: String
-    
+    let id: String
+
     @Published
     var root: SemanticIdentifier
     
@@ -28,17 +22,8 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     @Published
     var colorPalettes: [Int : ColorPalette]
     
-    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
-        fatalError()
-    }
-    
-    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>) {
-        fatalError()
-    }
-    
     init(id: String, title: String, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
         self.id = id
-        self.title = title
         self.root = root
         self.image = image
         self.colorPalettes = [:]
@@ -48,13 +33,9 @@ final class SemanticArtwork: Identifiable, ObservableObject {
         }        
     }
     
-    init(id: String, title: String, image: PixelImage<SemanticPixel<RGBA>>) {
-        self.id = id
-        self.title = title
-        self.root = SemanticIdentifier(id: -1, name: "Root")
-        self.image = image
-        self.colorPalettes = [:]
-        
+    func recomputeColorPalette() {
+        root = SemanticIdentifier(id: -1, name: "Root")
+        colorPalettes = [:]
         for pixel in image.buffer {
             if let palette = colorPalettes[pixel.id] {
                 if !palette.colors.contains(where: { $0.color == pixel.color }) {
@@ -72,7 +53,6 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     
     init(createUsing metadata: ArtworkMetadata) {
         self.id = metadata.id
-        self.title = metadata.title
         self.root = SemanticIdentifier(id: -1, name: "Root")
         self.image = PixelImage(width: metadata.size.width, height: metadata.size.height)
         let palette = ColorPalette(colors: [IdentifiableColor(color: RGBA.clear, id: UUID())])

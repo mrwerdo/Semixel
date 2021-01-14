@@ -28,6 +28,7 @@ func initialize() -> ArtworkStore {
     ignoreErrors {
         if reset {
             try fs.reset()
+            UserDefaults().removeObject(forKey: "Semixel_DefaultArtwork_Added")
         }
     }
     
@@ -42,7 +43,7 @@ func initialize() -> ArtworkStore {
     
     ignoreErrors {
         if initialize {
-//            try store.addDefaultArtwork()
+            try store.addDefaultArtwork()
         }
     }
     

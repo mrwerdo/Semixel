@@ -131,7 +131,6 @@ struct PixelView: View {
                             .ignoresSafeArea())
         }
         .background(Color(UIColor.secondarySystemBackground))
-        .navigationBarTitle(artwork.title, displayMode: .inline)
     }
     
     func onDrag(_ delta: CGPoint) {

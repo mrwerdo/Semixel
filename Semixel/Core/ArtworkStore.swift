@@ -13,13 +13,29 @@ enum PixelType: String, Codable {
     case semantic
 }
 
-struct ArtworkMetadata: Identifiable, Codable {
-    var preview: PixelImage<RGBA>
-    var title: String
-    var id: String
+class ArtworkMetadata: Identifiable, Codable, ObservableObject {
+    let id: String
+    var _title: String?
     var size: Size2D
     var pixelType: PixelType
     var path: String
+    
+    init(id: String, title: String? = nil, size: Size2D, pixelType: PixelType, path: String) {
+        self.id = id
+        self._title = title
+        self.size = size
+        self.pixelType = pixelType
+        self.path = path
+    }
+    
+    var title: String {
+        get {
+            return _title ?? "Untitled"
+        }
+        set {
+            _title = newValue
+        }
+    }
 }
 
 extension ArtworkMetadata {
@@ -99,15 +115,9 @@ class ArtworkStore: ObservableObject {
         try fs.write(object: metadata)
     }
     
-    func create(_ type: PixelType) throws -> ArtworkMetadata {
-        let size = Size2D(width: 32, height: 32)
+    func create(_ type: PixelType, size: Size2D) throws -> ArtworkMetadata {
         let id = UUID().description
-        let metadata = ArtworkMetadata(preview: PixelImage<RGBA>(width: size.width, height: size.height),
-                                       title: "Untitled",
-                                       id: id,
-                                       size: size,
-                                       pixelType: type,
-                                       path: "/")
+        let metadata = ArtworkMetadata(id: id, size: size, pixelType: type, path: "/")
 
         switch type {
         case .semantic:
@@ -129,6 +139,7 @@ class ArtworkStore: ObservableObject {
     
     func remove(_ artwork: ArtworkMetadata) throws {
         try fs.delete(id: artwork.id)
+        metadata.standaloneArtworks.removeAll { $0.id == artwork.id }
         try saveMetadata()
     }
     
@@ -149,6 +160,15 @@ class ArtworkStore: ObservableObject {
         let destination = PixelView()
             .environmentObject(model(for: artwork))
         return destination
+    }
+    
+    func preview(for metadata: ArtworkMetadata) -> Image {
+        let artwork = model(for: metadata)
+        if let img = artwork.image.convertToCGImage() {
+            return Image(decorative: img, scale: 1.0)
+        } else {
+            return Image(systemName: "questionmark")
+        }
     }
 }
 
@@ -222,5 +242,34 @@ extension ArtworkStore {
     
     static var defaultArtworkUrls: [URL]? {
         Bundle.main.urls(forResourcesWithExtension: "png", subdirectory: "Default Artwork")
+    }
+    
+    func addDefaultArtwork(force: Bool = false) throws {
+        let userDefaults = UserDefaults()
+        guard !userDefaults.bool(forKey: "Semixel_DefaultArtwork_Added") || force else {
+            return
+        }
+        userDefaults.set(true, forKey: "Semixel_DefaultArtwork_Added")
+        
+        guard let artworkUrls = ArtworkStore.defaultArtworkUrls else {
+            print("Failed to find default artwork subdirectory.")
+            return
+        }
+        
+        for url in artworkUrls {
+            guard let image = UIImage(contentsOfFile: url.path) else {
+                continue
+            }
+            
+            let size = Size2D(width: image.width, height: image.height)
+            let metadata = try create(.semantic, size: size)
+            metadata.title = url.deletingPathExtension().lastPathComponent
+            let artwork = model(for: metadata)
+            image.enumeratePixels { (x, y, pixel) in
+                artwork.image[x, y] = SemanticPixel(id: 0, color: pixel)
+            }
+            artwork.recomputeColorPalette()
+            try save(metadata)
+        }
     }
 }
