@@ -18,12 +18,26 @@ extension ProcessInfo {
     }
 }
 
+struct LoadingError: Error, CustomStringConvertible {
+    var description: String
+}
+
+private func documentsUrl() throws -> URL {
+    let fm = FileManager.default
+    let urls = fm.urls(for: FileManager.SearchPathDirectory.documentDirectory,
+                       in: .userDomainMask)
+    guard let url = urls.first else {
+        throw LoadingError(description: "Could not find documents directory.")
+    }
+    return url
+}
+
 func initialize() -> ArtworkStore {
     let proc = ProcessInfo()
     let reset = proc.env("Semixel_ArtworkFileSystem_Reset", Bool.init, default: false)
     let initialize = proc.env("Semixel_ArtworkFileSystem_Initialize", Bool.init, default: false)
     
-    let fs = ArtworkFileSystem.default
+    let fs = ArtworkFileSystem(baseDirectory: try! documentsUrl())
     
     ignoreErrors {
         if reset {

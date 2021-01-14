@@ -252,8 +252,7 @@ extension ArtworkStore {
         userDefaults.set(true, forKey: "Semixel_DefaultArtwork_Added")
         
         guard let artworkUrls = ArtworkStore.defaultArtworkUrls else {
-            print("Failed to find default artwork subdirectory.")
-            return
+            throw LoadingError(description: "Failed to find default artwork subdirectory.")
         }
         
         for url in artworkUrls {

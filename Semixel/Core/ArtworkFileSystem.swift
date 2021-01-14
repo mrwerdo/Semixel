@@ -36,8 +36,12 @@ extension FileSystemReadable where FileId: CaseIterable {
 
 // Stores data on disk and prevents name clashes. Objects can be associated with multiple files.
 class ArtworkFileSystem {
-    static let `default` = ArtworkFileSystem()
     private var fileSystemMetadata: [String : [Metadata]] = [:]
+    private var documentsUrl: URL
+    
+    private var metadataUrl: URL {
+        return documentsUrl.appendingPathComponent("metadata.json")
+    }
     
     struct Metadata: Codable {
         var objectId: String
@@ -45,13 +49,10 @@ class ArtworkFileSystem {
         var path: String
     }
     
-    private struct LoadingError: Error, CustomStringConvertible {
-        var description: String
-    }
-    
-    private init() {
+    init(baseDirectory: URL) {
+        documentsUrl = baseDirectory
         do {
-            let data = try Data(contentsOf: try metadataUrl())
+            let data = try Data(contentsOf: metadataUrl)
             let decoder = JSONDecoder()
             fileSystemMetadata = try decoder.decode([String : [Metadata]].self, from: data)
         } catch {
@@ -59,23 +60,8 @@ class ArtworkFileSystem {
         }
     }
     
-    private func metadataUrl() throws -> URL {
-        return try documentsUrl().appendingPathComponent("metadata.json")
-    }
-    
-    private func documentsUrl() throws -> URL {
-        let fm = FileManager.default
-        let urls = fm.urls(for: FileManager.SearchPathDirectory.documentDirectory,
-                           in: .userDomainMask)
-        guard let url = urls.first else {
-            throw LoadingError(description: "Could not find documents directory.")
-        }
-        return url
-    }
-    
     func write<Type: FileSystemRepresentable>(object: Type) throws {
         let files = try object.encodeAllFiles()
-        let documentsUrl = try self.documentsUrl()
         var metadatas = [Metadata]()
         for (name, data) in files {
             let metadata = Metadata(objectId: object.id, fileId: name, path: UUID().description)
@@ -90,7 +76,7 @@ class ArtworkFileSystem {
     private func saveMetadata() throws {
         let encoder = JSONEncoder()
         let data = try encoder.encode(fileSystemMetadata)
-        try data.write(to: try metadataUrl())
+        try data.write(to: metadataUrl)
     }
     
     func read<Type: FileSystemReadable>(id: String, type: Type.Type) throws -> Type {
@@ -98,7 +84,6 @@ class ArtworkFileSystem {
             throw LoadingError(description: "Object not found for id: \(id), type: \(Type.self)")
         }
         var parts: [Type.FileId : Data] = [:]
-        let documentsUrl = try self.documentsUrl()
         for metadata in files {
             let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
             let data = try Data(contentsOf: url)
@@ -129,7 +114,6 @@ class ArtworkFileSystem {
         guard let files = fileSystemMetadata.removeValue(forKey: id) else {
             return
         }
-        let documentsUrl = try self.documentsUrl()
         for file in files {
             let url = URL(fileURLWithPath: file.path, relativeTo: documentsUrl)
             try FileManager.default.removeItem(at: url)
@@ -138,7 +122,6 @@ class ArtworkFileSystem {
     }
     
     func reset() throws {
-        let documentsUrl = try self.documentsUrl()
         let fm = FileManager.default
         let urls = try fm.contentsOfDirectory(at: documentsUrl,
                                               includingPropertiesForKeys: nil,
