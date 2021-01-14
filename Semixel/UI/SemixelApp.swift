@@ -11,14 +11,12 @@ import SwiftUI
 @main
 struct SemixelApp: App {
     
-    static let artworkDirectory: URL = try! ArtworkModel.getArtworkUrl()
-    
-    @StateObject var artworkModel = try! ArtworkModel(artworkDirectory)
+    @StateObject var model = initialize()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(artworkModel)
+                .environmentObject(model)
         }
     }
 }

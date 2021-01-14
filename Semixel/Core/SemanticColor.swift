@@ -9,7 +9,7 @@
 import UIKit
 import Combine
 
-struct IdentifiableColor: Identifiable, Equatable {
+struct IdentifiableColor: Identifiable, Equatable, Codable {
     var color: RGBA
     var id: UUID
 }

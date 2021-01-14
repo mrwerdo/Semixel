@@ -86,6 +86,8 @@ struct PixelImage<ColorType: ColorTypeProtocol> {
     }
 }
 
+extension PixelImage: Codable where ColorType: Codable { }
+
 extension PixelImage {
     func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D) -> PixelImage {
         let a = Point2D(x: min(p1.x, p2.x), y: min(p1.y, p2.y))

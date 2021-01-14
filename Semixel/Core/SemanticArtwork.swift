@@ -10,32 +10,14 @@ import Foundation
 import UIKit
 import SwiftUI
 
-class SemanticArtwork: Identifiable, ObservableObject {
-    var id: URL {
-        return url
+final class SemanticArtwork: Identifiable, ObservableObject {
+    var id: String
+    var url: URL {
+        get { fatalError() } set { }
     }
     
-    var title: String {
-        let name = url.lastPathComponent
-        if name.starts(with: ".") {
-            return name
-        } else {
-            let index = name.index(name.startIndex,
-                                   offsetBy: name.count - url.pathExtension.count - 1,
-                                   limitedBy: name.endIndex) ?? name.endIndex
-            return String(name[name.startIndex..<index])
-        }
-    }
-    
-    var type: String {
-        if url.pathExtension == "json" {
-            return "semantic"
-        } else {
-            return "bitmap"
-        }
-    }
-    
-    var url: URL
+    @Published
+    var title: String
     
     @Published
     var root: SemanticIdentifier
@@ -47,7 +29,16 @@ class SemanticArtwork: Identifiable, ObservableObject {
     var colorPalettes: [Int : ColorPalette]
     
     init(url: URL, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
-        self.url = url
+        fatalError()
+    }
+    
+    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>) {
+        fatalError()
+    }
+    
+    init(id: String, title: String, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
+        self.id = id
+        self.title = title
         self.root = root
         self.image = image
         self.colorPalettes = [:]
@@ -57,8 +48,9 @@ class SemanticArtwork: Identifiable, ObservableObject {
         }        
     }
     
-    init(url: URL, image: PixelImage<SemanticPixel<RGBA>>) {
-        self.url = url
+    init(id: String, title: String, image: PixelImage<SemanticPixel<RGBA>>) {
+        self.id = id
+        self.title = title
         self.root = SemanticIdentifier(id: -1, name: "Root")
         self.image = image
         self.colorPalettes = [:]
@@ -75,6 +67,16 @@ class SemanticArtwork: Identifiable, ObservableObject {
             }
         }
         
+        root.children.append(SemanticIdentifier(id: 0, name: "Default"))
+    }
+    
+    init(createUsing metadata: ArtworkMetadata) {
+        self.id = metadata.id
+        self.title = metadata.title
+        self.root = SemanticIdentifier(id: -1, name: "Root")
+        self.image = PixelImage(width: metadata.size.width, height: metadata.size.height)
+        let palette = ColorPalette(colors: [IdentifiableColor(color: RGBA.clear, id: UUID())])
+        self.colorPalettes = [0 : palette]
         root.children.append(SemanticIdentifier(id: 0, name: "Default"))
     }
 }

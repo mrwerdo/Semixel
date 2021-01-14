@@ -10,27 +10,26 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @EnvironmentObject var model: ArtworkModel
+    @EnvironmentObject var store: ArtworkStore
     
-    @State var selection: URL?
+    @State var selection: String?
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(model.artwork) { (artwork: SemanticArtwork) in
-                    let destination = PixelView()
-                        .environmentObject(artwork)
-                        .onDisappear(perform: save(artwork: artwork))
-                    NavigationLink(destination: destination, tag: artwork.url, selection: $selection) {
+                ForEach(store.artwork) { (artwork: ArtworkMetadata) in
+                    let destination = store.view(for: artwork)
+                        .onDisappear(perform: { save(artwork) })
+                    NavigationLink(destination: destination, tag: artwork.id, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
-                        artwork.icon
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
+//                        artwork.preview
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: 50, height: 50)
+//                            .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
                         VStack(alignment: .leading) {
                             Text(artwork.title)
-                            Text("\(artwork.type) - \(artwork.image.size.width)x\(artwork.image.size.height)")
+                            Text(artwork.subtitle)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
                         }
@@ -65,23 +64,25 @@ struct ContentView: View {
         }
     }
     
-    func save(artwork: SemanticArtwork) -> (() -> Void) {
-        return {
-            do {
-                try artwork.write(to: artwork.url)
-            } catch {
-                print(error)
-            }
+    func save(_ artwork: ArtworkMetadata) {
+        do {
+            try store.save(artwork)
+        } catch {
+            print(error)
         }
     }
     
-    func delete(at offsets: IndexSet) {
-        model.remove(at: offsets)
+    func delete(at offset: IndexSet) {
+        do {
+            try store.remove(at: offset)
+        } catch {
+            print(error)
+        }
     }
     
     func add() {
         do {
-            selection = try model.createArtwork().url
+            _ = try store.create(.semantic)
         } catch {
             print(error)
         }
