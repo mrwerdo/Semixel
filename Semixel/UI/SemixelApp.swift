@@ -16,7 +16,7 @@ struct SemixelApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(model)
+                .environmentObject(model.store)
         }
     }
 }

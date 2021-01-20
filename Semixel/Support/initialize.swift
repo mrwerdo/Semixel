@@ -32,7 +32,17 @@ private func documentsUrl() throws -> URL {
     return url
 }
 
-func initialize() -> ArtworkStore {
+class AppContext: ObservableObject {
+    @Published var store: ArtworkStore
+    let projectSync: ProjectSyncService
+    
+    init(store: ArtworkStore, projectSync: ProjectSyncService) {
+        self.store = store
+        self.projectSync = projectSync
+    }
+}
+
+func initialize() -> AppContext {
     let proc = ProcessInfo()
     let reset = proc.env("Semixel_ArtworkFileSystem_Reset", Bool.init, default: false)
     let initialize = proc.env("Semixel_ArtworkFileSystem_Initialize", Bool.init, default: false)
@@ -61,6 +71,9 @@ func initialize() -> ArtworkStore {
         }
     }
     
-    return store
+    let syncService = ProjectSyncService(store: store)
+    
+    return AppContext(store: store,
+                      projectSync: syncService)
 }
 

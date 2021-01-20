@@ -49,5 +49,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Allow projects to be synchronised between nearby devices.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_semixel-prjsync._tcp</string>
+		<string>_semixel-prjsync._udp</string>
+	</array>
 </dict>
 </plist>

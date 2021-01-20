@@ -179,6 +179,7 @@ extension SemanticArtwork: FileSystemRepresentable {
         case colorPalettes
         case identifierTree
         case size
+        case id
     }
     
     func encode(for fileId: FileId) throws -> Data {
@@ -196,6 +197,8 @@ extension SemanticArtwork: FileSystemRepresentable {
             return try encoder.encode(root)
         case .size:
             return try encoder.encode(image.size)
+        case .id:
+            return try encoder.encode(id)
         }
     }
 }
@@ -208,11 +211,12 @@ extension SemanticArtwork: FileSystemReadable {
         let colorPalettes = try decoder.decode([Int : [IdentifiableColor]].self, from: parts[.colorPalettes]!)
         let root = try decoder.decode(SemanticIdentifier.self, from: parts[.identifierTree]!)
         let size = try decoder.decode(Size2D.self, from: parts[.size]!)
+        let id = try decoder.decode(String.self, from: parts[.id]!)
         
         let buffer = zip(semantics, pixels).map(SemanticPixel<RGBA>.init)
         let image = PixelImage<SemanticPixel<RGBA>>(size: size, buffer: buffer)
         let k = colorPalettes.mapValues { $0.map { $0.color } }
-        self.init(id: "", title: "", image: image, root: root, colorPalettes: k)
+        self.init(id: id, title: "", image: image, root: root, colorPalettes: k)
     }
 }
 
