@@ -9,20 +9,65 @@
 import Foundation
 import MultipeerConnectivity
 import Cocoa
+import ArgumentParser
 
-currentVerbosity = .normal
-
-let request = SyncRequest(project: nil,
-                          filter: nil,
-                          projectBaseDirectory: FileManager.default.currentDirectoryPath)
-
-guard let displayName = Host.current().localizedName else {
-    log("Unable to get current host name.", .warning, .normal)
-    exit(EXIT_FAILURE)
+struct ProjectSync: ParsableCommand {
+    static var configuration = CommandConfiguration(
+        commandName: "semxiel",
+        abstract: "Syncronize artwork to and from the iOS app.",
+        version: "0.1",
+        subcommands: [Download.self],
+        defaultSubcommand: Download.self)
 }
 
-let peerId = MCPeerID(displayName: displayName)
-log("Using peer: \(peerId.displayName)", .output, .verbose)
+struct Options: ParsableArguments {
+    @Flag(name: .shortAndLong,
+          help: "Include to increase the level of detail.")
+    var verbose: Bool = false
 
-let browser = Browser(peerId, request, RunLoop.current, service: "semixel-prjsync")
-browser.start()
+    @Flag(name: [.customLong("no-pp", withSingleDash: true), .long],
+          help: "Enable colorized output.")
+    var noPrettyPrint: Bool = false
+    
+    @Option(name: .shortAndLong,
+            help: "The name of the project on the iOS app to syncronize.")
+    var project: String?
+    
+    @Option(name: .shortAndLong,
+            help: "Only artwork with titles containing this string will be syncronized.")
+    var filter: String?
+    
+    @Option(name: .shortAndLong,
+            completion: .directory,
+            help: "The path to the project directory on this computer.")
+    var directory: String = FileManager.default.currentDirectoryPath
+}
+
+extension ProjectSync {
+    struct Download: ParsableCommand {
+
+        @OptionGroup var options: Options
+                
+        func run() throws {
+            var logger = Logger()
+            logger.prettyPrint = !options.noPrettyPrint
+            logger.verbosity = options.verbose
+            
+            guard let displayName = Host.current().localizedName else {
+                logger.error("unable to get current host name.")
+                throw ExitCode.failure
+            }
+
+            let peerId = MCPeerID(displayName: displayName)
+            
+            let request = SyncRequest(project: options.project,
+                                      filter: options.filter,
+                                      projectBaseDirectory: options.directory)
+
+            let browser = Browser(peerId, request, RunLoop.current, logger: logger)
+            browser.start()
+        }
+    }
+}
+
+ProjectSync.main()
