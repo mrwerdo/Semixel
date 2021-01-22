@@ -13,6 +13,18 @@ struct ContentView: View {
     @EnvironmentObject var store: ArtworkStore
     
     @State var selection: String?
+    @State var showAttributes: Bool = false
+    
+    var attributesButton: some View {
+        Button(action: {
+            showAttributes.toggle()
+        }, label: {
+            Image(systemName: "ellipsis.circle")
+                .font(Font.title2.weight(.light))
+                .contentShape(Rectangle())
+                .accentColor(Color.black)
+        })
+    }
     
     var body: some View {
         NavigationView {
@@ -38,27 +50,80 @@ struct ContentView: View {
                 }.onDelete(perform: delete(at:))
             }
             .navigationBarTitle("Artwork")
-            .navigationBarItems(trailing: EditButton())
+            .navigationBarItems(trailing: attributesButton)
             .listStyle(PlainListStyle())
-            .toolbar {
-                ToolbarItem(placement: .bottomBar) {
-                    HStack {
-                        Button {
-                            add()
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                        .padding()
-                        Button {
-                            ignoreErrors {
-                                try store.addDefaultArtwork(force: true)
-                            }
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }.padding()
-                        Spacer()
+            .toolbar { toolbarItems  }
+        }
+        .halfModalSheet(isPresented: $showAttributes, content: attributesView)
+    }
+    
+    var attributesView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("Standalone Artwork")
+                    .font(Font.title3)
+                Spacer()
+                Button {
+                    showAttributes = false
+                } label: {
+                    ZStack {
+                        Image(systemName: "circle.fill")
+                            .foregroundColor(Color(UIColor.secondarySystemFill))
+                            .font(.system(size: 31))
+                        Image(systemName: "xmark")
+                            .foregroundColor(Color.secondary)
+                            .font(.system(size: 15, weight: .bold))
                     }
                 }
+            }
+            .padding()
+            .padding(.leading)
+            .padding(.trailing)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
+            Divider()
+            List {
+                Section {
+                    action(title: "Add default artwork",
+                           icon: "doc.badge.plus",
+                           callback: addDefaultArtwork)
+                }
+                let warning = Text("Warning: this will remove all of your artwork.")
+                Section(footer: warning) {
+                    action(title: "Reset",
+                           icon: "exclamationmark.arrow.triangle.2.circlepath",
+                           callback: reset)
+                }
+            }
+            .onAppear {
+                UITableView.appearance().isScrollEnabled = false
+            }
+        }
+        .listStyle(InsetGroupedListStyle())
+        .accentColor(Color.black)
+        .background(Color(UIColor.secondarySystemBackground))
+    }
+    
+    func action(title: String, icon: String, callback: @escaping () -> ()) -> some View {
+        Button {
+            callback()
+            showAttributes = false
+        } label: {
+            HStack {
+                Text(title)
+                Spacer()
+                Image(systemName: icon)
+                    .font(Font.title3)
+            }
+        }
+    }
+    
+    var toolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .bottomBar) {
+            HStack {
+                Button(action: add) {
+                    Image(systemName: "plus")
+                }
+                .padding()
             }
         }
     }
@@ -84,6 +149,21 @@ struct ContentView: View {
             _ = try store.create(.semantic, size: Size2D(width: 32, height: 32))
         } catch {
             print(error)
+        }
+    }
+    
+    func reset() {
+        do {
+            try store.reset()
+        }
+        catch {
+            print(error)
+        }
+    }
+    
+    func addDefaultArtwork() {
+        ignoreErrors {
+            try store.addDefaultArtwork(force: true)
         }
     }
 }

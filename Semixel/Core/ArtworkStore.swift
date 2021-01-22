@@ -276,3 +276,12 @@ extension ArtworkStore {
         }
     }
 }
+
+extension ArtworkStore {
+    func reset() throws {
+        try fs.reset()
+        UserDefaults().removeObject(forKey: "Semixel_DefaultArtwork_Added")
+        artwork = []
+        metadata = Metadata()
+    }
+}
