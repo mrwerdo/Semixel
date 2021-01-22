@@ -16,6 +16,7 @@
 		864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DA24B714B30000A1AB /* Assets.xcassets */; };
 		864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 864E74DD24B714B30000A1AB /* Preview Assets.xcassets */; };
 		8650E3FA25B93CE90026AE24 /* HalfModalSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650E3F625B93CE90026AE24 /* HalfModalSheet.swift */; };
+		8650E40625BAB9F70026AE24 /* ArtworkMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */; };
 		86554BAF259040B3001864D6 /* SemanticIdentifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */; };
 		8660200025AC33B000BC6CC7 /* initialize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86601FFF25AC33B000BC6CC7 /* initialize.swift */; };
 		8660200325AD1CB400BC6CC7 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8660200225AD1CB400BC6CC7 /* ArtworkStore.swift */; };
@@ -53,6 +54,7 @@
 		864E74DD24B714B30000A1AB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		864E74E224B714B30000A1AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8650E3F625B93CE90026AE24 /* HalfModalSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HalfModalSheet.swift; sourceTree = "<group>"; };
+		8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkMetadataView.swift; sourceTree = "<group>"; };
 		86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticIdentifierView.swift; sourceTree = "<group>"; };
 		86601FFF25AC33B000BC6CC7 /* initialize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = initialize.swift; sourceTree = "<group>"; };
 		8660200225AD1CB400BC6CC7 /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				869C824125902E2E00B0235E /* ToolButton.swift */,
 				866DE89D2594482B0036B3E3 /* ToolsMenu.swift */,
 				869C823B25902DD500B0235E /* ToolType.swift */,
+				8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86554BAF259040B3001864D6 /* SemanticIdentifierView.swift in Sources */,
+				8650E40625BAB9F70026AE24 /* ArtworkMetadataView.swift in Sources */,
 				866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */,
 				86043AFE2592E9AB0057B747 /* PixelView.swift in Sources */,
 				86F520462590164300C19E41 /* FolderMonitor.swift in Sources */,

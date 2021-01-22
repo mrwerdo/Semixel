@@ -32,7 +32,6 @@ struct ContentView: View {
                 ForEach(store.artwork) { (artwork: ArtworkMetadata) in
                     let destination = store.view(for: artwork)
                         .onDisappear(perform: { save(artwork) })
-                        .navigationBarTitle(artwork.title, displayMode: .inline)
                     NavigationLink(destination: destination, tag: artwork.id, selection: $selection) {
                         // todo: make the thumbnail preview pixel perfect
                         store.preview(for: artwork)
@@ -96,6 +95,9 @@ struct ContentView: View {
             }
             .onAppear {
                 UITableView.appearance().isScrollEnabled = false
+            }
+            .onDisappear {
+                UITableView.appearance().isScrollEnabled = true
             }
         }
         .listStyle(InsetGroupedListStyle())

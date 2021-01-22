@@ -48,7 +48,6 @@ struct HalfModalSlider<Content: View, ModalContent: View, G1: Gesture, G2: Gestu
             }
             .background(Color.black.ignoresSafeArea())
         }
-        .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
     }
 }
 

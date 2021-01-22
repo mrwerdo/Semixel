@@ -33,7 +33,7 @@ class ArtworkMetadata: Identifiable, Codable, ObservableObject {
             return _title ?? "Untitled"
         }
         set {
-            _title = newValue
+            _title = newValue != "" ? newValue : ""
         }
     }
 }
@@ -159,6 +159,7 @@ class ArtworkStore: ObservableObject {
     func view(for artwork: ArtworkMetadata) -> some View {
         let destination = PixelView()
             .environmentObject(model(for: artwork))
+            .environmentObject(artwork)
         return destination
     }
     

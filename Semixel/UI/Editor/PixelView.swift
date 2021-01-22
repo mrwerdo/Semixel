@@ -8,11 +8,23 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+#endif
+
 struct PixelView: View {
     
     typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
     
     @EnvironmentObject var artwork: SemanticArtwork
+    @EnvironmentObject var metadata: ArtworkMetadata
+    @EnvironmentObject var store: ArtworkStore
+    
+    @State var editingTitle: Bool = false
     
     @State var _selectedColor: IdentifiableColor = IdentifiableColor(color: .white, id: UUID())
     @State var selectedSemanticIdentifierId: Int = 0
@@ -28,6 +40,7 @@ struct PixelView: View {
     @State var translation: Point2D = .zero
     
     @State var selectedRegion: SelectedRegion?
+    @State var showMetadataView: Bool = false
     
     var pixelSize: CGSize {
         return CGSize(width: 12, height: 12)
@@ -89,49 +102,85 @@ struct PixelView: View {
     }
     
     var body: some View {
-        VStack {
-            Spacer()
-            OverlayView(pixelSize: pixelSize,
-                        image: composedImage,
-                        position: $position,
-                        shapeStartPosition: shapeStartPosition,
-                        shapeEndPosition: shapeEndPosition,
-                        selectedRegion: $selectedRegion,
-                        translating: tool == .translation,
-                        speed: $speed,
-                        translation: $translation,
-                        onDrag: onDrag)
-                .padding()
-            Spacer()
-            Text(statusText)
+        // fixme: the overlay view shifts because the VStack's frame expands when the keyboard summoned.
+        ZStack(alignment: .bottom) {
             VStack {
-                ToolsMenu(tool: $tool,
-                          selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
-                          selectedColor: selectedColor,
-                          statusText: $statusText,
-                          position: $position,
-                          shapeStartPosition: $shapeStartPosition,
-                          shapeEndPosition: $shapeEndPosition,
-                          translation: $translation,
-                          selectedRegion: $selectedRegion)
-                    .environmentObject(artwork)
-                    .padding(.top)
-                HStack {
-                    Spacer()
-                    SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
-                    ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor)
-                        .padding([.top, .bottom, .trailing])
-                    Spacer()
+                Spacer()
+                OverlayView(pixelSize: pixelSize,
+                            image: composedImage,
+                            position: $position,
+                            shapeStartPosition: shapeStartPosition,
+                            shapeEndPosition: shapeEndPosition,
+                            selectedRegion: $selectedRegion,
+                            translating: tool == .translation,
+                            speed: $speed,
+                            translation: $translation,
+                            onDrag: onDrag)
+                    .padding()
+                Text(statusText)
+                    .frame(height: 30, alignment: .bottom)
+                VStack {
+                    ToolsMenu(tool: $tool,
+                              selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
+                              selectedColor: selectedColor,
+                              statusText: $statusText,
+                              position: $position,
+                              shapeStartPosition: $shapeStartPosition,
+                              shapeEndPosition: $shapeEndPosition,
+                              translation: $translation,
+                              selectedRegion: $selectedRegion)
+                        .environmentObject(artwork)
+                        .padding(.top)
+                    HStack {
+                        Spacer()
+                        SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
+                            .padding(.bottom)
+                        ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor)
+                            .padding([.top, .bottom, .trailing])
+                        Spacer()
+                    }
+                }
+                .frame(height: 320)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(Rectangle()
+                                .fill(Color(UIColor.systemBackground))
+                                .ignoresSafeArea())
+            }
+            .onTapGesture {
+                if editingTitle {
+                    hideKeyboard()
                 }
             }
-            .frame(height: 320)
-            .fixedSize(horizontal: false, vertical: true)
-            .background(Rectangle()
-                            .fill(Color(UIColor.systemBackground))
-                            .ignoresSafeArea())
+            .ignoresSafeArea(.keyboard)
+            .background(Color(UIColor.secondarySystemBackground).ignoresSafeArea())
         }
-        .background(Color(UIColor.secondarySystemBackground))
+        .halfModalSheet(isPresented: $showMetadataView,
+                        content: ArtworkMetadataView(isPresented: $showMetadataView))
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                TextField("Title", text: $metadata.title) {
+                    editingTitle = $0
+                } onCommit: {
+                    editingTitle = false
+                    ignoreErrors { try store.saveMetadata() }
+                }
+                .font(Font.system(size: 15, weight: .medium))
+            }
+        }
+        .navigationBarItems(trailing: attributesButton)
+        .navigationBarTitleDisplayMode(.inline)
     }
+    
+    var attributesButton: some View {
+        Button(action: {
+            showMetadataView.toggle()
+        }, label: {
+            Image(systemName: "ellipsis.circle")
+                .font(Font.title2.weight(.light))
+                .contentShape(Rectangle())
+        })
+    }
+
     
     func onDrag(_ delta: CGPoint) {
         if tool == nil {

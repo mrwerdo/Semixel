@@ -161,7 +161,11 @@ extension ArtworkMetadata: CustomStringConvertible {
             return "Untitled"
         } else {
             if title != "" {
-                return title
+                if path.hasSuffix("/") {
+                    return path + title
+                } else {
+                    return path + "/" + title
+                }
             } else {
                 return path
             }
