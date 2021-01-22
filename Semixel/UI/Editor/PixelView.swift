@@ -135,7 +135,7 @@ struct PixelView: View {
                         Spacer()
                         SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
                             .padding(.bottom)
-                        ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor)
+                        ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor, eyeDropper: eyeDropper)
                             .padding([.top, .bottom, .trailing])
                         Spacer()
                     }
@@ -181,6 +181,16 @@ struct PixelView: View {
         })
     }
 
+    private func eyeDropper() {
+        let c = artwork.image[position].color
+        if let color = selectedColorPalette.colors.first(where: { $0.color == c }) {
+            statusText = "Selected color at (x: \(position.x), y: \(position.y))"
+            selectedColor.wrappedValue = color
+        } else {
+            statusText = "Copied color at (x: \(position.x), y: \(position.y))"
+            selectedColor.wrappedValue = IdentifiableColor(color: c, id: UUID())
+        }
+    }
     
     func onDrag(_ delta: CGPoint) {
         if tool == nil {

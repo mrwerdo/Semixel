@@ -67,12 +67,10 @@ struct ColorPaletteView: View {
     
     @State var isEditing: Bool = false
     
+    var eyeDropper: () -> ()
+    
     private func add() {
         colorPalette.colors.append(IdentifiableColor(color: selectedColor.color, id: UUID()))
-    }
-    
-    private func eyeDropper() {
-        print(#function)
     }
     
     private func edit() {
