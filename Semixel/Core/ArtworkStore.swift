@@ -310,4 +310,11 @@ extension ArtworkStore {
         artwork = []
         metadata = Metadata()
     }
+    
+    func migrate() throws {
+        for metadata in artwork {
+            try save(metadata)
+        }
+        try saveMetadata()
+    }
 }
