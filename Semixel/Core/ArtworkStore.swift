@@ -174,13 +174,23 @@ class ArtworkStore: ObservableObject {
 }
 
 extension SemanticArtwork: FileSystemRepresentable {
-    enum FileId: String, CaseIterable {
+    enum FileId: String, CaseIterable, CodingKey {
         case pixels
         case semantics
         case colorPalettes
         case identifierTree
         case size
         case id
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: FileId.self)
+        try container.encode(image.buffer.map { $0.color }, forKey: .pixels)
+        try container.encode(image.buffer.map { $0.id }, forKey: .semantics)
+        try container.encode(colorPalettes.mapValues { $0.colors }, forKey: .colorPalettes)
+        try container.encode(root, forKey: .identifierTree)
+        try container.encode(image.size, forKey: .size)
+        try container.encode(id, forKey: .id)
     }
     
     func encode(for fileId: FileId) throws -> Data {
@@ -205,6 +215,21 @@ extension SemanticArtwork: FileSystemRepresentable {
 }
 
 extension SemanticArtwork: FileSystemReadable {
+    convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: FileId.self)
+        let pixels = try container.decode([RGBA].self, forKey: .pixels)
+        let semantics = try container.decode([Int].self, forKey: .semantics)
+        let colorPalettes = try container.decode([Int : [IdentifiableColor]].self, forKey: .colorPalettes)
+        let root = try container.decode(SemanticIdentifier.self, forKey: .identifierTree)
+        let size = try container.decode(Size2D.self, forKey: .size)
+        let id = try container.decode(String.self, forKey: .id)
+        
+        let buffer = zip(semantics, pixels).map(SemanticPixel<RGBA>.init)
+        let image = PixelImage<SemanticPixel<RGBA>>(size: size, buffer: buffer)
+        let k = colorPalettes.mapValues { $0.map { $0.color } }
+        self.init(id: id, title: "", image: image, root: root, colorPalettes: k)
+    }
+    
     convenience init(parts: [FileId : Data]) throws {
         let decoder = JSONDecoder()
         let pixels = try decoder.decode([RGBA].self, from: parts[.pixels]!)

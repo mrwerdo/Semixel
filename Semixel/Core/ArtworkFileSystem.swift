@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol FileSystemRepresentable {
+protocol FileSystemRepresentable: Encodable {
     associatedtype FileId: CaseIterable, RawRepresentable where FileId.RawValue == String
     var id: String { get }
     func encode(for fileId: FileId) throws -> Data
@@ -22,7 +22,7 @@ extension FileSystemRepresentable {
     }
 }
 
-protocol FileSystemReadable {
+protocol FileSystemReadable: Decodable {
     associatedtype FileId: Hashable, RawRepresentable where FileId.RawValue == String
     init(parts: [FileId: Data]) throws
     static var requiredKeys: Set<FileId> { get }
@@ -43,10 +43,47 @@ class ArtworkFileSystem {
         return documentsUrl.appendingPathComponent("metadata.json")
     }
     
+    enum ReadingError: Error {
+        case fileIdNotPresent
+        case versionTwoMetadataIsNotSingular
+        case missingMetadata
+    }
+    
     struct Metadata: Codable {
+        enum Keys: String, CodingKey {
+            case objectId
+            case fileId
+            case path
+            case version
+        }
+        
         var objectId: String
-        var fileId: String
+        var fileId: String?
         var path: String
+        var version: Version
+        
+        init(objectId: String, path: String) {
+            self.objectId = objectId
+            self.fileId = nil
+            self.path = path
+            self.version = Version.current
+        }
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: Keys.self)
+            try container.encode(objectId, forKey: .objectId)
+            try container.encodeIfPresent(fileId, forKey: .fileId)
+            try container.encode(path, forKey: .path)
+            try container.encode(version, forKey: .version)
+        }
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Keys.self)
+            objectId = try container.decode(String.self, forKey: .objectId)
+            fileId = try container.decodeIfPresent(String.self, forKey: .fileId)
+            path = try container.decode(String.self, forKey: .path)
+            version = try container.decodeIfPresent(Version.self, forKey: .version) ?? Version(0, 0, 1)
+        }
     }
     
     init(baseDirectory: URL) {
@@ -60,17 +97,37 @@ class ArtworkFileSystem {
         }
     }
     
-    func write<Type: FileSystemRepresentable>(object: Type) throws {
-        let files = try object.encodeAllFiles()
-        var metadatas = [Metadata]()
-        for (name, data) in files {
-            let metadata = Metadata(objectId: object.id, fileId: name, path: UUID().description)
-            metadatas.append(metadata)
-            let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
-            try data.write(to: url)
-        }
-        fileSystemMetadata[object.id] = metadatas
+    private func hardcoreWrite<Type: FileSystemRepresentable>(object: Type, using metadata: Metadata) throws {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(object)
+        let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
+        try data.write(to: url)
+        fileSystemMetadata[object.id] = [metadata]
         try saveMetadata()
+    }
+    
+    func write<Type: FileSystemRepresentable>(object: Type) throws {
+        if let files = fileSystemMetadata[object.id] {
+            guard let metadata = files.first else {
+                throw ReadingError.missingMetadata
+            }
+            
+            switch metadata.version {
+            case Version(0, 0, 1):
+                try delete(id: object.id, savingMetadata: false)
+                let newMetadata = Metadata(objectId: metadata.objectId, path: metadata.path)
+                try hardcoreWrite(object: object, using: newMetadata)
+            default:
+                if files.count > 1 {
+                    throw ReadingError.versionTwoMetadataIsNotSingular
+                }
+                try hardcoreWrite(object: object, using: metadata)
+            }
+        } else {
+            let path = UUID().description
+            let metadata = Metadata(objectId: object.id, path: path)
+            try hardcoreWrite(object: object, using: metadata)
+        }
     }
     
     private func saveMetadata() throws {
@@ -79,18 +136,23 @@ class ArtworkFileSystem {
         try data.write(to: metadataUrl)
     }
     
-    func read<Type: FileSystemReadable>(id: String, type: Type.Type) throws -> Type {
+    private func readFirstVersion<Type: FileSystemReadable>(id: String, type: Type.Type) throws -> Type {
         guard let files = fileSystemMetadata[id] else {
             throw LoadingError(description: "Object not found for id: \(id), type: \(Type.self)")
         }
         var parts: [Type.FileId : Data] = [:]
         for metadata in files {
+            
+            guard let fileId = metadata.fileId else {
+                throw ReadingError.fileIdNotPresent
+            }
+            
             let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
             let data = try Data(contentsOf: url)
-            if let fileId = Type.FileId(rawValue: metadata.fileId) {
+            if let fileId = Type.FileId(rawValue: fileId) {
                 parts[fileId] = data
             } else {
-                print("Warning: could not construct fileId from \(metadata.fileId) for \(Type.self)")
+                print("Warning: could not construct fileId from \(fileId) for \(Type.self)")
             }
         }
         
@@ -102,6 +164,29 @@ class ArtworkFileSystem {
         }
     }
     
+    private func read<Type: FileSystemReadable>(id: String, type: Type.Type) throws -> Type {
+        guard let files = fileSystemMetadata[id] else {
+            throw LoadingError(description: "Object not found for id: \(id), type: \(Type.self)")
+        }
+        
+        guard let metadata = files.first else {
+            throw ReadingError.missingMetadata
+        }
+        
+        switch metadata.version {
+        case Version(0, 0, 1):
+            return try readFirstVersion(id: id, type: type)
+        default:
+            if files.count > 1 {
+                throw ReadingError.versionTwoMetadataIsNotSingular
+            }
+            let decoder = JSONDecoder()
+            let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
+            let data = try Data(contentsOf: url)
+            return try decoder.decode(type, from: data)
+        }
+    }
+    
     func read<Type: FileSystemReadable>(id: String, type: Type.Type, default: @autoclosure () -> Type) -> Type {
         do {
             return try read(id: id, type: type)
@@ -110,7 +195,7 @@ class ArtworkFileSystem {
         }
     }
     
-    func delete(id: String) throws {
+    func delete(id: String, savingMetadata: Bool = true) throws {
         guard let files = fileSystemMetadata.removeValue(forKey: id) else {
             return
         }
@@ -118,7 +203,9 @@ class ArtworkFileSystem {
             let url = URL(fileURLWithPath: file.path, relativeTo: documentsUrl)
             try FileManager.default.removeItem(at: url)
         }
-        try saveMetadata()
+        if savingMetadata {
+            try saveMetadata()
+        }
     }
     
     func reset() throws {
