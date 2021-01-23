@@ -110,7 +110,7 @@ struct ColorPaletteView: View {
             if isEditing {
                 ColorPaletteEditView(colorPalette: colorPalette, selectedColor: $selectedColor)
             } else {
-                CollectionView(colorPalette: colorPalette, selectedColor: $selectedColor, addCallback: add)
+                CollectionView(colorPalette: colorPalette, selectedColor: $selectedColor, add: add)
             }
         }
         .padding([.top], 12)
