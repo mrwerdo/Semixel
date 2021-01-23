@@ -102,7 +102,6 @@ struct PixelView: View {
     }
     
     var body: some View {
-        // fixme: the overlay view shifts because the VStack's frame expands when the keyboard summoned.
         ZStack(alignment: .bottom) {
             VStack {
                 Spacer()
@@ -117,6 +116,7 @@ struct PixelView: View {
                             translation: $translation,
                             onDrag: onDrag)
                     .padding()
+                    .gesture(dismissKeyboard)
                 Text(statusText)
                     .frame(height: 30, alignment: .bottom)
                 VStack {
@@ -146,11 +146,6 @@ struct PixelView: View {
                                 .fill(Color(UIColor.systemBackground))
                                 .ignoresSafeArea())
             }
-            .onTapGesture {
-                if editingTitle {
-                    hideKeyboard()
-                }
-            }
             .ignoresSafeArea(.keyboard)
             .background(Color(UIColor.secondarySystemBackground).ignoresSafeArea())
         }
@@ -169,6 +164,15 @@ struct PixelView: View {
         }
         .navigationBarItems(trailing: attributesButton)
         .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    var dismissKeyboard: some Gesture {
+        TapGesture()
+            .onEnded {
+                if editingTitle {
+                    hideKeyboard()
+                }
+            }
     }
     
     var attributesButton: some View {
