@@ -173,8 +173,8 @@ class ArtworkStore: ObservableObject {
     }
 }
 
-extension SemanticArtwork: FileSystemRepresentable {
-    enum FileId: String, CaseIterable, CodingKey {
+extension SemanticArtwork: FileSystemRepresentable, FileSystemReadable {
+    enum Keys: String, CaseIterable, CodingKey {
         case pixels
         case semantics
         case colorPalettes
@@ -184,7 +184,7 @@ extension SemanticArtwork: FileSystemRepresentable {
     }
     
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: FileId.self)
+        var container = encoder.container(keyedBy: Keys.self)
         try container.encode(image.buffer.map { $0.color }, forKey: .pixels)
         try container.encode(image.buffer.map { $0.id }, forKey: .semantics)
         try container.encode(colorPalettes.mapValues { $0.colors }, forKey: .colorPalettes)
@@ -192,52 +192,15 @@ extension SemanticArtwork: FileSystemRepresentable {
         try container.encode(image.size, forKey: .size)
         try container.encode(id, forKey: .id)
     }
-    
-    func encode(for fileId: FileId) throws -> Data {
-        let encoder = JSONEncoder()
-        switch fileId {
-        case .pixels:
-            let pixels = image.buffer.map { $0.color }
-            return try encoder.encode(pixels)
-        case .semantics:
-            return try encoder.encode(image.buffer.map { $0.id })
-        case .colorPalettes:
-            let palettes = colorPalettes.mapValues { $0.colors }
-            return try encoder.encode(palettes)
-        case .identifierTree:
-            return try encoder.encode(root)
-        case .size:
-            return try encoder.encode(image.size)
-        case .id:
-            return try encoder.encode(id)
-        }
-    }
-}
 
-extension SemanticArtwork: FileSystemReadable {
     convenience init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: FileId.self)
+        let container = try decoder.container(keyedBy: Keys.self)
         let pixels = try container.decode([RGBA].self, forKey: .pixels)
         let semantics = try container.decode([Int].self, forKey: .semantics)
         let colorPalettes = try container.decode([Int : [IdentifiableColor]].self, forKey: .colorPalettes)
         let root = try container.decode(SemanticIdentifier.self, forKey: .identifierTree)
         let size = try container.decode(Size2D.self, forKey: .size)
         let id = try container.decode(String.self, forKey: .id)
-        
-        let buffer = zip(semantics, pixels).map(SemanticPixel<RGBA>.init)
-        let image = PixelImage<SemanticPixel<RGBA>>(size: size, buffer: buffer)
-        let k = colorPalettes.mapValues { $0.map { $0.color } }
-        self.init(id: id, title: "", image: image, root: root, colorPalettes: k)
-    }
-    
-    convenience init(parts: [FileId : Data]) throws {
-        let decoder = JSONDecoder()
-        let pixels = try decoder.decode([RGBA].self, from: parts[.pixels]!)
-        let semantics = try decoder.decode([Int].self, from: parts[.semantics]!)
-        let colorPalettes = try decoder.decode([Int : [IdentifiableColor]].self, from: parts[.colorPalettes]!)
-        let root = try decoder.decode(SemanticIdentifier.self, from: parts[.identifierTree]!)
-        let size = try decoder.decode(Size2D.self, from: parts[.size]!)
-        let id = try decoder.decode(String.self, from: parts[.id]!)
         
         let buffer = zip(semantics, pixels).map(SemanticPixel<RGBA>.init)
         let image = PixelImage<SemanticPixel<RGBA>>(size: size, buffer: buffer)
@@ -309,12 +272,5 @@ extension ArtworkStore {
         UserDefaults().removeObject(forKey: "Semixel_DefaultArtwork_Added")
         artwork = []
         metadata = Metadata()
-    }
-    
-    func migrate() throws {
-        for metadata in artwork {
-            try save(metadata)
-        }
-        try saveMetadata()
     }
 }

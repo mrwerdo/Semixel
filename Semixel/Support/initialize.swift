@@ -66,7 +66,6 @@ func initialize() -> AppContext {
     }
     
     ignoreErrors {
-        try store.migrate()
         if initialize {
             try store.addDefaultArtwork()
         }
