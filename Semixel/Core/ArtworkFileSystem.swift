@@ -39,6 +39,9 @@ class ArtworkFileSystem {
     private var fileSystemMetadata: [String : [Metadata]] = [:]
     private var documentsUrl: URL
     
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+    
     private var metadataUrl: URL {
         return documentsUrl.appendingPathComponent("metadata.json")
     }
@@ -88,6 +91,7 @@ class ArtworkFileSystem {
     
     init(baseDirectory: URL) {
         documentsUrl = baseDirectory
+        encoder.outputFormatting = .prettyPrinted
         do {
             let data = try Data(contentsOf: metadataUrl)
             let decoder = JSONDecoder()
@@ -98,7 +102,6 @@ class ArtworkFileSystem {
     }
     
     private func hardcoreWrite<Type: FileSystemRepresentable>(object: Type, using metadata: Metadata) throws {
-        let encoder = JSONEncoder()
         let data = try encoder.encode(object)
         let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
         try data.write(to: url)
@@ -124,7 +127,7 @@ class ArtworkFileSystem {
                 try hardcoreWrite(object: object, using: metadata)
             }
         } else {
-            let path = UUID().description
+            let path = UUID().description + ".json"
             let metadata = Metadata(objectId: object.id, path: path)
             try hardcoreWrite(object: object, using: metadata)
         }
@@ -180,7 +183,6 @@ class ArtworkFileSystem {
             if files.count > 1 {
                 throw ReadingError.versionTwoMetadataIsNotSingular
             }
-            let decoder = JSONDecoder()
             let url = URL(fileURLWithPath: metadata.path, relativeTo: documentsUrl)
             let data = try Data(contentsOf: url)
             return try decoder.decode(type, from: data)
