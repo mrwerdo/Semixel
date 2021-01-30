@@ -19,6 +19,73 @@ extension ToolButtonState {
     }
 }
 
+struct LongPressButtonStyle: PrimitiveButtonStyle {
+    
+    @State
+    private var isPressed: Bool = false
+    
+    @State
+    private var touchDownTime: Date?
+    
+    @State
+    private var isDisabled = false
+    
+    var minimumDuration: TimeInterval
+    var maximumDistance: CGFloat
+    var callback: () -> ()
+
+    init(minimumDuration: TimeInterval, maximumDistance: CGFloat, callback: @escaping () -> ()) {
+        self.minimumDuration = minimumDuration
+        self.maximumDistance = maximumDistance
+        self.callback = callback
+    }
+    
+    func makeBody(configuration: Configuration) -> some View {
+        let drag = DragGesture(minimumDistance: 0, coordinateSpace: .global)
+            .onChanged { state in
+                if isDisabled {
+                    return
+                }
+                isPressed = true
+                if touchDownTime == nil {
+                    touchDownTime = state.time
+                }
+                let dt = state.translation
+                let distance = sqrt(dt.width * dt.width + dt.height * dt.height)
+                if distance > maximumDistance {
+                    withAnimation(Animation.easeOut) {
+                        isPressed = false
+                        isDisabled = true
+                    }
+                }
+            }
+            .onEnded { state in
+                if isDisabled {
+                    isDisabled = false
+                    return
+                }
+                isPressed = false
+                
+                guard let touchDownTime = touchDownTime else {
+                    return
+                }
+                
+                let distance = touchDownTime.distance(to: state.time)
+                if distance < minimumDuration {
+                    configuration.trigger()
+                } else {
+                    callback()
+                }
+                self.touchDownTime = nil
+            }
+        
+        return configuration.label
+            .foregroundColor(Color.accentColor)
+            .opacity(isPressed ? 0.25 : 1.0)
+            .gesture(drag)
+    }
+}
+
 struct AnyToolButton<Image: View>: View {
     
     var isSelected: Bool

@@ -34,6 +34,7 @@ struct ToolsMenu: View {
     @State var menuState: MenuState = .main
     @State var selectionStarted: Bool = false
     @State var isAppendMode: Bool = true
+    @State var isLineTool: Bool = true
     
     @EnvironmentObject var artwork: SemanticArtwork
     
@@ -52,11 +53,17 @@ struct ToolsMenu: View {
         Image(systemName: type.iconName).font(Font.system(size: 24))
     }
     
+    private func longPressCallback() {
+        isLineTool.toggle()
+        tool = nil
+        reset()
+    }
+    
     var main: some View {
         HStack {
             TerneryState.create($tool,
-                                tool: .shape) {
-                resizing(statusText: "Shape tool.")
+                                tool: isLineTool ? .line : .circle) {
+                resizing(statusText: isLineTool ? "Line tool." : "Circle tool.")
             } translating: {
                 translating()
             } complete: {
@@ -64,6 +71,7 @@ struct ToolsMenu: View {
                     artwork.image = translatedShape(p1: p1, p2: p2)
                 }
             }
+            .buttonStyle(LongPressButtonStyle(minimumDuration: 0.3, maximumDistance: 100, callback: longPressCallback))
             AnyToolButton(isSelected: false, image: icon(for: .selection)) {
                 isAppendMode = true
                 menuState = .selection
@@ -95,7 +103,14 @@ struct ToolsMenu: View {
         let b = p2 + translation
         
         if artwork.image.isValid(a) && artwork.image.isValid(b) {
-            return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
+            switch tool {
+            case .line:
+                return artwork.image.drawLine(from: a, to: b, color: getCurrentSemanticPixel())
+            case .circle:
+                return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
+            default:
+                return artwork.image
+            }
         } else {
             return artwork.image
         }
@@ -189,9 +204,9 @@ struct ToolsMenu: View {
     }
     
     func resizing(statusText: String) {
-            reset()
-            self.statusText = statusText
-            shapeStartPosition = position
+        reset()
+        self.statusText = statusText
+        shapeStartPosition = position
     }
     
     func translating() {

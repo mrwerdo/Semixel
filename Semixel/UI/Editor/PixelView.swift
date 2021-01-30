@@ -73,24 +73,35 @@ struct PixelView: View {
         let b = p2 + translation
         
         if artwork.image.isValid(a) && artwork.image.isValid(b) {
-            return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
+            switch tool {
+            case .circle:
+                return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
+            case .line:
+                return artwork.image.drawLine(from: a, to: b, color: getCurrentSemanticPixel())
+            default:
+                return artwork.image
+            }
         } else {
             return artwork.image
         }
     }
     
     var composedImage: SemanticImage {
-        if let p1 = shapeStartPosition, tool == .shape {
+        if let p1 = shapeStartPosition, tool?.isShape == true {
             // Render shape on top of the image.
             
             if let p2 = shapeEndPosition {
                 return translatedShape(p1: p1, p2: p2)
             } else {
-                return artwork.image.drawEllipse(from: p1, to: position, color: getCurrentSemanticPixel())
+                switch tool {
+                case .circle:
+                    return artwork.image.drawEllipse(from: p1, to: position, color: getCurrentSemanticPixel())
+                case .line:
+                    return artwork.image.drawLine(from: p1, to: position, color: getCurrentSemanticPixel())
+                default:
+                    return artwork.image
+                }
             }
-            
-            // draw line in this case...
-//            return image.drawLine(from: p1, to: p2, color: c)
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
             return artwork.image.moveRectangle(between: p1, and: p2, by: translation)

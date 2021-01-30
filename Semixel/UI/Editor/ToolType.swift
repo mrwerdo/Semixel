@@ -11,7 +11,8 @@ import Foundation
 enum ToolType: Equatable {
     case pencil
     case brush
-    case shape
+    case circle
+    case line
     case selection
     case undo
     case redo
@@ -38,8 +39,10 @@ enum ToolType: Equatable {
             return "arrow.uturn.right"
         case .undo:
             return "arrow.uturn.left"
-        case .shape:
+        case .circle:
             return "circle"
+        case .line:
+            return "line.diagonal"
         case .selection:
             return "cursorarrow"
         case .settings:
@@ -67,5 +70,9 @@ enum ToolType: Equatable {
         case .complete:
             return "checkmark.circle"
         }
+    }
+    
+    var isShape: Bool {
+        return self == .circle || self == .line
     }
 }
