@@ -13,6 +13,7 @@ struct ArtworkMetadataView: View {
     @EnvironmentObject var store: ArtworkStore
     
     @Binding var isPresented: Bool
+    @Binding var showGrid: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -39,6 +40,11 @@ struct ArtworkMetadataView: View {
             .background(Color(UIColor.secondarySystemGroupedBackground))
             Divider()
             List {
+                Section {
+                    action(title: showGrid ? "Hide Grid" : "Show Grid", icon: "squareshape.split.3x3") {
+                        showGrid.toggle()
+                    }
+                }
                 Section {
                     textfield("Title", for: $metadata.title)
                     textfield("Path", for: $metadata.path)

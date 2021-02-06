@@ -39,6 +39,8 @@ struct PixelView: View {
     @State var selectedRegion: SelectedRegion?
     @State var showMetadataView: Bool = false
     
+    @State var showGrid: Bool = true
+    
     @State var __position: CGPoint = .zero
     
     func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
@@ -108,6 +110,7 @@ struct PixelView: View {
                                                                   geometry.size.height / size.height)),
                                     image: bitmapImage,
                                     position: position,
+                                    showGrid: showGrid,
                                     showBoundingRectangle: tool != .line,
                                     shapeStartPosition: shapeStartPosition,
                                     shapeEndPosition: shapeEndPosition,
@@ -162,7 +165,8 @@ struct PixelView: View {
             .background(Color(UIColor.secondarySystemBackground).ignoresSafeArea())
         }
         .halfModalSheet(isPresented: $showMetadataView,
-                        content: ArtworkMetadataView(isPresented: $showMetadataView))
+                        content: ArtworkMetadataView(isPresented: $showMetadataView,
+                                                     showGrid: $showGrid))
         .toolbar {
             ToolbarItem(placement: .principal) {
                 TextField("Title", text: $metadata.title) {

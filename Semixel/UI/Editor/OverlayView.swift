@@ -13,6 +13,7 @@ struct OverlayView: View {
     var image: PixelImage<RGBA>
     var position: Point2D
     
+    var showGrid: Bool
     var showBoundingRectangle: Bool
     var shapeStartPosition: Point2D?
     var shapeEndPosition: Point2D?
@@ -53,7 +54,9 @@ struct OverlayView: View {
     var body: some View {
         ZStack {
             PixelBufferView(pixelSize: pixelSize, image: image)
-            PixelGridImageView(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
+            if showGrid {
+                PixelGridImageView(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
+            }
             
             if let path = selectedRegion?.boundingPath {
                 if translating {
