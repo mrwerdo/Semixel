@@ -59,8 +59,9 @@ struct ToolsMenu: View {
     
     var main: some View {
         HStack {
-            TerneryState.create($tool,
-                                tool: isLineTool ? .line : .circle) {
+            TernaryState.create($tool,
+                                tool: isLineTool ? .line : .circle,
+                                skipTranslation: isLineTool) {
                 resizing(statusText: isLineTool ? "Line tool." : "Circle tool.")
             } translating: {
                 translating()

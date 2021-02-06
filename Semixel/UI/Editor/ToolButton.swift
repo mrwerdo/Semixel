@@ -165,23 +165,31 @@ extension BinaryState {
     }
 }
 
-enum TerneryState: ToolButtonState {
+enum TernaryState: ToolButtonState {
     case deselected
     case resizing
     case translating
 }
 
-extension TerneryState {
-    static func create(_ selectedTool: Binding<ToolType?>, tool: ToolType, resizing: @escaping () -> (), translating: @escaping () -> (), complete: @escaping () -> ()) -> ToolButton<Self> {
+extension TernaryState {
+    static func create(_ selectedTool: Binding<ToolType?>,
+                       tool: ToolType,
+                       skipTranslation: Bool = false,
+                       resizing: @escaping () -> (),
+                       translating: @escaping () -> (),
+                       complete: @escaping () -> ()) -> ToolButton<Self> {
         return ToolButton<Self>(selectedTool, tool: tool) { state -> Self in
-            switch state {
-            case .deselected:
+            switch (state, skipTranslation) {
+            case (.deselected, _):
                 resizing()
                 return .resizing
-            case .resizing:
+            case (.resizing, false):
                 translating()
                 return .translating
-            case .translating:
+            case (.resizing, true):
+                translating()
+                fallthrough
+            case (.translating, _):
                 complete()
                 return .deselected
             }
