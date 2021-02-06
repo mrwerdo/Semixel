@@ -100,6 +100,7 @@ struct PixelView: View {
                 OverlayView(pixelSize: pixelSize,
                             image: bitmapImage,
                             position: $position,
+                            showBoundingRectangle: tool != .line,
                             shapeStartPosition: shapeStartPosition,
                             shapeEndPosition: shapeEndPosition,
                             selectedRegion: $selectedRegion,

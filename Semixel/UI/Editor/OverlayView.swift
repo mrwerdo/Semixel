@@ -14,6 +14,7 @@ struct OverlayView: View {
     var image: PixelImage<RGBA>
     @Binding var position: Point2D
     
+    var showBoundingRectangle: Bool
     var shapeStartPosition: Point2D?
     var shapeEndPosition: Point2D?
     @Binding var selectedRegion: SelectedRegion?
@@ -138,7 +139,7 @@ struct OverlayView: View {
                 }
             }
             
-            if let p1 = shapeStartPosition {
+            if showBoundingRectangle, let p1 = shapeStartPosition {
                 if let p2 = shapeEndPosition {
                     selectionView(p1: p1, p2: p2, offset: translation)
                 } else {
