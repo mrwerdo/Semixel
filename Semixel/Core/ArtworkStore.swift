@@ -163,13 +163,12 @@ class ArtworkStore: ObservableObject {
         return destination
     }
     
-    func preview(for metadata: ArtworkMetadata) -> Image {
+    func preview(for metadata: ArtworkMetadata) -> some View {
         let artwork = model(for: metadata)
-        if let img = artwork.bitmapImage.convertToCGImage() {
-            return Image(decorative: img, scale: 1.0)
-        } else {
-            return Image(systemName: "questionmark")
-        }
+        let n: CGFloat = 64
+        let length = n / max(CGFloat(metadata.size.width), CGFloat(metadata.size.height))
+        return PixelBufferView(pixelSize: CGSize(square: length), image: artwork.bitmapImage, centered: true)
+            .frame(width: n, height: n, alignment: .center)
     }
 }
 

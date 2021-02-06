@@ -33,11 +33,7 @@ struct ContentView: View {
                     let destination = store.view(for: artwork)
                         .onDisappear(perform: { save(artwork) })
                     NavigationLink(destination: destination, tag: artwork.id, selection: $selection) {
-                        // todo: make the thumbnail preview pixel perfect
                         store.preview(for: artwork)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
                             .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
                         VStack(alignment: .leading) {
                             Text(artwork.title)

@@ -66,16 +66,6 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     }
 }
 
-extension SemanticArtwork {
-    var icon: Image {
-        if let img = bitmapImage.convertToCGImage() {
-            return Image(decorative: img, scale: 1.0)
-        } else {
-            return Image(systemName: "questionmark")
-        }
-    }
-}
-
 struct SemanticPixel: Equatable, Identifiable {
     // 0 represents the default semantic, which always exists.
     var semantic: Int
