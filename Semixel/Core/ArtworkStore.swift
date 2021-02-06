@@ -256,6 +256,7 @@ extension ArtworkStore {
             let metadata = try create(.semantic, size: size)
             metadata.title = url.deletingPathExtension().lastPathComponent
             let artwork = model(for: metadata)
+            artwork.colorPalette.colors = []
             image.enumeratePixels { (x, y, pixel) in
                 if let index = artwork.colorPalette.colors.first(where: { item in item.color == pixel }) {
                     artwork.image[x, y] = SemanticPixel(semantic: 0, color: index.id)

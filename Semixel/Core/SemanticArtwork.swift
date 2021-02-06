@@ -53,7 +53,7 @@ final class SemanticArtwork: Identifiable, ObservableObject {
         self.image = PixelImage(width: metadata.size.width,
                                 height: metadata.size.height,
                                 default: SemanticPixel(semantic: 0, color: 0))
-        self.colorPalette = ColorPalette(colors: [0 : .clear])
+        self.colorPalette = ColorPalette(colors: [0 : .white])
         root.children.append(SemanticIdentifier(id: 0, name: "Default"))
         
         anyCancellable = colorPalette.objectWillChange.sink { [weak self] (_) in
