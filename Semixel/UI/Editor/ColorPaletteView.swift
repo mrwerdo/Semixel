@@ -32,28 +32,28 @@ struct ColorTab<T: Equatable>: View {
 }
 
 struct ColorPaletteEditView: View {
-    @ObservedObject var colorPalette: ColorPalette
-    @Binding var selectedColor: IdentifiableColor
+    @EnvironmentObject var colorPalette: ColorPalette
     
     var body: some View {
-        VStack {
+        let stuff: [IdentifiableColor] = colorPalette.colors
+        return VStack {
             ScrollView( .horizontal) {
                 LazyHStack(alignment: .top, spacing: 4) {
-                    ForEach(colorPalette.colors) { item in
-                        ColorTab(color: item.color, index: item, state: $selectedColor)
+                    ForEach(stuff, id: \.id) { (item: IdentifiableColor) in
+                        ColorTab(color: item.color, index: item.id, state: $colorPalette.selectedIndex)
                     }
                 }
             }
-            Slider(value: $selectedColor.color.red, in: 0...1.0) {
+            Slider(value: colorPalette.currentColor.red, in: 0...1.0) {
                 Text("Red")
             }
-            Slider(value: $selectedColor.color.green, in: 0...1.0) {
+            Slider(value: colorPalette.currentColor.green, in: 0...1.0) {
                 Text("Green")
             }
-            Slider(value: $selectedColor.color.blue, in: 0...1.0) {
+            Slider(value: colorPalette.currentColor.blue, in: 0...1.0) {
                 Text("Blue")
             }
-            Slider(value: $selectedColor.color.alpha, in: 0...1.0) {
+            Slider(value: colorPalette.currentColor.alpha, in: 0...1.0) {
                 Text("Alpha")
             }
         }
@@ -61,33 +61,18 @@ struct ColorPaletteEditView: View {
 }
 
 struct ColorPaletteView: View {
-    
-    @ObservedObject var colorPalette: ColorPalette
-    @Binding var selectedColor: IdentifiableColor
+    @EnvironmentObject var colorPalette: ColorPalette
     
     @State var isEditing: Bool = false
     
     var eyeDropper: () -> ()
-    
-    private func add() {
-        colorPalette.colors.append(IdentifiableColor(color: selectedColor.color, id: UUID()))
-    }
     
     private func edit() {
         isEditing.toggle()
     }
     
     private func replace() {
-        
-        let index = colorPalette.colors.firstIndex(of: selectedColor)
-        
-        colorPalette.colors.removeAll { (color) -> Bool in
-            selectedColor == color
-        }
-        
-        if let i = index, colorPalette.colors.count > 0 {
-            selectedColor = colorPalette.colors[max(min(i, colorPalette.colors.count-1), 0)]
-        }
+        colorPalette.remove(id: colorPalette.selectedIndex)
     }
     
     var body: some View {
@@ -108,9 +93,9 @@ struct ColorPaletteView: View {
             }
             .font(Font.system(size: 20))
             if isEditing {
-                ColorPaletteEditView(colorPalette: colorPalette, selectedColor: $selectedColor)
+                ColorPaletteEditView()
             } else {
-                CollectionView(colorPalette: colorPalette, selectedColor: $selectedColor, add: add)
+                CollectionView()
             }
         }
         .padding([.top], 12)

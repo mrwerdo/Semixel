@@ -165,7 +165,7 @@ class ArtworkStore: ObservableObject {
     
     func preview(for metadata: ArtworkMetadata) -> Image {
         let artwork = model(for: metadata)
-        if let img = artwork.image.convertToCGImage() {
+        if let img = artwork.bitmapImage.convertToCGImage() {
             return Image(decorative: img, scale: 1.0)
         } else {
             return Image(systemName: "questionmark")
@@ -186,8 +186,8 @@ extension SemanticArtwork: FileSystemRepresentable, FileSystemReadable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Keys.self)
         try container.encode(image.buffer.map { $0.color }, forKey: .pixels)
-        try container.encode(image.buffer.map { $0.id }, forKey: .semantics)
-        try container.encode(colorPalettes.mapValues { $0.colors }, forKey: .colorPalettes)
+        try container.encode(image.buffer.map { $0.semantic }, forKey: .semantics)
+        try container.encode(colorPalette.colors, forKey: .colorPalettes)
         try container.encode(root, forKey: .identifierTree)
         try container.encode(image.size, forKey: .size)
         try container.encode(id, forKey: .id)
@@ -195,17 +195,16 @@ extension SemanticArtwork: FileSystemRepresentable, FileSystemReadable {
 
     convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
-        let pixels = try container.decode([RGBA].self, forKey: .pixels)
+        let pixels = try container.decode([Int].self, forKey: .pixels)
         let semantics = try container.decode([Int].self, forKey: .semantics)
-        let colorPalettes = try container.decode([Int : [IdentifiableColor]].self, forKey: .colorPalettes)
+        let colors = try container.decode([IdentifiableColor].self, forKey: .colorPalettes)
         let root = try container.decode(SemanticIdentifier.self, forKey: .identifierTree)
         let size = try container.decode(Size2D.self, forKey: .size)
         let id = try container.decode(String.self, forKey: .id)
         
-        let buffer = zip(semantics, pixels).map(SemanticPixel<RGBA>.init)
-        let image = PixelImage<SemanticPixel<RGBA>>(size: size, buffer: buffer)
-        let k = colorPalettes.mapValues { $0.map { $0.color } }
-        self.init(id: id, title: "", image: image, root: root, colorPalettes: k)
+        let buffer = zip(semantics, pixels).map { SemanticPixel(semantic: $0.0, color: $0.1) }
+        let image = PixelImage<SemanticPixel>(size: size, buffer: buffer)
+        self.init(id: id, title: "", image: image, root: root, colorPalette: ColorPalette(colors))
     }
 }
 
@@ -258,9 +257,13 @@ extension ArtworkStore {
             metadata.title = url.deletingPathExtension().lastPathComponent
             let artwork = model(for: metadata)
             image.enumeratePixels { (x, y, pixel) in
-                artwork.image[x, y] = SemanticPixel(id: 0, color: pixel)
+                if let index = artwork.colorPalette.colors.first(where: { item in item.color == pixel }) {
+                    artwork.image[x, y] = SemanticPixel(semantic: 0, color: index.id)
+                } else {
+                    let index = artwork.colorPalette.add(pixel)
+                    artwork.image[x, y] = SemanticPixel(semantic: 0, color: index)
+                }
             }
-            artwork.recomputeColorPalette()
             try save(metadata)
         }
     }

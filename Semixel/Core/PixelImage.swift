@@ -17,7 +17,7 @@ protocol ColorTypeProtocol {
     func convertToCGColor() -> CGColor
 }
 
-struct PixelImage<ColorType: ColorTypeProtocol> {
+struct PixelImage<ColorType> {
     
     var buffer: [ColorType]
     private(set) var size: Size2D
@@ -27,8 +27,8 @@ struct PixelImage<ColorType: ColorTypeProtocol> {
         size = copy.size
     }
     
-    init(width: Int, height: Int) {
-        buffer = [ColorType](repeating: .clear, count: width * height)
+    init(width: Int, height: Int, default: ColorType) {
+        buffer = [ColorType](repeating: `default`, count: width * height)
         size = Size2D(width: width, height: height)
     }
     
@@ -86,10 +86,22 @@ struct PixelImage<ColorType: ColorTypeProtocol> {
     }
 }
 
+extension PixelImage where ColorType: ColorTypeProtocol {
+    init(width: Int, height: Int) {
+        buffer = [ColorType](repeating: .clear, count: width * height)
+        size = Size2D(width: width, height: height)
+    }
+    
+    func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D) -> PixelImage {
+        return moveRectangle(between: p1, and: p2, by: offset, background: .clear)
+    }
+}
+
 extension PixelImage: Codable where ColorType: Codable { }
+extension PixelImage: Equatable where ColorType: Equatable { }
 
 extension PixelImage {
-    func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D) -> PixelImage {
+    func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D, background: ColorType) -> PixelImage {
         let a = Point2D(x: min(p1.x, p2.x), y: min(p1.y, p2.y))
         let b = Point2D(x: max(p1.x, p2.x), y: max(p1.y, p2.y))
         
@@ -97,7 +109,7 @@ extension PixelImage {
         
         for y in a.y...b.y {
             for x in a.x...b.x {
-                img[x, y] = .clear
+                img[x, y] = background
             }
         }
         

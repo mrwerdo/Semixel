@@ -21,16 +21,7 @@ extension PixelImage where ColorType == RGBA {
     }
 }
 
-extension PixelImage where ColorType == SemanticPixel<RGBA> {
-    init(uiImage: UIImage, defaultId: Int) {
-        self.init(width: uiImage.width, height: uiImage.height)
-        uiImage.enumeratePixels { (x, y, color) in
-            buffer[y * size.width + x] = SemanticPixel(id: defaultId, color: color)
-        }
-    }
-}
-
-extension PixelImage {
+extension PixelImage where ColorType: ColorTypeProtocol {
     func write(to url: URL) throws {
         guard let img = convertToCGImage() else {
             throw WritingError(description: "Could not create CGImage.")

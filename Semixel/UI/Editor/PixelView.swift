@@ -18,15 +18,12 @@ extension View {
 
 struct PixelView: View {
     
-    typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
-    
     @EnvironmentObject var artwork: SemanticArtwork
     @EnvironmentObject var metadata: ArtworkMetadata
     @EnvironmentObject var store: ArtworkStore
     
     @State var editingTitle: Bool = false
     
-    @State var _selectedColor: IdentifiableColor = IdentifiableColor(color: .white, id: UUID())
     @State var selectedSemanticIdentifierId: Int = 0
     @State var statusText: String = ""
     
@@ -46,29 +43,7 @@ struct PixelView: View {
         return CGSize(width: 12, height: 12)
     }
     
-    var selectedColor: Binding<IdentifiableColor> {
-        Binding<IdentifiableColor> {
-            _selectedColor
-        } set: { newValue in
-            if let index = selectedColorPalette.colors.firstIndex(where: { $0.id == newValue.id }) {
-                selectedColorPalette.colors[index].color = newValue.color
-            }
-            _selectedColor = newValue
-        }
-    }
-    
-    var selectedColorPalette: ColorPalette {
-        let identifier = artwork.root.find(matching: selectedSemanticIdentifierId) ?? artwork.root
-        if let palette = artwork.colorPalettes[identifier.id] {
-            return palette
-        } else {
-            let palette = ColorPalette(colors: [IdentifiableColor(color: .white, id: UUID())])
-            artwork.colorPalettes[identifier.id] = palette
-            return palette
-        }
-    }
-    
-    func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
+    func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
         let a = p1 + translation
         let b = p2 + translation
         
@@ -86,7 +61,7 @@ struct PixelView: View {
         }
     }
     
-    var composedImage: SemanticImage {
+    var composedImage: PixelImage<SemanticPixel> {
         if let p1 = shapeStartPosition, tool?.isShape == true {
             // Render shape on top of the image.
             
@@ -104,7 +79,7 @@ struct PixelView: View {
             }
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
-            return artwork.image.moveRectangle(between: p1, and: p2, by: translation)
+            return artwork.image.moveRectangle(between: p1, and: p2, by: translation, background: .clear)
         } else if tool == .translation, let selection = self.selectedRegion {
             return artwork.image.move(selection: selection, by: translation, background: .clear)
         } else {
@@ -112,12 +87,18 @@ struct PixelView: View {
         }
     }
     
+    private var bitmapImage: PixelImage<RGBA> {
+        let image = composedImage
+        let buffer = image.buffer.map { artwork.colorPalette[rgba: $0.color] }
+        return PixelImage(size: image.size, buffer: buffer)
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
                 Spacer()
                 OverlayView(pixelSize: pixelSize,
-                            image: composedImage,
+                            image: bitmapImage,
                             position: $position,
                             shapeStartPosition: shapeStartPosition,
                             shapeEndPosition: shapeEndPosition,
@@ -133,7 +114,7 @@ struct PixelView: View {
                 VStack {
                     ToolsMenu(tool: $tool,
                               selectedSemanticIdentifierId: $selectedSemanticIdentifierId,
-                              selectedColor: selectedColor,
+                              selectedColor: $artwork.colorPalette.selectedIndex,
                               statusText: $statusText,
                               position: $position,
                               shapeStartPosition: $shapeStartPosition,
@@ -146,7 +127,8 @@ struct PixelView: View {
                         Spacer()
                         SemanticIdentifierView(root: $artwork.root, selection: $selectedSemanticIdentifierId)
                             .padding(.bottom)
-                        ColorPaletteView(colorPalette: selectedColorPalette, selectedColor: selectedColor, eyeDropper: eyeDropper)
+                        ColorPaletteView(eyeDropper: eyeDropper)
+                            .environmentObject(artwork.colorPalette)
                             .padding([.top, .bottom, .trailing])
                         Spacer()
                     }
@@ -197,14 +179,8 @@ struct PixelView: View {
     }
 
     private func eyeDropper() {
-        let c = artwork.image[position].color
-        if let color = selectedColorPalette.colors.first(where: { $0.color == c }) {
-            statusText = "Selected color at (x: \(position.x), y: \(position.y))"
-            selectedColor.wrappedValue = color
-        } else {
-            statusText = "Copied color at (x: \(position.x), y: \(position.y))"
-            selectedColor.wrappedValue = IdentifiableColor(color: c, id: UUID())
-        }
+        artwork.colorPalette.selectedIndex = artwork.image[position].color
+        statusText = "Selected color at (x: \(position.x), y: \(position.y))"
     }
     
     func onDrag(_ delta: CGPoint) {
@@ -216,8 +192,8 @@ struct PixelView: View {
         }
     }
     
-    func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {
-        return SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: _selectedColor.color)
+    func getCurrentSemanticPixel() -> SemanticPixel {
+        return SemanticPixel(semantic: selectedSemanticIdentifierId, color: artwork.colorPalette.selectedIndex)
     }
 }
 

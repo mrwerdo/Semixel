@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SwiftUI
+import Combine
 
 final class SemanticArtwork: Identifiable, ObservableObject {
     let id: String
@@ -17,53 +18,57 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     var root: SemanticIdentifier
     
     @Published
-    var image: PixelImage<SemanticPixel<RGBA>>
+    var image: PixelImage<SemanticPixel>
     
     @Published
-    var colorPalettes: [Int : ColorPalette]
+    var colorPalette: ColorPalette {
+        didSet {
+            anyCancellable?.cancel()
+            anyCancellable = colorPalette.objectWillChange.sink { [weak self] (_) in
+                self?.objectWillChange.send()
+            }
+        }
+    }
+
+    var bitmapImage: PixelImage<RGBA> {
+        return PixelImage<RGBA>(size: image.size, buffer: image.buffer.map { colorPalette[rgba: $0.color] })
+    }
     
-    init(id: String, title: String, image: PixelImage<SemanticPixel<RGBA>>, root: SemanticIdentifier, colorPalettes: [Int : [RGBA]]) {
+    var anyCancellable: AnyCancellable? = nil
+    
+    init(id: String, title: String, image: PixelImage<SemanticPixel>, root: SemanticIdentifier, colorPalette: ColorPalette) {
         self.id = id
         self.root = root
         self.image = image
-        self.colorPalettes = [:]
+        self.colorPalette = colorPalette
         
-        for (key, colors) in colorPalettes {
-            self.colorPalettes[key] = ColorPalette(colors: colors.map { IdentifiableColor(color: $0, id: UUID()) })
-        }        
-    }
-    
-    func recomputeColorPalette() {
-        root = SemanticIdentifier(id: -1, name: "Root")
-        colorPalettes = [:]
-        for pixel in image.buffer {
-            if let palette = colorPalettes[pixel.id] {
-                if !palette.colors.contains(where: { $0.color == pixel.color }) {
-                    let color = IdentifiableColor(color: pixel.color, id: UUID())
-                    palette.colors.append(color)
-                }
-            } else {
-                let palette = ColorPalette(colors: [IdentifiableColor(color: pixel.color, id: UUID())])
-                colorPalettes[pixel.id] = palette
-            }
+        anyCancellable = colorPalette.objectWillChange.sink { [weak self] (_) in
+            self?.objectWillChange.send()
         }
-        
-        root.children.append(SemanticIdentifier(id: 0, name: "Default"))
     }
     
     init(createUsing metadata: ArtworkMetadata) {
         self.id = metadata.id
         self.root = SemanticIdentifier(id: -1, name: "Root")
-        self.image = PixelImage(width: metadata.size.width, height: metadata.size.height)
-        let palette = ColorPalette(colors: [IdentifiableColor(color: RGBA.clear, id: UUID())])
-        self.colorPalettes = [0 : palette]
+        self.image = PixelImage(width: metadata.size.width,
+                                height: metadata.size.height,
+                                default: SemanticPixel(semantic: 0, color: 0))
+        self.colorPalette = ColorPalette(colors: [0 : .clear])
         root.children.append(SemanticIdentifier(id: 0, name: "Default"))
+        
+        anyCancellable = colorPalette.objectWillChange.sink { [weak self] (_) in
+            self?.objectWillChange.send()
+        }
+    }
+    
+    deinit {
+        anyCancellable?.cancel()
     }
 }
 
 extension SemanticArtwork {
     var icon: Image {
-        if let img = image.convertToCGImage() {
+        if let img = bitmapImage.convertToCGImage() {
             return Image(decorative: img, scale: 1.0)
         } else {
             return Image(systemName: "questionmark")
@@ -71,24 +76,21 @@ extension SemanticArtwork {
     }
 }
 
-struct SemanticPixel<Pixel: ColorTypeProtocol> {
+struct SemanticPixel: Equatable, Identifiable {
     // 0 represents the default semantic, which always exists.
-    var id: Int
-    var color: Pixel
-}
-
-extension SemanticPixel: ColorTypeProtocol {
-    static var clear: SemanticPixel<Pixel> {
-        return SemanticPixel(id: 0, color: Pixel.clear)
+    var semantic: Int
+    var color: ColorIdentifier
+    
+    var id: Int {
+        return semantic * 100 + color
     }
     
-    static var cgColorSpace: CGColorSpace {
-        return Pixel.cgColorSpace
+    init(semantic: Int, color: Int) {
+        self.semantic = semantic
+        self.color = color
     }
     
-    func convertToCGColor() -> CGColor {
-        return color.convertToCGColor()
-    }
+    static let clear: SemanticPixel = SemanticPixel(semantic: 0, color: 0)
 }
 
 struct SemanticIdentifier: Codable {

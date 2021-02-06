@@ -89,7 +89,7 @@ class ProjectSyncSession: NSObject, MCSessionDelegate {
         }
         
         let semanticArtwork = metadata.map { service.store.model(for: $0) }
-        let pixels = semanticArtwork.map { $0.image.buffer.map { $0.color } }
+        let pixels = semanticArtwork.map { $0.bitmapImage.buffer }
         let ids = semanticArtwork.map { $0.id }
         
         let pixelData = Dictionary(uniqueKeysWithValues: zip(ids, pixels))

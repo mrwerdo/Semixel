@@ -11,50 +11,44 @@ import UIKit
 import Combine
 
 struct CollectionView: UIViewControllerRepresentable {
-    @ObservedObject
+    @EnvironmentObject
     var colorPalette: ColorPalette
-    
-    @Binding
-    var selectedColor: IdentifiableColor
     
     var add: (() -> ())?
     
     func makeUIViewController(context: Context) -> CollectionViewController {
-        let vc = CollectionViewController(colorPalette: colorPalette, selectedColor: $selectedColor)
-        vc.addCallback = add
-        return vc
+        return CollectionViewController(colorPalette: colorPalette)
     }
     
     func updateUIViewController(_ uiViewController: CollectionViewController, context: Context) {
         uiViewController.colorPalette = colorPalette
-        uiViewController.addCallback = add
-        uiViewController.collectionView.reloadData()
     }
 }
 
-class CollectionViewController: UIViewController, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    var addCallback: (() -> ())?
-    
-    @Binding
-    var selectedColor: IdentifiableColor
-    
-    @ObservedObject
+class CollectionViewController: UIViewController, UICollectionViewDelegateFlowLayout {
     var colorPalette: ColorPalette {
         didSet {
-            cancellable?.cancel()
-            cancellable = colorPalette.$colors.sink { (newColors) in
-                self.colors = newColors
+            if oldValue !== colorPalette {
+                cancellable?.cancel()
+                cancellable2?.cancel()
+                
+                cancellable = colorPalette.$colors
+                    .receive(on: RunLoop.main)
+                    .sink(receiveValue: updateColors(_:))
+                cancellable2 = colorPalette.$selectedIndex
+                    .receive(on: RunLoop.main)
+                    .sink(receiveValue: updateSelection(_:))
             }
         }
     }
-    
-    var colors: [IdentifiableColor] = [] {
-        didSet {
-            collectionView.reloadData()
-        }
+
+    var colors: [RGBA] {
+        colorPalette.colors.map { $0.color }
     }
     
     var cancellable: AnyCancellable? = nil
+    var cancellable2: AnyCancellable? = nil
+    var dataSource: UICollectionViewDiffableDataSource<Int, Int>!
     
     let collectionView: UICollectionView
     let pageControl: UIPageControl
@@ -63,82 +57,83 @@ class CollectionViewController: UIViewController, UICollectionViewDelegateFlowLa
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(direction: UICollectionView.ScrollDirection = .horizontal, colorPalette: ColorPalette, selectedColor: Binding<IdentifiableColor>) {
-        self._selectedColor = selectedColor
+    deinit {
+        cancellable?.cancel()
+        cancellable2?.cancel()
+        cancellable = nil
+        cancellable2 = nil
+    }
+    
+    init(direction: UICollectionView.ScrollDirection = .horizontal, colorPalette: ColorPalette) {
         self.colorPalette = colorPalette
-        self.colors = colorPalette.colors
         
         let layout: UICollectionViewFlowLayout = Self.createLayout()
         layout.scrollDirection = direction
-        collectionView = Self.createCollectionView(layout: layout)
         
+        collectionView = Self.createCollectionView(layout: layout)
         pageControl = Self.createPageControl()
         
         super.init(nibName: nil, bundle: nil)
         
-        collectionView.dataSource = self
+        dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView, cellProvider: cellProvider)
+        
+        collectionView.dataSource = dataSource
         collectionView.delegate = self
+        collectionView.allowsMultipleSelection = false
+        collectionView.allowsSelection = true
+        
         pageControl.addTarget(self, action: #selector(changePage(sender:)), for: .valueChanged)
-                
-        cancellable = colorPalette.$colors.sink { (newColors) in
-            self.colors = newColors
+        
+        cancellable = colorPalette.$colors
+            .receive(on: RunLoop.main)
+            .sink(receiveValue: updateColors(_:))
+        cancellable2 = colorPalette.$selectedIndex
+            .receive(on: RunLoop.main)
+            .sink(receiveValue: updateSelection(_:))
+    }
+    
+    private func cellProvider(_ collectionView: UICollectionView, _ indexPath: IndexPath, _ identifier: Int) -> UICollectionViewCell? {
+        if identifier == -1 {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "add", for: indexPath) as! AddCell
+        } else {
+            let semanticColor = colors[indexPath.row]
+            let view = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+            if let cell = view as? Cell {
+                cell.color = semanticColor
+            }
+            return view
         }
     }
     
-    let numberOfColumns: Int = 3
-    let numberOfRows: Int = 4
+    private func updateColors(_ newValue: [IdentifiableColor]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Int>()
+        snapshot.appendSections([0])
+        snapshot.appendItems(colorPalette.colors.map { $0.id })
+        snapshot.appendItems([-1])
+        dataSource.apply(snapshot, animatingDifferences: false)
+        updateSelection(colorPalette.selectedIndex)
+    }
+    
+    private func updateSelection(_ newValue: ColorIdentifier) {
+        if let index = self.colorPalette.colors.firstIndex(where: { $0.id == newValue }) {
+            let indexPath = IndexPath(row: index, section: 0)
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .bottom)
+        }
+    }
     
     @objc
     func changePage(sender: UIPageControl) {
-//        if let indexPath = collectionView.indexPathsForSelectedItems?.first {
-            let path = IndexPath(row: 0, section: sender.currentPage)
-            collectionView.scrollToItem(at: path, at: [.top, .left], animated: true)
-//        }
-    }
-    
-    func color(_ section: Int, row: Int) -> IdentifiableColor? {
-        let index = section * numberOfColumns * numberOfRows + row
-        if index < colorPalette.colors.count {
-            return colorPalette.colors[index]
-        }
-        return nil
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        let count = colorPalette.colors.count + 1
-        let quotient = count / (numberOfColumns * numberOfRows)
-        let remainder = count % (numberOfColumns * numberOfRows)
-        let number =  remainder > 0 ? quotient + 1 : quotient
-        pageControl.numberOfPages = number
-        return number
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return numberOfRows * numberOfColumns
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let semanticColor = color(indexPath.section, row: indexPath.row) {
-            let view = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-            if let cell = view as? Cell {
-                cell.color = semanticColor.color
-                cell.isSelected = selectedColor.id == semanticColor.id
-            }
-            return view
-        } else if indexPath.section * numberOfRows * numberOfColumns + indexPath.row == colorPalette.colors.count {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "add", for: indexPath) as! AddCell
-            cell.callback = addCallback
-            return cell
-        } else {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: "empty", for: indexPath)
-        }
+//        let path = IndexPath(row: 0, section: sender.currentPage)
+//        collectionView.scrollToItem(at: path, at: [.top, .left], animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let index = indexPath.section * numberOfRows * numberOfColumns + indexPath.row
-        if colorPalette.colors.indices.contains(index) {
-            let color = colorPalette.colors[index]
-            selectedColor = color
+        let index = indexPath.row
+        if colors.indices.contains(index) {
+            colorPalette.selectedIndex = colorPalette.colors[index].id
+        } else if index == colorPalette.colors.count {
+            colorPalette.add(colorPalette.currentColor.wrappedValue, updateSelection: true)
+            collectionView.deselectItem(at: indexPath, animated: true)
         }
     }
     
@@ -178,13 +173,15 @@ extension CollectionViewController {
         pc.allowsContinuousInteraction = true
         pc.hidesForSinglePage = false
         pc.backgroundStyle = .automatic
+        pc.numberOfPages = 1
+        pc.sizeToFit()
+        pc.isHidden = true
         return pc
     }
     
     static func createCollectionView(layout: UICollectionViewFlowLayout) -> UICollectionView {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.register(Cell.self, forCellWithReuseIdentifier: "cell")
-        cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "empty")
         cv.register(AddCell.self, forCellWithReuseIdentifier: "add")
         cv.isScrollEnabled = true
         cv.showsHorizontalScrollIndicator = false
@@ -206,8 +203,7 @@ extension CollectionViewController {
 
 private class AddCell: UICollectionViewCell {
     
-    private var buttonView = UIButton(type: .system)
-    var callback: (() -> ())?
+    private var buttonView = UILabel()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -218,15 +214,12 @@ private class AddCell: UICollectionViewCell {
         super.init(coder: coder)
         setup()
     }
-    
-    @objc private func selected(_ sender: UIButton) {
-        callback?()
-    }
-    
+
     private func setup() {
-        buttonView.setTitle("+", for: .normal)
+        buttonView.text = "+"
+        buttonView.textAlignment = .center
+        buttonView.sizeToFit()
         buttonView.translatesAutoresizingMaskIntoConstraints = false
-        buttonView.addTarget(self, action: #selector(selected(_:)), for: .primaryActionTriggered)
         
         contentView.addSubview(buttonView)
         

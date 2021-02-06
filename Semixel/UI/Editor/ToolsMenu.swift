@@ -23,8 +23,6 @@ import SwiftUI
 
 struct ToolsMenu: View {
     
-    typealias SemanticImage = PixelImage<SemanticPixel<RGBA>>
-    
     enum MenuState {
         case main
         case selection
@@ -40,7 +38,7 @@ struct ToolsMenu: View {
     
     @Binding var tool: ToolType?
     @Binding var selectedSemanticIdentifierId: Int
-    @Binding var selectedColor: IdentifiableColor
+    @Binding var selectedColor: Int
     @Binding var statusText: String
     @Binding var position: Point2D
     @Binding var shapeStartPosition: Point2D?
@@ -79,7 +77,7 @@ struct ToolsMenu: View {
             OneShotState.create($tool, tool: .brush) {
                 statusText = "Applied paint bucket."
                 let oldColor = artwork.image[position]
-                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.id == oldColor.id }
+                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.semantic == oldColor.semantic }
                 for point in points {
                     artwork.image[point] = getCurrentSemanticPixel()
                 }
@@ -98,7 +96,7 @@ struct ToolsMenu: View {
         }
     }
     
-    func translatedShape(p1: Point2D, p2: Point2D) -> SemanticImage {
+    func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
         let a = p1 + translation
         let b = p2 + translation
         
@@ -240,7 +238,7 @@ struct ToolsMenu: View {
         artwork.image[position] = getCurrentSemanticPixel()
     }
     
-    func getCurrentSemanticPixel() -> SemanticPixel<RGBA> {
-        return SemanticPixel<RGBA>(id: selectedSemanticIdentifierId, color: selectedColor.color)
+    func getCurrentSemanticPixel() -> SemanticPixel {
+        return SemanticPixel(semantic: selectedSemanticIdentifierId, color: selectedColor)
     }
 }
