@@ -89,8 +89,8 @@ struct OverlayView: View {
                 self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
                 var newPosition = CGPoint(x: __position.x + delta.x, y: __position.y + delta.y)
                 
-                newPosition.x = max(-size.width/2, min(newPosition.x, size.width/2 - 12))
-                newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - 12))
+                newPosition.x = max(-size.width/2, min(newPosition.x, size.width/2 - pixelSize.width))
+                newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - pixelSize.height))
                 
                 self.__position = newPosition
                 
