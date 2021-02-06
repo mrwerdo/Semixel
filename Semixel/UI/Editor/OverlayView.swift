@@ -9,25 +9,18 @@
 import SwiftUI
 
 struct OverlayView: View {
-    
     var pixelSize: CGSize
     var image: PixelImage<RGBA>
-    @Binding var position: Point2D
+    var position: Point2D
     
     var showBoundingRectangle: Bool
     var shapeStartPosition: Point2D?
     var shapeEndPosition: Point2D?
     @Binding var selectedRegion: SelectedRegion?
     var translating: Bool
+    var translation: Point2D
     
-    @Binding var speed: CGFloat
-    @Binding var translation: Point2D
-    @State var lastPosition: CGPoint = .zero
-    @State var __position: CGPoint = .zero
-    @State var __translation: CGPoint = .zero
-    @State var didSyncPosition: Bool = false
-    
-    var onDrag: (CGPoint) -> ()
+    @Binding var __position: CGPoint
     
     private var pencilPosition: CGPoint {
         let x = round(__position.x / pixelSize.width)
@@ -50,68 +43,6 @@ struct OverlayView: View {
             .frame(width: w, height: h, alignment: .center)
             .border(Color(.gray), width: 2)
             .offset(x: x, y: y)
-    }
-    
-    func updateTranslation(_ delta: CGPoint) {
-        // Update `translation` ensuring that the selection rectangle defined by
-        // `shapeStartPosition` and `shapeEndPosition` do not go outside of the bounds of the image.
-        // Translation is measured in terms of pixels (i.e. CGFloats) while the image is measured
-        // in terms of points (i.e. Ints)
-        
-        if !translating {
-            guard let a = shapeStartPosition, let b = shapeEndPosition else {
-                return
-            }
-            
-            let p1 = Point2D(x: min(a.x, b.x), y: min(a.y, b.y))
-            let p2 = Point2D(x: max(a.x, b.x) + 1, y: max(a.y, b.y) + 1)
-            
-            __translation.x = max(CGFloat(-p1.x) * pixelSize.width,
-                                  min(__translation.x + delta.x,
-                                      CGFloat(image.size.width - p2.x) * pixelSize.width))
-            __translation.y = max(CGFloat(-p1.y) * pixelSize.height,
-                                  min(__translation.y + delta.y,
-                                      CGFloat(image.size.height - p2.y) * pixelSize.height))
-            
-            translation = convertToInteger(__translation)
-        } else {
-            __translation.x += delta.x
-            __translation.y += delta.y
-            translation = convertToInteger(__translation)
-        }
-    }
-    
-    var drag: some Gesture {
-        DragGesture()
-            .onChanged({ event in
-                let delta = CGPoint(x: speed * (event.translation.width - lastPosition.x),
-                                    y: speed * (event.translation.height - lastPosition.y))
-                self.lastPosition = CGPoint(x: event.translation.width, y: event.translation.height)
-                var newPosition = CGPoint(x: __position.x + delta.x, y: __position.y + delta.y)
-                
-                newPosition.x = max(-size.width/2, min(newPosition.x, size.width/2 - pixelSize.width))
-                newPosition.y = max(-size.height/2, min(newPosition.y, size.height/2 - pixelSize.height))
-                
-                self.__position = newPosition
-                
-                updatePosition()
-                updateTranslation(delta)
-                self.onDrag(delta)
-            })
-            .onEnded({ delta in
-                self.lastPosition = .zero
-            })
-    }
-    
-    private func updatePosition() {
-        let p = convertToInteger(__position) + Point2D(x: image.size.width, y: image.size.height)/2
-        if image.isValid(p) {
-            position = p
-        }
-    }
-    
-    func convertToInteger(_ p: CGPoint) -> Point2D {
-        return Point2D(x: Int(round(p.x / pixelSize.width)), y: Int(round(p.y / pixelSize.height)))
     }
     
     private var size: CGSize {
@@ -158,11 +89,5 @@ struct OverlayView: View {
                 .offset(x: __position.x + pixelSize.width, y: __position.y)
         }
         .frame(width: size.width, height: size.height)
-        .gesture(drag)
-        .onAppear(perform: {
-            if !didSyncPosition {
-                updatePosition()
-            }
-        })
     }
 }

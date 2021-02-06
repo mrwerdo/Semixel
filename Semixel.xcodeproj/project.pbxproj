@@ -24,6 +24,7 @@
 		866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99BF2581D6CC00FAEF03 /* PixelImage.swift */; };
 		866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE89D2594482B0036B3E3 /* ToolsMenu.swift */; };
 		867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867DD94F25901A770013E03D /* SemanticArtwork.swift */; };
+		867F396225CE50270047B714 /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867F396125CE50270047B714 /* DragView.swift */; };
 		868D3FDF25AED39E0018D754 /* ArtworkFileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868D3FDE25AED39E0018D754 /* ArtworkFileSystem.swift */; };
 		868D3FE325AEDE950018D754 /* ignore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868D3FE225AEDE950018D754 /* ignore.swift */; };
 		869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImageView.swift */; };
@@ -62,6 +63,7 @@
 		866C99BF2581D6CC00FAEF03 /* PixelImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelImage.swift; sourceTree = "<group>"; };
 		866DE89D2594482B0036B3E3 /* ToolsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsMenu.swift; sourceTree = "<group>"; };
 		867DD94F25901A770013E03D /* SemanticArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticArtwork.swift; sourceTree = "<group>"; };
+		867F396125CE50270047B714 /* DragView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragView.swift; sourceTree = "<group>"; };
 		868D3FDE25AED39E0018D754 /* ArtworkFileSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkFileSystem.swift; sourceTree = "<group>"; };
 		868D3FE225AEDE950018D754 /* ignore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ignore.swift; sourceTree = "<group>"; };
 		869C823725902D7C00B0235E /* PixelGridImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelGridImageView.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				866DE89D2594482B0036B3E3 /* ToolsMenu.swift */,
 				869C823B25902DD500B0235E /* ToolType.swift */,
 				8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */,
+				867F396125CE50270047B714 /* DragView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				869C824E25902E9200B0235E /* SemanticColor.swift in Sources */,
 				869C824525902E5400B0235E /* OverlayView.swift in Sources */,
 				869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */,
+				867F396225CE50270047B714 /* DragView.swift in Sources */,
 				867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */,
 				860FB303258AC6460014A0E1 /* CollectionView.swift in Sources */,
 				8660200025AC33B000BC6CC7 /* initialize.swift in Sources */,

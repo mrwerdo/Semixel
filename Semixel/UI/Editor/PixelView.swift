@@ -39,6 +39,8 @@ struct PixelView: View {
     @State var selectedRegion: SelectedRegion?
     @State var showMetadataView: Bool = false
     
+    @State var __position: CGPoint = .zero
+    
     func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
         let a = p1 + translation
         let b = p2 + translation
@@ -92,19 +94,30 @@ struct PixelView: View {
     var overlay: some View {
         let size = CGSize(width: CGFloat(artwork.image.size.width), height: CGFloat(artwork.image.size.height))
         return GeometryReader() { geometry in
-            OverlayView(pixelSize: CGSize(width: min(geometry.size.width / size.width, geometry.size.height / size.height),
-                                          height: min(geometry.size.width / size.width, geometry.size.height / size.height)),
-                               image: bitmapImage,
-                               position: $position,
-                               showBoundingRectangle: tool != .line,
-                               shapeStartPosition: shapeStartPosition,
-                               shapeEndPosition: shapeEndPosition,
-                               selectedRegion: $selectedRegion,
-                               translating: tool == .translation,
-                               speed: $speed,
-                               translation: $translation,
-                               onDrag: onDrag)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+            DragView(imageSize: artwork.image.size,
+                     pixelSize: CGSize(square: min(geometry.size.width / size.width,
+                                                   geometry.size.height / size.height)),
+                     translating: tool == .translation,
+                     position: $position,
+                     speed: $speed,
+                     translation: $translation,
+                     __position: $__position,
+                     onDrag: onDrag,
+                     content:
+                        OverlayView(pixelSize: CGSize(square: min(geometry.size.width / size.width,
+                                                                  geometry.size.height / size.height)),
+                                    image: bitmapImage,
+                                    position: position,
+                                    showBoundingRectangle: tool != .line,
+                                    shapeStartPosition: shapeStartPosition,
+                                    shapeEndPosition: shapeEndPosition,
+                                    selectedRegion: $selectedRegion,
+                                    translating: tool == .translation,
+                                    translation: translation,
+                                    __position: $__position)
+                        .frame(width: geometry.size.width,
+                               height: geometry.size.height,
+                               alignment: .center))
         }
     }
     
