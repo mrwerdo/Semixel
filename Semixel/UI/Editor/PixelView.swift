@@ -97,8 +97,8 @@ struct PixelView: View {
         let size = CGSize(width: CGFloat(artwork.image.size.width), height: CGFloat(artwork.image.size.height))
         return GeometryReader() { geometry in
             DragView(imageSize: artwork.image.size,
-                     pixelSize: CGSize(square: min(geometry.size.width / size.width,
-                                                   geometry.size.height / size.height)),
+                     pixelSize: CGSize(square: floor(min(geometry.size.width / size.width,
+                                                   geometry.size.height / size.height))),
                      translating: tool == .translation,
                      position: $position,
                      speed: $speed,
@@ -106,8 +106,8 @@ struct PixelView: View {
                      __position: $__position,
                      onDrag: onDrag,
                      content:
-                        OverlayView(pixelSize: CGSize(square: min(geometry.size.width / size.width,
-                                                                  geometry.size.height / size.height)),
+                        OverlayView(pixelSize: CGSize(square: floor(min(geometry.size.width / size.width,
+                                                                  geometry.size.height / size.height))),
                                     image: bitmapImage,
                                     position: position,
                                     showGrid: showGrid,
