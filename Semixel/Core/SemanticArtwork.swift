@@ -66,7 +66,7 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     }
 }
 
-struct SemanticPixel: Equatable, Identifiable {
+struct SemanticPixel: Equatable, Identifiable, HasDefaultColor {
     // 0 represents the default semantic, which always exists.
     var semantic: Int
     var color: ColorIdentifier

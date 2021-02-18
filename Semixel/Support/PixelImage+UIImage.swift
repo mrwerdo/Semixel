@@ -21,6 +21,29 @@ extension PixelImage where ColorType == RGBA {
     }
 }
 
+protocol ColorTypeProtocol {
+    static var cgColorSpace: CGColorSpace { get }
+    func convertToCGColor() -> CGColor
+}
+
+extension RGBA: ColorTypeProtocol {
+    func convertToCGColor() -> CGColor {
+        var components: [CGFloat] = [
+            red,
+            green,
+            blue,
+            alpha
+        ]
+        return CGColor(colorSpace: RGBA.cgColorSpace, components: &components)!
+    }
+
+    static var cgColorSpace: CGColorSpace {
+        get {
+            return CGColorSpaceCreateDeviceRGB()
+        }
+    }
+}
+
 extension PixelImage where ColorType: ColorTypeProtocol {
     func write(to url: URL) throws {
         guard let img = convertToCGImage() else {
@@ -73,7 +96,6 @@ extension PixelImage where ColorType: ColorTypeProtocol {
                        intent: .defaultIntent)
     }
 }
-
 
 extension UIImage {
     
@@ -193,8 +215,8 @@ extension UIImage {
         let bytesPerRow = cgImage.bytesPerRow
         let bytesPerPixel = cgImage.bitsPerPixel/8
 
-        for y in 0..<width {
-            for x in 0..<height {
+        for y in 0..<height {
+            for x in 0..<width {
                 let pixelOffset = y*bytesPerRow + x*bytesPerPixel
                 let color = extractPixel(componentLayout, dataPtr, pixelOffset, cgImage)
                 closure(x, y, color)

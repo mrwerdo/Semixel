@@ -8,17 +8,7 @@
 
 import SwiftUI
 
-struct RGBA: Equatable, ColorTypeProtocol, Codable, Hashable {
-    func convertToCGColor() -> CGColor {
-        var components: [CGFloat] = [
-            red,
-            green,
-            blue,
-            alpha
-        ]
-        return CGColor(colorSpace: RGBA.cgColorSpace, components: &components)!
-    }
-    
+struct RGBA: Equatable, HasDefaultColor, Codable, Hashable {
     var red: CGFloat
     var green: CGFloat
     var blue: CGFloat
@@ -93,14 +83,6 @@ extension RGBA {
             alpha = 1.0
         } else {
             return nil
-        }
-    }
-}
-
-extension RGBA {
-    static var cgColorSpace: CGColorSpace {
-        get {
-            return CGColorSpaceCreateDeviceRGB()
         }
     }
 }

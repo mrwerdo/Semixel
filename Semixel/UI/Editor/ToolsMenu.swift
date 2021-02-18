@@ -47,6 +47,9 @@ struct ToolsMenu: View {
     
     @Binding var selectedRegion: SelectedRegion?
     
+    @Binding var verticalFlip: Bool
+    @Binding var horizontalFlip: Bool
+    
     func icon(for type: ToolType) -> some View {
         Image(systemName: type.iconName).font(Font.system(size: 24))
     }
@@ -146,7 +149,12 @@ struct ToolsMenu: View {
                 }
             }
             OneShotState.create($tool, tool: .wand) {
-                print("Wand")
+                let oldColor = artwork.image[position]
+                let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.semantic == oldColor.semantic }
+                if selectedRegion == nil {
+                    selectedRegion = SelectedRegion(size: artwork.image.size)
+                }
+                selectedRegion?.update(points: points, mode: isAppendMode ? .select : .deselect)
                 selectionStarted = true
             }
             AnyToolButton(isSelected: false, image: icon(for: isAppendMode ? .selectionModeAdd : .selectionModeRemove)) {
@@ -169,7 +177,7 @@ struct ToolsMenu: View {
             AnyToolButton(isSelected: false, image: icon(for: .complete)) {
                 menuState = .main
                 if let selection = selectedRegion {
-                    artwork.image = artwork.image.move(selection: selection, by: translation, background: .clear)
+                    artwork.image = artwork.image.transform(selection: selection, offset: translation)
                 }
                 selectionStarted = false
                 reset()
@@ -182,11 +190,11 @@ struct ToolsMenu: View {
             OneShotState.create($tool, tool: .cut) {
                 print("Cut")
             }
-            OneShotState.create($tool, tool: .vflip) {
-                print("Vflip")
+            AnyToolButton(isSelected: false, image: icon(for: .vflip)) {
+                verticalFlip.toggle()
             }
-            OneShotState.create($tool, tool: .hflip) {
-                print("Hflip")
+            AnyToolButton(isSelected: false, image: icon(for: .hflip)) {
+                horizontalFlip.toggle()
             }
         }
     }
@@ -233,6 +241,8 @@ struct ToolsMenu: View {
         shapeStartPosition = nil
         shapeEndPosition = nil
         translation = .zero
+        verticalFlip = false
+        horizontalFlip = false
     }
     
     func applyPencil() {

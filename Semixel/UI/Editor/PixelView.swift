@@ -41,6 +41,9 @@ struct PixelView: View {
     
     @State var showGrid: Bool = true
     
+    @State var verticalFlip: Bool = false
+    @State var horizontalFlip: Bool = false
+    
     @State var __position: CGPoint = .zero
     
     func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
@@ -79,9 +82,10 @@ struct PixelView: View {
             }
         } else if tool == .selection, let p1 = shapeStartPosition, let p2 = shapeEndPosition {
             // Grab the pixels in the rectangle between p1 and p2, draw each one translated by p3.
-            return artwork.image.moveRectangle(between: p1, and: p2, by: translation, background: .clear)
-        } else if tool == .translation, let selection = self.selectedRegion {
-            return artwork.image.move(selection: selection, by: translation, background: .clear)
+            return artwork.image.moveRectangle(between: p1, and: p2, by: translation)
+        } else if let selection = self.selectedRegion {
+            return artwork.image
+                .transform(selection: selection, horizontalFlip: horizontalFlip, verticalFlip: verticalFlip, offset: translation)
         } else {
             return artwork.image
         }
@@ -117,6 +121,8 @@ struct PixelView: View {
                                     selectedRegion: $selectedRegion,
                                     translating: tool == .translation,
                                     translation: translation,
+                                    selectionVerticalFlipped: verticalFlip,
+                                    selectionHorizontalFlipped: horizontalFlip,
                                     __position: $__position)
                         .frame(width: geometry.size.width,
                                height: geometry.size.height,
@@ -142,7 +148,9 @@ struct PixelView: View {
                               shapeStartPosition: $shapeStartPosition,
                               shapeEndPosition: $shapeEndPosition,
                               translation: $translation,
-                              selectedRegion: $selectedRegion)
+                              selectedRegion: $selectedRegion,
+                              verticalFlip: $verticalFlip,
+                              horizontalFlip: $horizontalFlip)
                         .environmentObject(artwork)
                         .padding(.top)
                     HStack {

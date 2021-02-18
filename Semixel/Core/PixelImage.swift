@@ -10,11 +10,8 @@ import Foundation
 import SwiftUI
 import UIKit
 
-
-protocol ColorTypeProtocol {
+protocol HasDefaultColor {
     static var clear: Self { get }
-    static var cgColorSpace: CGColorSpace { get }
-    func convertToCGColor() -> CGColor
 }
 
 struct PixelImage<ColorType> {
@@ -86,7 +83,7 @@ struct PixelImage<ColorType> {
     }
 }
 
-extension PixelImage where ColorType: ColorTypeProtocol {
+extension PixelImage where ColorType: HasDefaultColor {
     init(width: Int, height: Int) {
         buffer = [ColorType](repeating: .clear, count: width * height)
         size = Size2D(width: width, height: height)
@@ -94,6 +91,14 @@ extension PixelImage where ColorType: ColorTypeProtocol {
     
     func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D) -> PixelImage {
         return moveRectangle(between: p1, and: p2, by: offset, background: .clear)
+    }
+    
+    func transform(selection: SelectedRegion, horizontalFlip: Bool = false, verticalFlip: Bool = false, offset: Point2D = .zero) -> PixelImage {
+        transform(selection: selection,
+             horizontalFlip: horizontalFlip,
+             verticalFlip: verticalFlip,
+             offset: offset,
+             background: .clear)
     }
 }
 
@@ -266,18 +271,31 @@ extension PixelImage {
 }
 
 extension PixelImage {
-    func move(selection: SelectedRegion, by offset: Point2D, background: ColorType) -> PixelImage {
-        // Everything inside of selection is translated by offset,
+    func transform(selection: SelectedRegion, horizontalFlip: Bool, verticalFlip: Bool, offset: Point2D, background: ColorType) -> PixelImage {
+        if !verticalFlip && !horizontalFlip && offset == .zero {
+            return self
+        }
+        
+        let rect = selection.boundingRectangle
+        let points = selection.selectedPoints
+        
+        let ha: Int = horizontalFlip ? 1 : 0
+        let hb: Int = horizontalFlip ? -1 : 1
+        let va: Int = verticalFlip ? 1 : 0
+        let vb: Int = verticalFlip ? -1 : 1
+        
         var img = PixelImage(copy: self)
-        
-        let selectedPoints = selection.selectedPoints
-        
-        for point in selectedPoints {
+
+        for point in points {
             img[point] = background
         }
         
-        for point in selection.selectedPoints where img.isValid(point + offset) {
-            img[point + offset] = self[point]
+        for point in points {
+            let newPoint = Point2D(x: ha * (rect.bottomRight.x + rect.bottomLeft.x) + hb * point.x + offset.x,
+                                y: va * (rect.bottomLeft.y + rect.topLeft.y) + vb * point.y + offset.y)
+            if isValid(newPoint) {
+                img[newPoint] = self[point]
+            }
         }
         
         return img

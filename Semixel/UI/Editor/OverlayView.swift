@@ -20,6 +20,8 @@ struct OverlayView: View {
     @Binding var selectedRegion: SelectedRegion?
     var translating: Bool
     var translation: Point2D
+    var selectionVerticalFlipped: Bool
+    var selectionHorizontalFlipped: Bool
     
     @Binding var __position: CGPoint
     
@@ -51,6 +53,14 @@ struct OverlayView: View {
                height: pixelSize.height * CGFloat(image.size.height))
     }
     
+    func selectedRegionOutline(_ region: SelectedRegion) -> some View {
+        let path = region.boundingPath(horizontalFlip: selectionHorizontalFlipped, verticalFlip: selectionVerticalFlipped)
+        return Path(path)
+            .transform(CGAffineTransform(scaleX: pixelSize.width, y: pixelSize.height))
+            .stroke(style: StrokeStyle(lineWidth: 2, dash: [5], dashPhase: 0))
+            .foregroundColor(Color(.lightGray))
+    }
+    
     var body: some View {
         ZStack {
             PixelBufferView(pixelSize: pixelSize, image: image)
@@ -58,18 +68,12 @@ struct OverlayView: View {
                 PixelGridImageView(horizontalSpacing: pixelSize.width, verticalSpacing: pixelSize.height)
             }
             
-            if let path = selectedRegion?.boundingPath {
+            if let region = selectedRegion {
+                let outline = selectedRegionOutline(region)
                 if translating {
-                    Path(path)
-                        .transform(CGAffineTransform(scaleX: pixelSize.width, y: pixelSize.height))
-                        .stroke(style: StrokeStyle(lineWidth: 2, dash: [5], dashPhase: 0))
-                        .foregroundColor(Color(.lightGray))
-                        .offset(x: CGFloat(translation.x) * pixelSize.width, y: CGFloat(translation.y) * pixelSize.height)
+                    outline.offset(x: CGFloat(translation.x) * pixelSize.width, y: CGFloat(translation.y) * pixelSize.height)
                 } else {
-                    Path(path)
-                        .transform(CGAffineTransform(scaleX: pixelSize.width, y: pixelSize.height))
-                        .stroke(style: StrokeStyle(lineWidth: 2, dash: [5], dashPhase: 0))
-                        .foregroundColor(Color(.lightGray))
+                    outline
                 }
             }
             
