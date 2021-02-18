@@ -70,7 +70,7 @@ struct ToolsMenu: View {
                 translating()
             } complete: {
                 completed { (p1, p2, offset) in
-                    artwork.image = translatedShape(p1: p1, p2: p2)
+                    commitShape(p1: p1, p2: p2)
                 }
             }
             .buttonStyle(LongPressButtonStyle(minimumDuration: 0.3, maximumDistance: 100, callback: longPressCallback))
@@ -82,9 +82,7 @@ struct ToolsMenu: View {
                 statusText = "Applied paint bucket."
                 let oldColor = artwork.image[position]
                 let points = artwork.image.floodSearch(at: position) { (_, c) -> Bool in c.color == oldColor.color && c.semantic == oldColor.semantic }
-                for point in points {
-                    artwork.image[point] = getCurrentSemanticPixel()
-                }
+                artwork.assign(pixel: getCurrentSemanticPixel(), at: points)
             }
             BinaryState.create($tool, tool: .pencil) {
                 reset()
@@ -93,28 +91,28 @@ struct ToolsMenu: View {
             }
             OneShotState.create($tool, tool: .undo) {
                 statusText = "Undone"
+                artwork.undo()
             }
             OneShotState.create($tool, tool: .redo) {
                 statusText = "Redone"
+                artwork.redo()
             }
         }
     }
     
-    func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
+    func commitShape(p1: Point2D, p2: Point2D) {
         let a = p1 + translation
         let b = p2 + translation
         
         if artwork.image.isValid(a) && artwork.image.isValid(b) {
             switch tool {
             case .line:
-                return artwork.image.drawLine(from: a, to: b, color: getCurrentSemanticPixel())
+                artwork.drawLine(from: a, to: b, color: getCurrentSemanticPixel())
             case .circle:
-                return artwork.image.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
+                artwork.drawEllipse(from: a, to: b, color: getCurrentSemanticPixel())
             default:
-                return artwork.image
+                break
             }
-        } else {
-            return artwork.image
         }
     }
     
@@ -177,7 +175,10 @@ struct ToolsMenu: View {
             AnyToolButton(isSelected: false, image: icon(for: .complete)) {
                 menuState = .main
                 if let selection = selectedRegion {
-                    artwork.image = artwork.image.transform(selection: selection, offset: translation)
+                    artwork.transform(selection: selection,
+                                      horizontalFlip: horizontalFlip,
+                                      verticalFlip: verticalFlip,
+                                      offset: translation)
                 }
                 selectionStarted = false
                 reset()

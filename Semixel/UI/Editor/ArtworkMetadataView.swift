@@ -47,11 +47,11 @@ struct ArtworkMetadataView: View {
                     }
                     action(title: "Horizontal Flip", icon: ToolType.hflip.iconName, dismisses: false) {
                         let region = SelectedRegion(size: artwork.image.size, default: true)
-                        artwork.image = artwork.image.transform(selection: region, horizontalFlip: true)
+                        artwork.transform(selection: region, horizontalFlip: true)
                     }
                     action(title: "Vertical Flip", icon: ToolType.vflip.iconName, dismisses: false) {
                         let region = SelectedRegion(size: artwork.image.size, default: true)
-                        artwork.image = artwork.image.transform(selection: region, verticalFlip: true)
+                        artwork.transform(selection: region, verticalFlip: true)
                     }
                 }
                 Section {

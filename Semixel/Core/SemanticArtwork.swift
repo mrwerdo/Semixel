@@ -29,6 +29,8 @@ final class SemanticArtwork: Identifiable, ObservableObject {
             }
         }
     }
+    
+    private var history: History = History()
 
     var bitmapImage: PixelImage<RGBA> {
         return PixelImage<RGBA>(size: image.size, buffer: image.buffer.map { colorPalette[rgba: $0.color] })
@@ -64,9 +66,64 @@ final class SemanticArtwork: Identifiable, ObservableObject {
     deinit {
         anyCancellable?.cancel()
     }
+    
+    func undo() {
+        if let head = history.head {
+            head.operation.undo(&image)
+            history.head = head.previous ?? head
+        }
+    }
+    
+    func redo() {
+        if let next = history.head?.next.last {
+            next.operation.redo(&image)
+            history.head = next
+        }
+    }
+    
+    func transform(selection: SelectedRegion,
+                   horizontalFlip: Bool = false,
+                   verticalFlip: Bool = false,
+                   offset: Point2D = .zero,
+                   background: SemanticPixel = .clear) {
+        let points = selection.selectedPoints
+        let overWrittenPoints = points.compactMap {
+            image.isValid($0 + offset) ? image[$0 + offset] : nil
+        }
+        let op = Ops.Transformation(points: points,
+                                    offset: offset,
+                                    overWrittenPixels: overWrittenPoints,
+                                    selectedPixels: points.map { image[$0] },
+                                    backgroundColor: background,
+                                    horizontalFlip: horizontalFlip,
+                                    verticalFlip: verticalFlip,
+                                    flipRect: selection.boundingRectangle)
+        history.record(op)
+        image = image.transform(selection: selection,
+                                horizontalFlip: horizontalFlip,
+                                verticalFlip: verticalFlip,
+                                offset: offset,
+                                background: background)
+    }
+    
+    func assign(pixel: SemanticPixel, at points: [Point2D]) {
+        let op = Ops.Assignment(points: points,
+                                oldColors: points.map { image[$0] },
+                                newColors: Array(repeating: pixel, count: points.count))
+        history.record(op)
+        points.forEach { image[$0] = pixel }
+    }
+    
+    func drawLine(from a: Point2D, to b: Point2D, color: SemanticPixel) {
+        assign(pixel: color, at: a.line(to: b))
+    }
+    
+    func drawEllipse(from a: Point2D, to b: Point2D, color: SemanticPixel) {
+        assign(pixel: color, at: a.ellipse(to: b))
+    }
 }
 
-struct SemanticPixel: Equatable, Identifiable, HasDefaultColor {
+struct SemanticPixel: Equatable, Identifiable, HasDefaultColor, Codable {
     // 0 represents the default semantic, which always exists.
     var semantic: Int
     var color: ColorIdentifier

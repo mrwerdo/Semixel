@@ -104,6 +104,8 @@ struct PixelView: View {
                      pixelSize: CGSize(square: floor(min(geometry.size.width / size.width,
                                                    geometry.size.height / size.height))),
                      translating: tool == .translation,
+                     shapeStartPosition: shapeStartPosition,
+                     shapeEndPosition: shapeEndPosition,
                      position: $position,
                      speed: $speed,
                      translation: $translation,
@@ -219,7 +221,7 @@ struct PixelView: View {
             statusText = ("(x: \(position.x), y: \(position.y))")
         }
         if tool == .pencil {
-            artwork.image[position] = getCurrentSemanticPixel()
+            artwork.assign(pixel: getCurrentSemanticPixel(), at: [position])
         }
     }
     
