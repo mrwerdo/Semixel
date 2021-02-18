@@ -16,9 +16,9 @@ struct SelectedRegion {
         case select
     }
     
-    init(size: Size2D) {
+    init(size: Size2D, default: Bool = false) {
         self.size = size
-        selectionBuffer = [Bool](repeating: false, count: size.width * size.height)
+        selectionBuffer = [Bool](repeating: `default`, count: size.width * size.height)
     }
     
     private var selectionBuffer: [Bool]

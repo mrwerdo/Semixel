@@ -11,6 +11,7 @@ import SwiftUI
 struct ArtworkMetadataView: View {
     @EnvironmentObject var metadata: ArtworkMetadata
     @EnvironmentObject var store: ArtworkStore
+    @EnvironmentObject var artwork: SemanticArtwork
     
     @Binding var isPresented: Bool
     @Binding var showGrid: Bool
@@ -41,8 +42,16 @@ struct ArtworkMetadataView: View {
             Divider()
             List {
                 Section {
-                    action(title: showGrid ? "Hide Grid" : "Show Grid", icon: "squareshape.split.3x3") {
+                    action(title: showGrid ? "Hide Grid" : "Show Grid", icon: "squareshape.split.3x3", dismisses: false) {
                         showGrid.toggle()
+                    }
+                    action(title: "Horizontal Flip", icon: ToolType.hflip.iconName, dismisses: false) {
+                        let region = SelectedRegion(size: artwork.image.size, default: true)
+                        artwork.image = artwork.image.transform(selection: region, horizontalFlip: true)
+                    }
+                    action(title: "Vertical Flip", icon: ToolType.vflip.iconName, dismisses: false) {
+                        let region = SelectedRegion(size: artwork.image.size, default: true)
+                        artwork.image = artwork.image.transform(selection: region, verticalFlip: true)
                     }
                 }
                 Section {
@@ -89,10 +98,12 @@ struct ArtworkMetadataView: View {
         }
     }
     
-    func action(title: String, icon: String, callback: @escaping () -> ()) -> some View {
+    func action(title: String, icon: String, dismisses: Bool = true, callback: @escaping () -> ()) -> some View {
         Button {
             callback()
-            isPresented = false
+            if dismisses {
+                isPresented = false
+            }
         } label: {
             HStack {
                 Text(title)
