@@ -222,8 +222,6 @@ struct ToolsMenu: View {
         if shapeStartPosition != nil {
             translation = .zero
             shapeEndPosition = position
-//            let p = convertToInteger(position)
-//            position = CGPoint(x: CGFloat(p.x) * pixelSize.height, y: CGFloat(p.y) * pixelSize.height)
         }
     }
     

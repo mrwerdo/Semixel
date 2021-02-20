@@ -76,7 +76,6 @@ struct OverlayView: View {
                     outline
                 }
             }
-            
             if showBoundingRectangle, let p1 = shapeStartPosition {
                 if let p2 = shapeEndPosition {
                     selectionView(p1: p1, p2: p2, offset: translation)
@@ -85,15 +84,17 @@ struct OverlayView: View {
                 }
             }
             
-            Rectangle()
-                .opacity(0.0)
-                .frame(width: pixelSize.width, height: pixelSize.height , alignment: .center)
-                .border(Color(.systemRed), width: 2)
-                .offset(x: pencilPosition.x, y: pencilPosition.y)
-            Image(systemName: "pencil")
-                .renderingMode(Image.TemplateRenderingMode.template)
-                .foregroundColor(Color(.white))
-                .offset(x: __position.x + pixelSize.width, y: __position.y)
+            if !(showBoundingRectangle && shapeStartPosition != nil && shapeEndPosition != nil || selectedRegion != nil && translating) {
+                Rectangle()
+                    .opacity(0.0)
+                    .frame(width: pixelSize.width, height: pixelSize.height , alignment: .center)
+                    .border(Color(.systemRed), width: 2)
+                    .offset(x: pencilPosition.x, y: pencilPosition.y)
+                Image(systemName: "pencil")
+                    .renderingMode(Image.TemplateRenderingMode.template)
+                    .foregroundColor(Color(.white))
+                    .offset(x: __position.x + pixelSize.width, y: __position.y)
+            }
         }
         .frame(width: size.width, height: size.height)
     }
