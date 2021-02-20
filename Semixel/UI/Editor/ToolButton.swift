@@ -110,6 +110,8 @@ struct ToolButton<State: ToolButtonState>: View {
     var transition: (State) -> State
     @SwiftUI.State var state: State = .deselected
     
+    @EnvironmentObject var store: ArtworkStore
+    
     init(_ selectedTool: Binding<ToolType?>, tool: ToolType, transition: @escaping (State) -> State) {
         self._selectedTool = selectedTool
         self.tool = tool
@@ -134,7 +136,7 @@ struct ToolButton<State: ToolButtonState>: View {
     }
     
     var image: some View {
-        return Image(systemName: tool.iconName).font(Font.system(size: 24))
+        store.icon(for: tool, ifNotFound: Image(systemName: tool.iconName).font(Font.system(size: 24)))
     }
 }
 

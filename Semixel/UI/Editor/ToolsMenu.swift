@@ -50,8 +50,10 @@ struct ToolsMenu: View {
     @Binding var verticalFlip: Bool
     @Binding var horizontalFlip: Bool
     
+    @EnvironmentObject var store: ArtworkStore
+    
     func icon(for type: ToolType) -> some View {
-        Image(systemName: type.iconName).font(Font.system(size: 24))
+        store.icon(for: type, ifNotFound: Image(systemName: type.iconName).font(Font.system(size: 24)))
     }
     
     private func longPressCallback() {

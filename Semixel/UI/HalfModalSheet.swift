@@ -92,6 +92,7 @@ struct HalfModalView<Content: View, ModalContent: View>: View {
                         notch = .halfOpen
                         isPresented = true
                         endTranslation = nil
+                        UITableView.appearance().isScrollEnabled = false
                         return
                     } else if value.translation.height >= 350 {
                         notch = .halfOpen
@@ -105,6 +106,7 @@ struct HalfModalView<Content: View, ModalContent: View>: View {
                         notch = .open
                         isPresented = true
                         endTranslation = nil
+                        UITableView.appearance().isScrollEnabled = true
                     } else if value.translation.height > 90 {
                         notch = .halfOpen
                         isPresented = false

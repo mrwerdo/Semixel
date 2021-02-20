@@ -64,6 +64,7 @@ class ArtworkStore: ObservableObject {
         var projects: [ProjectMetadata]
         var standaloneArtworks: [ArtworkMetadata]
         var visibleDefaultArtwork: Set<String>
+        var toolIconOverrides: [ToolType : String] = [:]
         
         enum FileId: String, CaseIterable {
             case metadata
@@ -163,12 +164,33 @@ class ArtworkStore: ObservableObject {
         return destination
     }
     
-    func preview(for metadata: ArtworkMetadata) -> some View {
+    func preview(for metadata: ArtworkMetadata, size n: CGFloat = 64) -> some View {
         let artwork = model(for: metadata)
-        let n: CGFloat = 64
         let length = n / max(CGFloat(metadata.size.width), CGFloat(metadata.size.height))
         return PixelBufferView(pixelSize: CGSize(square: length), image: artwork.bitmapImage, centered: true)
             .frame(width: n, height: n, alignment: .center)
+    }
+    
+    func icon<T: View>(for tool: ToolType, ifNotFound `default`: T) -> AnyView {
+        if let id = metadata.toolIconOverrides[tool] {
+            if let m = artwork.first(where: { $0.id == id }) {
+                return AnyView(preview(for: m, size: 32))
+            }
+        }
+        return AnyView(`default`)
+    }
+    
+    func toolOverride(for metadata: ArtworkMetadata) -> ToolType? {
+        return self.metadata.toolIconOverrides.first(where: { $0.value == metadata.id })?.key
+    }
+    
+    func setToolOverride(_ tool: ToolType?, for metadata: ArtworkMetadata) {
+        if let oldValue = toolOverride(for: metadata) {
+            self.metadata.toolIconOverrides.removeValue(forKey: oldValue)
+        }
+        if let tool = tool {
+            self.metadata.toolIconOverrides[tool] = metadata.id
+        }
     }
 }
 

@@ -16,6 +16,24 @@ struct ArtworkMetadataView: View {
     @Binding var isPresented: Bool
     @Binding var showGrid: Bool
     
+    var toolOverride: Binding<Int> {
+        Binding { () -> Int in
+            if let tool = store.toolOverride(for: metadata), let index = ToolType.allCases.firstIndex(of: tool) {
+                return index + 1
+            } else {
+                return 0
+            }
+        } set: { (value: Int) in
+            if value == 0 {
+                store.setToolOverride(nil, for: metadata)
+            } else {
+                store.setToolOverride(ToolType.allCases[value - 1], for: metadata)
+            }
+        }
+    }
+    
+    @State var showToolTypePicker: Bool = false
+    
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -64,6 +82,23 @@ struct ArtworkMetadataView: View {
                     field("Size", "\(metadata.size.width)x\(metadata.size.height)")
                     field("Type", metadata.pixelType.rawValue)
                     field("Id", metadata.id)
+                }
+                Section {
+                    action(title: "Tool Override", icon: ToolType.selection.iconName, dismisses: false) {
+                        showToolTypePicker.toggle()
+                    }
+                    if showToolTypePicker {
+                        Picker(selection: toolOverride, label: Text("Tool Override")) {
+                            ForEach(0..<(ToolType.allCases.count + 1)) {
+                                if $0 == 0 {
+                                    Text("None")
+                                } else {
+                                    Text(ToolType.allCases[$0 - 1].rawValue)
+                                }
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                    }
                 }
             }
             .onAppear {

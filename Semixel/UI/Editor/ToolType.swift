@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ToolType: Equatable {
+enum ToolType: String, Equatable, Codable, CaseIterable {
     case pencil
     case brush
     case circle
