@@ -104,7 +104,6 @@ class History: Codable {
     }
     
     func record<Op>(_ operation: Op) where Op: Operation {
-        print("Added operation...")
         if let head = head {
             head.next.append(HistoryNode(operation, previous: head))
             self.head = head.next.last
