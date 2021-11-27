@@ -20,10 +20,13 @@ struct DragView<Content: View>: View {
     @Binding var speed: CGFloat
     @Binding var translation: Point2D
     
+    @Binding var zoomFactor: CGFloat
+    
     @Binding var __position: CGPoint
     @State var lastPosition: CGPoint = .zero
     @State var __translation: CGPoint = .zero
     @State var didSyncPosition: Bool = false
+    @State var lastZoomFactor: CGFloat = 1.0
     
     var onDrag: (CGPoint) -> ()
     var content: Content
@@ -79,8 +82,20 @@ struct DragView<Content: View>: View {
             })
     }
     
+    private var zoomGesture: some Gesture {
+        MagnificationGesture(minimumScaleDelta: 0.001)
+            .onChanged { value in
+                zoomFactor *= value / lastZoomFactor
+                zoomFactor = max(1, zoomFactor)
+                lastZoomFactor = value
+            }
+            .onEnded { value in
+                lastZoomFactor = 1.0
+            }
+    }
+    
     private func updatePosition() {
-        let p = convertToInteger(__position) + Point2D(x: imageSize.width, y: imageSize.height)/2
+        let p = convertToInteger(CGPoint(x: __position.x / zoomFactor, y: __position.y / zoomFactor)) + Point2D(x: imageSize.width, y: imageSize.height)/2
         if 0..<imageSize.width ~= p.x && 0..<imageSize.height ~= p.y {
             position = p
         }
@@ -104,5 +119,6 @@ struct DragView<Content: View>: View {
                     updatePosition()
                 }
             })
+            .gesture(zoomGesture)
     }
 }

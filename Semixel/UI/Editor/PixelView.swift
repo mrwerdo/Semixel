@@ -45,6 +45,7 @@ struct PixelView: View {
     @State var horizontalFlip: Bool = false
     
     @State var __position: CGPoint = .zero
+    @State var zoomFactor: CGFloat = 1.0
     
     func translatedShape(p1: Point2D, p2: Point2D) -> PixelImage<SemanticPixel> {
         let a = p1 + translation
@@ -109,10 +110,11 @@ struct PixelView: View {
                      position: $position,
                      speed: $speed,
                      translation: $translation,
+                     zoomFactor: $zoomFactor,
                      __position: $__position,
                      onDrag: onDrag,
                      content:
-                        OverlayView(pixelSize: CGSize(square: floor(min(geometry.size.width / size.width,
+                        OverlayView(pixelSize: CGSize(square: zoomFactor * floor(min(geometry.size.width / size.width,
                                                                   geometry.size.height / size.height))),
                                     image: bitmapImage,
                                     position: position,
@@ -125,6 +127,7 @@ struct PixelView: View {
                                     translation: translation,
                                     selectionVerticalFlipped: verticalFlip,
                                     selectionHorizontalFlipped: horizontalFlip,
+                                    zoom: zoomFactor,
                                     __position: $__position)
                         .frame(width: geometry.size.width,
                                height: geometry.size.height,

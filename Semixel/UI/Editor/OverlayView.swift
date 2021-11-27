@@ -22,6 +22,8 @@ struct OverlayView: View {
     var translation: Point2D
     var selectionVerticalFlipped: Bool
     var selectionHorizontalFlipped: Bool
+    var zoom: CGFloat
+    var bounds: CGSize = CGSize(width: 340, height: 340)
     
     @Binding var __position: CGPoint
     
@@ -97,5 +99,7 @@ struct OverlayView: View {
             }
         }
         .frame(width: size.width, height: size.height)
+        .frame(width: bounds.width, height: bounds.height)
+        .clipped()
     }
 }
