@@ -44,10 +44,20 @@ struct ContentView: View {
                     }
                 }.onDelete(perform: delete(at:))
             }
-            .navigationBarTitle("Artwork")
-            .navigationBarItems(trailing: attributesButton)
+            .navigationTitle("Artwork")
             .listStyle(PlainListStyle())
-            .toolbar { toolbarItems  }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    attributesButton
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: add) {
+                        Image(systemName: "plus")
+                    }
+                    .accentColor(.black)
+                    .padding()
+                }
+            }
         }
         .halfModalSheet(isPresented: $showAttributes, content: attributesView)
     }
@@ -111,17 +121,6 @@ struct ContentView: View {
                 Spacer()
                 Image(systemName: icon)
                     .font(Font.title3)
-            }
-        }
-    }
-    
-    var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) {
-            HStack {
-                Button(action: add) {
-                    Image(systemName: "plus")
-                }
-                .padding()
             }
         }
     }
