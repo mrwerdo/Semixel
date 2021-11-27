@@ -14,7 +14,7 @@ extension View {
     }
 }
 
-struct HalfModalSlider<Content: View, ModalContent: View, G1: Gesture, G2: Gesture>: View {
+private struct HalfModalSlider<Content: View, ModalContent: View, G1: Gesture, G2: Gesture>: View {
     var content: Content
     var modal: ModalContent
     var height: CGFloat

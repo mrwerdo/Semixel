@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct ArtworkView: View {
     
     @EnvironmentObject var store: ArtworkStore
     
@@ -167,6 +167,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ArtworkView()
     }
 }
