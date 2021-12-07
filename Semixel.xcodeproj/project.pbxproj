@@ -51,6 +51,7 @@
 		869F4E1A275EF77E00328FBC /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E19275EF77E00328FBC /* ColorPickerView.swift */; };
 		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
 		86C31C7425986113006350FB /* SelectedRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C31C7325986113006350FB /* SelectedRegion.swift */; };
+		86CDD36C275F17E8009A2569 /* PixelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CDD36B275F17E8009A2569 /* PixelView.swift */; };
 		86F52043259015D000C19E41 /* RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F52042259015D000C19E41 /* RGBA.swift */; };
 		86F520462590164300C19E41 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520452590164300C19E41 /* FolderMonitor.swift */; };
 		86F520542590190D00C19E41 /* PixelImage+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520532590190D00C19E41 /* PixelImage+UIImage.swift */; };
@@ -106,6 +107,7 @@
 		869F4E19275EF77E00328FBC /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
 		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
 		86C31C7325986113006350FB /* SelectedRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedRegion.swift; sourceTree = "<group>"; };
+		86CDD36B275F17E8009A2569 /* PixelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelView.swift; sourceTree = "<group>"; };
 		86F52042259015D000C19E41 /* RGBA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGBA.swift; sourceTree = "<group>"; };
 		86F520452590164300C19E41 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		86F520532590190D00C19E41 /* PixelImage+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PixelImage+UIImage.swift"; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				869F4E03275EDE5A00328FBC /* AppDelegate.swift */,
 				869F4E05275EDE5A00328FBC /* SceneDelegate.swift */,
 				869F4E07275EDE5A00328FBC /* ViewController.swift */,
+				86CDD36B275F17E8009A2569 /* PixelView.swift */,
 				869F4E19275EF77E00328FBC /* ColorPickerView.swift */,
 				869F4E15275EE12F00328FBC /* GridView.swift */,
 				869F4E17275EF43600328FBC /* ColorPalette.swift */,
@@ -418,6 +421,7 @@
 				869F4E18275EF43600328FBC /* ColorPalette.swift in Sources */,
 				869F4E08275EDE5A00328FBC /* ViewController.swift in Sources */,
 				869F4E1A275EF77E00328FBC /* ColorPickerView.swift in Sources */,
+				86CDD36C275F17E8009A2569 /* PixelView.swift in Sources */,
 				869F4E04275EDE5A00328FBC /* AppDelegate.swift in Sources */,
 				869F4E16275EE13000328FBC /* GridView.swift in Sources */,
 				869F4E06275EDE5A00328FBC /* SceneDelegate.swift in Sources */,
@@ -620,8 +624,9 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -649,8 +654,9 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

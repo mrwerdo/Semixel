@@ -10,8 +10,7 @@ import UIKit
 
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
-    var gridView: GridView = GridView()
-    
+    var pixelView: PixelView = PixelView()
     var colorPalette: UICollectionView!
     
     var colors: [Color] = [
@@ -27,19 +26,14 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let imageView = UIImageView(image: UIImage(named: "Coal 4"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.magnificationFilter = .nearest
-        imageView.layer.minificationFilter = .nearest
+        pixelView.grid.lineWidth = 1
+        pixelView.grid.color = .lightGray
+        pixelView.imageView.image = UIImage(named: "Coal 4")
+        pixelView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalToConstant: 256),
-            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor)
+            pixelView.widthAnchor.constraint(equalTo: pixelView.heightAnchor)
         ])
-        
-        gridView = GridView()
-        imageView.addSubview(gridView)
-        gridView.color = .lightGray
         
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 35, height: 45)
@@ -65,17 +59,17 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(container)
-        container.addSubview(imageView)
+        container.addSubview(pixelView)
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            pixelView.leadingAnchor.constraint(equalToSystemSpacingAfter: container.leadingAnchor, multiplier: 2),
+            container.trailingAnchor.constraint(equalToSystemSpacingAfter: pixelView.trailingAnchor, multiplier: 2),
+            pixelView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            pixelView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             container.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             container.topAnchor.constraint(equalTo: view.topAnchor),
             container.bottomAnchor.constraint(equalTo: colorPalette.topAnchor)
         ])
-        
-
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
