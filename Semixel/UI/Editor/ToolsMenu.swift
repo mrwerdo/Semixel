@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Geometry
+import SemixelCore
 
 /*
  ToolsMenu could be improved to satisfy the following:

@@ -8,35 +8,38 @@
 
 import SwiftUI
 
-struct RGBA: Equatable, HasDefaultColor, Codable, Hashable {
-    var red: CGFloat
-    var green: CGFloat
-    var blue: CGFloat
-    var alpha: CGFloat
+@frozen
+public struct RGBA: Equatable, HasDefaultColor, Codable, Hashable {
+    public var red: CGFloat
+    public var green: CGFloat
+    public var blue: CGFloat
+    public var alpha: CGFloat
     
-    static var white: RGBA {
+    public static var white: RGBA {
         return RGBA(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
     }
     
-    static var clear: RGBA {
+    public static var clear: RGBA {
         return RGBA(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
     }
     
-    init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+    @inlinable
+    public init(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
         self.red = red
         self.green = green
         self.blue = blue
         self.alpha = alpha
     }
     
-    init?(_ color: Color) {
+    @available(iOS 14.0, *)
+    public init?(_ color: Color) {
         red = 0; green = 0; blue = 0; alpha = 0
         guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
             return nil
         }
     }
     
-    init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
+    public init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
         self.init(
             red: CGFloat(red)/255,
             green: CGFloat(green)/255,
@@ -63,14 +66,14 @@ extension RGBA {
 //    /* Object */
 //    {"Xiketic":"03071e","Dark Sienna":"370617","Rosewood":"6a040f","Dark Red":"9d0208","Rosso Corsa":"d00000","Vermilion":"dc2f02","Persimmon":"e85d04","Carrot Orange":"f48c06","Orange Web":"faa307","Selective Yellow":"ffba08"}
     
-    static let defaultColorPalette: [RGBA] = [
+    public static let defaultColorPalette: [RGBA] = [
         "f72585", "b5179e", "7209b7", "560bad", "480ca8",
         "3a0ca3", "3f37c9", "4361ee", "4895ef", "4cc9f0",
         // Second one
         "03071e","370617","6a040f","9d0208","d00000","dc2f02","e85d04","f48c06","faa307","ffba08",
     ].compactMap(RGBA.init(hex:))
     
-    init?(hex: String) {
+    public init?(hex: String) {
         if hex.count == 6, let value = Int(hex, radix: 16) {
             red = CGFloat((value & 0xFF0000) >> 16) / 0xFF
             green = CGFloat((value & 0x00FF00) >> 8) / 0xFF

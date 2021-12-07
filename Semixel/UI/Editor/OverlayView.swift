@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Geometry
+import SemixelCore
 
 struct OverlayView: View {
     var pixelSize: CGSize

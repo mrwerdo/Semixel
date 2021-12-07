@@ -8,15 +8,16 @@
 
 import Foundation
 import CoreGraphics
+import Geometry
 
-struct SelectedRegion {
-    enum UpdateMode {
+public struct SelectedRegion {
+    public enum UpdateMode {
         case toggle
         case deselect
         case select
     }
     
-    init(size: Size2D, default: Bool = false) {
+    public init(size: Size2D, default: Bool = false) {
         self.size = size
         selectionBuffer = [Bool](repeating: `default`, count: size.width * size.height)
     }
@@ -28,7 +29,7 @@ struct SelectedRegion {
         return 0..<size.width ~= p.x && 0..<size.height ~= p.y
     }
     
-    mutating func update(points: [Point2D], mode: UpdateMode) {
+    public mutating func update(points: [Point2D], mode: UpdateMode) {
         for point in points {
             assert(isValid(point))
             switch mode {
@@ -42,7 +43,7 @@ struct SelectedRegion {
         }
     }
     
-    func boundingPath(horizontalFlip: Bool, verticalFlip: Bool) -> CGPath {
+    public func boundingPath(horizontalFlip: Bool, verticalFlip: Bool) -> CGPath {
         let path = CGMutablePath()
         
         let ha: Int = horizontalFlip ? 1 : 0
@@ -71,7 +72,7 @@ struct SelectedRegion {
         return path
     }
     
-    var selectedPoints: [Point2D] {
+    public var selectedPoints: [Point2D] {
         var points: [Point2D] = []
         for y in 0..<size.height {
             for x in 0..<size.width {
@@ -83,7 +84,7 @@ struct SelectedRegion {
         return points
     }
     
-    var boundingRectangle: Rect2D {
+    public var boundingRectangle: Rect2D {
         let points = selectedPoints
         if points.count > 0 {
             var r = Rect2D(c1: points.first!, c2: points.first!)
@@ -104,7 +105,7 @@ struct SelectedRegion {
         var end: Point2D
     }
     
-    func isSelected(at x: Int, _ y: Int, default: Bool) -> Bool {
+    public func isSelected(at x: Int, _ y: Int, default: Bool) -> Bool {
         return (isValid(Point2D(x: x, y: y)) && selectionBuffer[y * size.width + x]) || `default`
     }
     

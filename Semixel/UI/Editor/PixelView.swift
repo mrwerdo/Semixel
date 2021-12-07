@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Geometry
+import SemixelCore
 
 #if canImport(UIKit)
 extension View {

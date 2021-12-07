@@ -3,14 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		86043AFE2592E9AB0057B747 /* PixelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86043AFD2592E9AB0057B747 /* PixelView.swift */; };
 		860FB303258AC6460014A0E1 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860FB302258AC6460014A0E1 /* CollectionView.swift */; };
 		8617E52A2592CF6600D7460B /* SemixelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8617E5292592CF6600D7460B /* SemixelApp.swift */; };
-		861A23BE25DDFB7B00F365E5 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861A23BD25DDFB7B00F365E5 /* History.swift */; };
 		862609A825B7BAEF00B325E4 /* ProjectSyncSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862609A625B7BAEF00B325E4 /* ProjectSyncSession.swift */; };
 		862609A925B7BAEF00B325E4 /* ProjectSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862609A725B7BAEF00B325E4 /* ProjectSyncService.swift */; };
 		864E74D924B714B20000A1AB /* ArtworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864E74D824B714B20000A1AB /* ArtworkView.swift */; };
@@ -20,26 +19,14 @@
 		8650E40625BAB9F70026AE24 /* ArtworkMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */; };
 		86554BAF259040B3001864D6 /* SemanticIdentifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */; };
 		8660200025AC33B000BC6CC7 /* initialize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86601FFF25AC33B000BC6CC7 /* initialize.swift */; };
-		8660200325AD1CB400BC6CC7 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8660200225AD1CB400BC6CC7 /* ArtworkStore.swift */; };
 		866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 866C99BB2581D60F00FAEF03 /* Default Artwork */; };
-		866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C99BF2581D6CC00FAEF03 /* PixelImage.swift */; };
 		866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE89D2594482B0036B3E3 /* ToolsMenu.swift */; };
-		86764CFF25E07E990019E304 /* Point2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764CFE25E07E990019E304 /* Point2D.swift */; };
-		86764D0225E0800C0019E304 /* Size2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764D0125E0800C0019E304 /* Size2D.swift */; };
-		86764D0525E080610019E304 /* Rect2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764D0425E080610019E304 /* Rect2D.swift */; };
-		86764D0C25E0841F0019E304 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764D0B25E0841F0019E304 /* CGPoint.swift */; };
-		86764D1025E084750019E304 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764D0F25E084750019E304 /* CGSize.swift */; };
-		86764D1325E0847B0019E304 /* CGRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86764D1225E0847B0019E304 /* CGRect.swift */; };
-		867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867DD94F25901A770013E03D /* SemanticArtwork.swift */; };
 		867F396225CE50270047B714 /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867F396125CE50270047B714 /* DragView.swift */; };
-		868D3FDF25AED39E0018D754 /* ArtworkFileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868D3FDE25AED39E0018D754 /* ArtworkFileSystem.swift */; };
-		868D3FE325AEDE950018D754 /* ignore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868D3FE225AEDE950018D754 /* ignore.swift */; };
 		869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImageView.swift */; };
 		869C823C25902DD500B0235E /* ToolType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823B25902DD500B0235E /* ToolType.swift */; };
 		869C824225902E2E00B0235E /* ToolButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824125902E2E00B0235E /* ToolButton.swift */; };
 		869C824525902E5400B0235E /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824425902E5400B0235E /* OverlayView.swift */; };
 		869C824825902E6200B0235E /* ColorPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824725902E6200B0235E /* ColorPaletteView.swift */; };
-		869C824E25902E9200B0235E /* SemanticColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824D25902E9200B0235E /* SemanticColor.swift */; };
 		869F4E04275EDE5A00328FBC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E03275EDE5A00328FBC /* AppDelegate.swift */; };
 		869F4E06275EDE5A00328FBC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E05275EDE5A00328FBC /* SceneDelegate.swift */; };
 		869F4E08275EDE5A00328FBC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E07275EDE5A00328FBC /* ViewController.swift */; };
@@ -49,10 +36,14 @@
 		869F4E16275EE13000328FBC /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E15275EE12F00328FBC /* GridView.swift */; };
 		869F4E18275EF43600328FBC /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E17275EF43600328FBC /* ColorPalette.swift */; };
 		869F4E1A275EF77E00328FBC /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E19275EF77E00328FBC /* ColorPickerView.swift */; };
+		869F993227601A740005FF31 /* SemixelCore in Frameworks */ = {isa = PBXBuildFile; productRef = 869F993127601A740005FF31 /* SemixelCore */; };
+		869F993427601A7C0005FF31 /* SemixelCore in Frameworks */ = {isa = PBXBuildFile; productRef = 869F993327601A7C0005FF31 /* SemixelCore */; };
+		869F993627601D5D0005FF31 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F993527601D5D0005FF31 /* ArtworkStore.swift */; };
+		869F99382760203F0005FF31 /* SemanticArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F99372760203F0005FF31 /* SemanticArtwork.swift */; };
+		869F993A276020640005FF31 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F9939276020640005FF31 /* History.swift */; };
+		869F993C2760207A0005FF31 /* SemanticColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F993B2760207A0005FF31 /* SemanticColor.swift */; };
 		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
-		86C31C7425986113006350FB /* SelectedRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C31C7325986113006350FB /* SelectedRegion.swift */; };
 		86CDD36C275F17E8009A2569 /* PixelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CDD36B275F17E8009A2569 /* PixelView.swift */; };
-		86F52043259015D000C19E41 /* RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F52042259015D000C19E41 /* RGBA.swift */; };
 		86F520462590164300C19E41 /* FolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520452590164300C19E41 /* FolderMonitor.swift */; };
 		86F520542590190D00C19E41 /* PixelImage+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F520532590190D00C19E41 /* PixelImage+UIImage.swift */; };
 /* End PBXBuildFile section */
@@ -61,7 +52,6 @@
 		86043AFD2592E9AB0057B747 /* PixelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelView.swift; sourceTree = "<group>"; };
 		860FB302258AC6460014A0E1 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		8617E5292592CF6600D7460B /* SemixelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemixelApp.swift; sourceTree = "<group>"; };
-		861A23BD25DDFB7B00F365E5 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		862609A425B7BA5500B325E4 /* ProjectSync */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ProjectSync; sourceTree = "<group>"; };
 		862609A625B7BAEF00B325E4 /* ProjectSyncSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectSyncSession.swift; sourceTree = "<group>"; };
 		862609A725B7BAEF00B325E4 /* ProjectSyncService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectSyncService.swift; sourceTree = "<group>"; };
@@ -74,26 +64,14 @@
 		8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkMetadataView.swift; sourceTree = "<group>"; };
 		86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticIdentifierView.swift; sourceTree = "<group>"; };
 		86601FFF25AC33B000BC6CC7 /* initialize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = initialize.swift; sourceTree = "<group>"; };
-		8660200225AD1CB400BC6CC7 /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
 		866C99BB2581D60F00FAEF03 /* Default Artwork */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Default Artwork"; sourceTree = "<group>"; };
-		866C99BF2581D6CC00FAEF03 /* PixelImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelImage.swift; sourceTree = "<group>"; };
 		866DE89D2594482B0036B3E3 /* ToolsMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsMenu.swift; sourceTree = "<group>"; };
-		86764CFE25E07E990019E304 /* Point2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point2D.swift; sourceTree = "<group>"; };
-		86764D0125E0800C0019E304 /* Size2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Size2D.swift; sourceTree = "<group>"; };
-		86764D0425E080610019E304 /* Rect2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rect2D.swift; sourceTree = "<group>"; };
-		86764D0B25E0841F0019E304 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
-		86764D0F25E084750019E304 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
-		86764D1225E0847B0019E304 /* CGRect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRect.swift; sourceTree = "<group>"; };
-		867DD94F25901A770013E03D /* SemanticArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticArtwork.swift; sourceTree = "<group>"; };
 		867F396125CE50270047B714 /* DragView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragView.swift; sourceTree = "<group>"; };
-		868D3FDE25AED39E0018D754 /* ArtworkFileSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkFileSystem.swift; sourceTree = "<group>"; };
-		868D3FE225AEDE950018D754 /* ignore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ignore.swift; sourceTree = "<group>"; };
 		869C823725902D7C00B0235E /* PixelGridImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelGridImageView.swift; sourceTree = "<group>"; };
 		869C823B25902DD500B0235E /* ToolType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolType.swift; sourceTree = "<group>"; };
 		869C824125902E2E00B0235E /* ToolButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolButton.swift; sourceTree = "<group>"; };
 		869C824425902E5400B0235E /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
 		869C824725902E6200B0235E /* ColorPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPaletteView.swift; sourceTree = "<group>"; };
-		869C824D25902E9200B0235E /* SemanticColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticColor.swift; sourceTree = "<group>"; };
 		869F4E01275EDE5A00328FBC /* Semixel-UIKIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Semixel-UIKIt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		869F4E03275EDE5A00328FBC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		869F4E05275EDE5A00328FBC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -105,10 +83,13 @@
 		869F4E15275EE12F00328FBC /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 		869F4E17275EF43600328FBC /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
 		869F4E19275EF77E00328FBC /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
+		869F9930276019FE0005FF31 /* SemixelCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SemixelCore; sourceTree = "<group>"; };
+		869F993527601D5D0005FF31 /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
+		869F99372760203F0005FF31 /* SemanticArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticArtwork.swift; sourceTree = "<group>"; };
+		869F9939276020640005FF31 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
+		869F993B2760207A0005FF31 /* SemanticColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticColor.swift; sourceTree = "<group>"; };
 		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
-		86C31C7325986113006350FB /* SelectedRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedRegion.swift; sourceTree = "<group>"; };
 		86CDD36B275F17E8009A2569 /* PixelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelView.swift; sourceTree = "<group>"; };
-		86F52042259015D000C19E41 /* RGBA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGBA.swift; sourceTree = "<group>"; };
 		86F520452590164300C19E41 /* FolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMonitor.swift; sourceTree = "<group>"; };
 		86F520532590190D00C19E41 /* PixelImage+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PixelImage+UIImage.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				869F993227601A740005FF31 /* SemixelCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +107,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				869F993427601A7C0005FF31 /* SemixelCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +135,7 @@
 		864E74C824B714B20000A1AB = {
 			isa = PBXGroup;
 			children = (
+				869F9930276019FE0005FF31 /* SemixelCore */,
 				862609A425B7BA5500B325E4 /* ProjectSync */,
 				864E74D324B714B20000A1AB /* Semixel */,
 				869F4E02275EDE5A00328FBC /* Semixel-UIKIt */,
@@ -173,7 +157,6 @@
 			isa = PBXGroup;
 			children = (
 				86ADB31D259013DA00F59A39 /* UI */,
-				86ADB31C259013CB00F59A39 /* Core */,
 				86F5204C259017FC00C19E41 /* Support */,
 				86ADB31E2590142500F59A39 /* Other */,
 				866C99BB2581D60F00FAEF03 /* Default Artwork */,
@@ -205,21 +188,6 @@
 				869F4E11275EDE5C00328FBC /* Info.plist */,
 			);
 			path = "Semixel-UIKIt";
-			sourceTree = "<group>";
-		};
-		86ADB31C259013CB00F59A39 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				866C99BF2581D6CC00FAEF03 /* PixelImage.swift */,
-				86F52042259015D000C19E41 /* RGBA.swift */,
-				869C824D25902E9200B0235E /* SemanticColor.swift */,
-				867DD94F25901A770013E03D /* SemanticArtwork.swift */,
-				86C31C7325986113006350FB /* SelectedRegion.swift */,
-				8660200225AD1CB400BC6CC7 /* ArtworkStore.swift */,
-				868D3FDE25AED39E0018D754 /* ArtworkFileSystem.swift */,
-				861A23BD25DDFB7B00F365E5 /* History.swift */,
-			);
-			path = Core;
 			sourceTree = "<group>";
 		};
 		86ADB31D259013DA00F59A39 /* UI */ = {
@@ -254,18 +222,15 @@
 		86F5204C259017FC00C19E41 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+				869F993B2760207A0005FF31 /* SemanticColor.swift */,
+				869F9939276020640005FF31 /* History.swift */,
+				869F99372760203F0005FF31 /* SemanticArtwork.swift */,
+				869F993527601D5D0005FF31 /* ArtworkStore.swift */,
 				862609A725B7BAEF00B325E4 /* ProjectSyncService.swift */,
 				862609A625B7BAEF00B325E4 /* ProjectSyncSession.swift */,
 				86F520452590164300C19E41 /* FolderMonitor.swift */,
 				86F520532590190D00C19E41 /* PixelImage+UIImage.swift */,
 				86601FFF25AC33B000BC6CC7 /* initialize.swift */,
-				868D3FE225AEDE950018D754 /* ignore.swift */,
-				86764D1225E0847B0019E304 /* CGRect.swift */,
-				86764D0F25E084750019E304 /* CGSize.swift */,
-				86764D0B25E0841F0019E304 /* CGPoint.swift */,
-				86764CFE25E07E990019E304 /* Point2D.swift */,
-				86764D0425E080610019E304 /* Rect2D.swift */,
-				86764D0125E0800C0019E304 /* Size2D.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -287,6 +252,7 @@
 			);
 			name = Semixel;
 			packageProductDependencies = (
+				869F993127601A740005FF31 /* SemixelCore */,
 			);
 			productName = Semixel;
 			productReference = 864E74D124B714B20000A1AB /* Semixel.app */;
@@ -305,6 +271,9 @@
 			dependencies = (
 			);
 			name = "Semixel-UIKIt";
+			packageProductDependencies = (
+				869F993327601A7C0005FF31 /* SemixelCore */,
+			);
 			productName = "Semixel-UIKIt";
 			productReference = 869F4E01275EDE5A00328FBC /* Semixel-UIKIt.app */;
 			productType = "com.apple.product-type.application";
@@ -378,39 +347,28 @@
 			files = (
 				86554BAF259040B3001864D6 /* SemanticIdentifierView.swift in Sources */,
 				8650E40625BAB9F70026AE24 /* ArtworkMetadataView.swift in Sources */,
-				866C99C02581D6CC00FAEF03 /* PixelImage.swift in Sources */,
 				86043AFE2592E9AB0057B747 /* PixelView.swift in Sources */,
 				86F520462590164300C19E41 /* FolderMonitor.swift in Sources */,
 				866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */,
-				86F52043259015D000C19E41 /* RGBA.swift in Sources */,
-				86764D1325E0847B0019E304 /* CGRect.swift in Sources */,
-				86764CFF25E07E990019E304 /* Point2D.swift in Sources */,
-				86764D0525E080610019E304 /* Rect2D.swift in Sources */,
 				8617E52A2592CF6600D7460B /* SemixelApp.swift in Sources */,
-				868D3FDF25AED39E0018D754 /* ArtworkFileSystem.swift in Sources */,
 				869C823C25902DD500B0235E /* ToolType.swift in Sources */,
-				869C824E25902E9200B0235E /* SemanticColor.swift in Sources */,
 				869C824525902E5400B0235E /* OverlayView.swift in Sources */,
 				869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */,
 				867F396225CE50270047B714 /* DragView.swift in Sources */,
-				867DD95025901A770013E03D /* SemanticArtwork.swift in Sources */,
-				86764D1025E084750019E304 /* CGSize.swift in Sources */,
+				869F99382760203F0005FF31 /* SemanticArtwork.swift in Sources */,
 				860FB303258AC6460014A0E1 /* CollectionView.swift in Sources */,
 				8660200025AC33B000BC6CC7 /* initialize.swift in Sources */,
+				869F993A276020640005FF31 /* History.swift in Sources */,
 				869C824825902E6200B0235E /* ColorPaletteView.swift in Sources */,
 				862609A925B7BAEF00B325E4 /* ProjectSyncService.swift in Sources */,
-				868D3FE325AEDE950018D754 /* ignore.swift in Sources */,
-				86C31C7425986113006350FB /* SelectedRegion.swift in Sources */,
 				8650E3FA25B93CE90026AE24 /* HalfModalView.swift in Sources */,
-				861A23BE25DDFB7B00F365E5 /* History.swift in Sources */,
+				869F993C2760207A0005FF31 /* SemanticColor.swift in Sources */,
 				869C824225902E2E00B0235E /* ToolButton.swift in Sources */,
 				864E74D924B714B20000A1AB /* ArtworkView.swift in Sources */,
 				86F520542590190D00C19E41 /* PixelImage+UIImage.swift in Sources */,
+				869F993627601D5D0005FF31 /* ArtworkStore.swift in Sources */,
 				86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */,
 				862609A825B7BAEF00B325E4 /* ProjectSyncSession.swift in Sources */,
-				86764D0C25E0841F0019E304 /* CGPoint.swift in Sources */,
-				86764D0225E0800C0019E304 /* Size2D.swift in Sources */,
-				8660200325AD1CB400BC6CC7 /* ArtworkStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -701,6 +659,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		869F993127601A740005FF31 /* SemixelCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SemixelCore;
+		};
+		869F993327601A7C0005FF31 /* SemixelCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SemixelCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 864E74C924B714B20000A1AB /* Project object */;
 }

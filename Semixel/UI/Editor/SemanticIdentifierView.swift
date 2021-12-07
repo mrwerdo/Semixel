@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SemixelCore
 
 struct MultipleSelectionRow: View {
     var title: String

@@ -9,6 +9,8 @@
 import SwiftUI
 import UIKit
 import Combine
+import Geometry
+import SemixelCore
 
 struct CollectionView: UIViewControllerRepresentable {
     @EnvironmentObject

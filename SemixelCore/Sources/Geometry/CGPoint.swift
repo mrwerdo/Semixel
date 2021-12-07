@@ -8,12 +8,15 @@
 
 import CoreGraphics
 
-extension CGPoint {
+public extension CGPoint {
+    @inlinable
     init(_ cgsize: CGSize) {
         self.init()
         self.x = cgsize.width
         self.y = cgsize.height
     }
+    
+    @inlinable
     init(_ v: CGVector) {
         self.init()
         x = v.dx
@@ -23,6 +26,7 @@ extension CGPoint {
 
 public extension CGPoint {
 
+    @inlinable
     static func +(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(
             x: lhs.x + rhs.x,
@@ -30,6 +34,7 @@ public extension CGPoint {
         )
     }
 
+    @inlinable
     static func -(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(
             x: lhs.x - rhs.x,
@@ -37,6 +42,7 @@ public extension CGPoint {
         )
     }
 
+    @inlinable
     static func *(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(
             x: lhs.x * rhs.x,
@@ -44,6 +50,7 @@ public extension CGPoint {
         )
     }
 
+    @inlinable
     static func /(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(
             x: lhs.x / rhs.x,
@@ -51,6 +58,7 @@ public extension CGPoint {
         )
     }
 
+    @inlinable
     static prefix func -(arg: CGPoint) -> CGPoint {
         return CGPoint(
             x: -arg.x,
@@ -58,21 +66,25 @@ public extension CGPoint {
         )
     }
 
+    @inlinable
     static func +=(lhs: inout CGPoint, rhs: CGPoint) {
         lhs.x += rhs.x
         lhs.y += rhs.y
     }
 
+    @inlinable
     static func -=(lhs: inout CGPoint, rhs: CGPoint) {
         lhs.x -= rhs.x
         lhs.y -= rhs.y
     }
 
+    @inlinable
     static func *=(lhs: inout CGPoint, rhs: CGPoint) {
         lhs.x *= rhs.x
         lhs.y *= rhs.y
     }
 
+    @inlinable
     static func /=(lhs: inout CGPoint, rhs: CGPoint) {
         lhs.x /= rhs.x
         lhs.y /= rhs.y

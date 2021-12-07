@@ -7,10 +7,12 @@
 //
 
 
+@frozen
 public struct Size2D : Codable, Equatable, Hashable {
     public var width: Int
     public var height: Int
     
+    @inlinable
     public init(width: Int, height: Int) {
         self.width = width
         self.height = height
@@ -28,41 +30,50 @@ public extension Size2D {
 }
 
 public extension Size2D {
+    @inlinable
     static func +(lhs: Size2D, rhs: Size2D) -> Size2D {
         Size2D(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
     }
 
+    @inlinable
     static func -(lhs: Size2D, rhs: Size2D) -> Size2D {
         Size2D(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
     }
 
+    @inlinable
     static func *(lhs: Size2D, rhs: Size2D) -> Size2D {
         Size2D(width: lhs.width * rhs.width, height: lhs.height * rhs.height)
     }
 
+    @inlinable
     static func /(lhs: Size2D, rhs: Size2D) -> Size2D {
         Size2D(width: lhs.width / rhs.width, height: lhs.height / rhs.height)
     }
 
+    @inlinable
     static prefix func -(arg: Size2D) -> Size2D {
         Size2D(width: -arg.width, height: -arg.height)
     }
 
+    @inlinable
     static func +=(lhs: inout Size2D, rhs: Size2D) {
         lhs.width += rhs.width
         lhs.height += rhs.height
     }
 
+    @inlinable
     static func -=(lhs: inout Size2D, rhs: Size2D) {
         lhs.width -= rhs.width
         lhs.height -= rhs.height
     }
 
+    @inlinable
     static func *=(lhs: inout Size2D, rhs: Size2D) {
         lhs.width *= rhs.width
         lhs.height *= rhs.height
     }
 
+    @inlinable
     static func /=(lhs: inout Size2D, rhs: Size2D) {
         lhs.width /= rhs.width
         lhs.height /= rhs.height
@@ -70,21 +81,25 @@ public extension Size2D {
 }
 
 public extension Size2D {
+    @inlinable
     static func *=(a: inout Size2D, b: Int) {
         a.width *= b
         a.height *= b
     }
     
+    @inlinable
     static func +=(a: inout Size2D, b: Int)  {
         a.width += b
         a.height += b
     }
     
+    @inlinable
     static func -=(a: inout Size2D, b: Int) {
         a.width -= b
         a.height -= b
     }
     
+    @inlinable
     static func /=(a: inout Size2D, b: Int) {
         a.width /= b
         a.height /= b
@@ -92,18 +107,22 @@ public extension Size2D {
 }
 
 public extension Size2D {
+    @inlinable
     static func *(a: Size2D, b: Int) -> Size2D {
         Size2D(width: a.width * b, height: a.height * b)
     }
     
+    @inlinable
     static func *(a: Int, b: Size2D) -> Size2D {
         Size2D(width: b.width * a, height: b.height * a)
     }
     
+    @inlinable
     static func /(a: Size2D, b: Int) -> Size2D {
         Size2D(width: a.width / b, height: a.height / b)
     }
     
+    @inlinable
     static func /(a: Int, b: Size2D) -> Size2D {
         Size2D(width: b.width * a, height: b.height * a)
     }

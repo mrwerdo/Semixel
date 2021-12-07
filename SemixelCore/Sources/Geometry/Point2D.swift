@@ -6,56 +6,68 @@
 //  Copyright © 2021 Andrew Thompson. All rights reserved.
 //
 
+@frozen
 public struct Point2D: Codable, Equatable, Hashable {
     public var x: Int
     public var y: Int
     
+    @inlinable
     public init(x: Int = 0, y: Int = 0) {
         self.x = x
         self.y = y
     }
     
+    @inlinable
     public static var zero: Point2D {
         return Point2D()
     }
 }
 
 public extension Point2D {
+    @inlinable
     static func +(lhs: Point2D, rhs: Point2D) -> Point2D {
         Point2D(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
     }
 
+    @inlinable
     static func -(lhs: Point2D, rhs: Point2D) -> Point2D {
         Point2D(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }
 
+    @inlinable
     static func *(lhs: Point2D, rhs: Point2D) -> Point2D {
         Point2D(x: lhs.x * rhs.x, y: lhs.y * rhs.y)
     }
 
+    @inlinable
     static func /(lhs: Point2D, rhs: Point2D) -> Point2D {
         Point2D(x: lhs.x / rhs.x, y: lhs.y / rhs.y)
     }
 
+    @inlinable
     static prefix func -(arg: Point2D) -> Point2D {
         Point2D(x: -arg.x, y: -arg.y)
     }
 
+    @inlinable
     static func +=(lhs: inout Point2D, rhs: Point2D) {
         lhs.x += rhs.x
         lhs.y += rhs.y
     }
 
+    @inlinable
     static func -=(lhs: inout Point2D, rhs: Point2D) {
         lhs.x -= rhs.x
         lhs.y -= rhs.y
     }
 
+    @inlinable
     static func *=(lhs: inout Point2D, rhs: Point2D) {
         lhs.x *= rhs.x
         lhs.y *= rhs.y
     }
 
+    @inlinable
     static func /=(lhs: inout Point2D, rhs: Point2D) {
         lhs.x /= rhs.x
         lhs.y /= rhs.y
@@ -63,19 +75,25 @@ public extension Point2D {
 }
 
 public extension Point2D {
+    @inlinable
     static func *=(a: inout Self, b: Int) {
         a.x *= b
         a.y *= b
     }
     
+    @inlinable
     static func +=(a: inout Self, b: Int)  {
         a.x += b
         a.y += b
     }
+    
+    @inlinable
     static func -=(a: inout Self, b: Int) {
         a.x -= b
         a.y -= b
     }
+    
+    @inlinable
     static func /=(a: inout Self, b: Int) {
         a.x /= b
         a.y /= b
@@ -84,24 +102,28 @@ public extension Point2D {
 
 public extension Point2D {
     
+    @inlinable
     static func *(a: Point2D, b: Int) -> Self {
         var i = a
         i *= b
         return i
     }
     
+    @inlinable
     static func *(a: Int, b: Point2D) -> Self {
         var i = b
         i *= a
         return i
     }
     
+    @inlinable
     static func /(a: Point2D, b: Int) -> Self {
         var i = a
         i /= b
         return i
     }
     
+    @inlinable
     static func /(a: Int, b: Point2D) -> Self {
         var i = b
         i /= a
@@ -109,7 +131,7 @@ public extension Point2D {
     }
 }
 
-extension Point2D {
+public extension Point2D {
     func line(to point: Point2D) -> [Point2D] {
         // See the algorithm here: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 

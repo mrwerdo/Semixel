@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Geometry
+import SemixelCore
 
 struct DragView<Content: View>: View {
     var imageSize: Size2D

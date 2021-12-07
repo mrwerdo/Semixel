@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SemixelCore
 
 struct WritingError: Error, CustomStringConvertible {
     var description: String
@@ -16,7 +17,7 @@ extension PixelImage where ColorType == RGBA {
     init(uiImage: UIImage) {
         self.init(width: uiImage.width, height: uiImage.height)
         uiImage.enumeratePixels { (x, y, color) in
-            buffer[y * size.width + x] = color
+            self[x, y] = color
         }
     }
 }

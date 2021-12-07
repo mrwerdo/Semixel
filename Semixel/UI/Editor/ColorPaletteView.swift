@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SemixelCore
 
 struct ColorTab<T: Equatable>: View {
     var color: RGBA

@@ -8,6 +8,8 @@
 
 import Foundation
 import MultipeerConnectivity
+import Geometry
+import SemixelCore
 
 struct SyncRequest: Codable {
     let project: String?

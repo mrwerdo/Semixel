@@ -10,6 +10,8 @@ import Foundation
 import UIKit
 import SwiftUI
 import Combine
+import Geometry
+import SemixelCore
 
 final class SemanticArtwork: Identifiable, ObservableObject {
     let id: String

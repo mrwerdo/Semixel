@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import Geometry
+import SemixelCore
 
 // History is stored as a tree of changes from a base image. The head of the history is the
 // current state of the document. There can be multiple heads if there are different versions of the

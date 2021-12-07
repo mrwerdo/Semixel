@@ -9,36 +9,37 @@
 import Foundation
 import SwiftUI
 import UIKit
+import Geometry
 
-protocol HasDefaultColor {
+public protocol HasDefaultColor {
     static var clear: Self { get }
 }
 
-struct PixelImage<ColorType> {
+public struct PixelImage<ColorType> {
     
-    var buffer: [ColorType]
-    private(set) var size: Size2D
+    public private(set) var buffer: [ColorType]
+    public private(set) var size: Size2D
     
-    init(copy: PixelImage) {
+    public init(copy: PixelImage) {
         buffer = copy.buffer
         size = copy.size
     }
     
-    init(width: Int, height: Int, default: ColorType) {
+    public init(width: Int, height: Int, default: ColorType) {
         buffer = [ColorType](repeating: `default`, count: width * height)
         size = Size2D(width: width, height: height)
     }
     
-    init(size: Size2D, buffer: [ColorType]) {
+    public init(size: Size2D, buffer: [ColorType]) {
         self.buffer = buffer
         self.size = size
     }
     
-    func isValid(_ point: Point2D) -> Bool {
+    public func isValid(_ point: Point2D) -> Bool {
         return point.x >= 0 && point.x < size.width && point.y >= 0 && point.y < size.height
     }
     
-    func floodSearch(at point: Point2D, isIncluded: (_ point: Point2D, _ color: ColorType) -> Bool) -> [Point2D] {
+    public func floodSearch(at point: Point2D, isIncluded: (_ point: Point2D, _ color: ColorType) -> Bool) -> [Point2D] {
         var unvisitedPoints: [Point2D] = [point]
         var points = unvisitedPoints
         
@@ -62,7 +63,7 @@ struct PixelImage<ColorType> {
         return points
     }
     
-    subscript(x: Int, y: Int) -> ColorType {
+    public subscript(x: Int, y: Int) -> ColorType {
         get {
             return buffer[y * size.width + x]
         }
@@ -72,7 +73,7 @@ struct PixelImage<ColorType> {
         }
     }
     
-    subscript(point: Point2D) -> ColorType {
+    public subscript(point: Point2D) -> ColorType {
         get {
             return self[point.x, point.y]
         }
@@ -83,7 +84,7 @@ struct PixelImage<ColorType> {
     }
 }
 
-extension PixelImage where ColorType: HasDefaultColor {
+public extension PixelImage where ColorType: HasDefaultColor {
     init(width: Int, height: Int) {
         buffer = [ColorType](repeating: .clear, count: width * height)
         size = Size2D(width: width, height: height)
@@ -105,7 +106,7 @@ extension PixelImage where ColorType: HasDefaultColor {
 extension PixelImage: Codable where ColorType: Codable { }
 extension PixelImage: Equatable where ColorType: Equatable { }
 
-extension PixelImage {
+public extension PixelImage {
     func moveRectangle(between p1: Point2D, and p2: Point2D, by offset: Point2D, background: ColorType) -> PixelImage {
         let a = Point2D(x: min(p1.x, p2.x), y: min(p1.y, p2.y))
         let b = Point2D(x: max(p1.x, p2.x), y: max(p1.y, p2.y))
@@ -142,9 +143,7 @@ extension PixelImage {
         }
         return img
     }
-}
-
-extension PixelImage {
+    
     func transform(selection: SelectedRegion, horizontalFlip: Bool, verticalFlip: Bool, offset: Point2D, background: ColorType) -> PixelImage {
         if !verticalFlip && !horizontalFlip && offset == .zero {
             return self

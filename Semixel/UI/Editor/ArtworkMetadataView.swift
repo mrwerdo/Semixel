@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import Geometry
+import SemixelCore
 
 struct ArtworkMetadataView: View {
     @EnvironmentObject var metadata: ArtworkMetadata

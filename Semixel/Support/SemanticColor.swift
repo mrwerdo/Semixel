@@ -9,27 +9,29 @@
 import UIKit
 import Combine
 import SwiftUI
+import SemixelCore
 
-typealias ColorIdentifier = Int
+public typealias ColorIdentifier = Int
 
-struct IdentifiableColor: Identifiable, Equatable, Codable {
-    var id: ColorIdentifier
-    var color: RGBA
+public struct IdentifiableColor: Identifiable, Equatable, Codable {
+    public var id: ColorIdentifier
+    public var color: RGBA
     
-    init(id: ColorIdentifier, color: RGBA) {
+    public init(id: ColorIdentifier, color: RGBA) {
         self.id = id
         self.color = color
     }
 }
 
-class ColorPalette: ObservableObject {
+@available(iOS 14.0, *)
+public class ColorPalette: ObservableObject {
     @Published
-    var colors: [IdentifiableColor]
+    public var colors: [IdentifiableColor]
     
     @Published
-    var selectedIndex: Int = 0
+    public var selectedIndex: Int = 0
     
-    var currentColor: Binding<RGBA> {
+    public var currentColor: Binding<RGBA> {
         Binding { () -> RGBA in
             self[rgba: self.selectedIndex]
         } set: { (newValue) in
@@ -37,11 +39,11 @@ class ColorPalette: ObservableObject {
         }
     }
 
-    func color(with id: ColorIdentifier) -> IdentifiableColor? {
+    public func color(with id: ColorIdentifier) -> IdentifiableColor? {
         return colors.first { $0.id == id }
     }
 
-    func remove(id: ColorIdentifier) {
+    public func remove(id: ColorIdentifier) {
         if let oldIndex = colors.firstIndex(where: { $0.id == selectedIndex }) {
             if oldIndex > colors.startIndex {
                 let index = colors.index(before: oldIndex)
@@ -54,7 +56,7 @@ class ColorPalette: ObservableObject {
         colors.removeAll { $0.id == id }
     }
     
-    subscript(rgba id: ColorIdentifier) -> RGBA {
+    public subscript(rgba id: ColorIdentifier) -> RGBA {
         get { color(with: id)?.color ?? .clear }
         set {
             let index = colors.firstIndex(where: { $0.id == id })!
@@ -63,7 +65,7 @@ class ColorPalette: ObservableObject {
     }
     
     @discardableResult
-    func add(_ color: RGBA, updateSelection: Bool = false) -> ColorIdentifier {
+    public func add(_ color: RGBA, updateSelection: Bool = false) -> ColorIdentifier {
         let index = getNewId()
         colors.append(IdentifiableColor(id: index, color: color))
         
@@ -82,11 +84,11 @@ class ColorPalette: ObservableObject {
         return index
     }
     
-    init(colors: [Int: RGBA]) {
+    public init(colors: [Int: RGBA]) {
         self.colors = colors.map { IdentifiableColor(id: $0.key, color: $0.value) }
     }
     
-    init(_ colors: [IdentifiableColor]) {
+    public init(_ colors: [IdentifiableColor]) {
         self.colors = colors
     }
 }

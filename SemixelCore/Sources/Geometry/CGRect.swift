@@ -8,7 +8,8 @@
 
 import CoreGraphics
 
-extension CGRect {
+public extension CGRect {
+    @inlinable
     var center: CGPoint {
         get {
             return CGPoint(x: width / 2, y: height / 2) + origin
@@ -19,6 +20,7 @@ extension CGRect {
         }
     }
     
+    @inlinable
     var corners: [CGPoint] {
         let a = origin
         let b = origin + CGPoint(x: size.width, y: 0)

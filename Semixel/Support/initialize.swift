@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SemixelCore
 
 extension ProcessInfo {
     func env<T>(_ key: String, _ init: (String) -> T?, default: @autoclosure () -> T) -> T {

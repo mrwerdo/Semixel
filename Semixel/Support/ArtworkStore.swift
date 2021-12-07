@@ -8,6 +8,8 @@
 
 import Foundation
 import SwiftUI
+import Geometry
+import SemixelCore
 
 enum PixelType: String, Codable {
     case semantic
