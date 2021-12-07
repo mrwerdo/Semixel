@@ -40,6 +40,15 @@
 		869C824525902E5400B0235E /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824425902E5400B0235E /* OverlayView.swift */; };
 		869C824825902E6200B0235E /* ColorPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824725902E6200B0235E /* ColorPaletteView.swift */; };
 		869C824E25902E9200B0235E /* SemanticColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C824D25902E9200B0235E /* SemanticColor.swift */; };
+		869F4E04275EDE5A00328FBC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E03275EDE5A00328FBC /* AppDelegate.swift */; };
+		869F4E06275EDE5A00328FBC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E05275EDE5A00328FBC /* SceneDelegate.swift */; };
+		869F4E08275EDE5A00328FBC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E07275EDE5A00328FBC /* ViewController.swift */; };
+		869F4E0B275EDE5A00328FBC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 869F4E09275EDE5A00328FBC /* Main.storyboard */; };
+		869F4E0D275EDE5C00328FBC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 869F4E0C275EDE5C00328FBC /* Assets.xcassets */; };
+		869F4E10275EDE5C00328FBC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 869F4E0E275EDE5C00328FBC /* LaunchScreen.storyboard */; };
+		869F4E16275EE13000328FBC /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E15275EE12F00328FBC /* GridView.swift */; };
+		869F4E18275EF43600328FBC /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E17275EF43600328FBC /* ColorPalette.swift */; };
+		869F4E1A275EF77E00328FBC /* ColorPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869F4E19275EF77E00328FBC /* ColorPickerView.swift */; };
 		86BFA8E1254CFE0200DE3D1B /* PixelBufferView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */; };
 		86C31C7425986113006350FB /* SelectedRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C31C7325986113006350FB /* SelectedRegion.swift */; };
 		86F52043259015D000C19E41 /* RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F52042259015D000C19E41 /* RGBA.swift */; };
@@ -84,6 +93,17 @@
 		869C824425902E5400B0235E /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
 		869C824725902E6200B0235E /* ColorPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPaletteView.swift; sourceTree = "<group>"; };
 		869C824D25902E9200B0235E /* SemanticColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemanticColor.swift; sourceTree = "<group>"; };
+		869F4E01275EDE5A00328FBC /* Semixel-UIKIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Semixel-UIKIt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		869F4E03275EDE5A00328FBC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		869F4E05275EDE5A00328FBC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		869F4E07275EDE5A00328FBC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		869F4E0A275EDE5A00328FBC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		869F4E0C275EDE5C00328FBC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		869F4E0F275EDE5C00328FBC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		869F4E11275EDE5C00328FBC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		869F4E15275EE12F00328FBC /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
+		869F4E17275EF43600328FBC /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		869F4E19275EF77E00328FBC /* ColorPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerView.swift; sourceTree = "<group>"; };
 		86BFA8E0254CFE0200DE3D1B /* PixelBufferView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelBufferView.swift; sourceTree = "<group>"; };
 		86C31C7325986113006350FB /* SelectedRegion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedRegion.swift; sourceTree = "<group>"; };
 		86F52042259015D000C19E41 /* RGBA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGBA.swift; sourceTree = "<group>"; };
@@ -93,6 +113,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		864E74CE24B714B20000A1AB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		869F4DFE275EDE5A00328FBC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -125,6 +152,7 @@
 			children = (
 				862609A425B7BA5500B325E4 /* ProjectSync */,
 				864E74D324B714B20000A1AB /* Semixel */,
+				869F4E02275EDE5A00328FBC /* Semixel-UIKIt */,
 				864E74D224B714B20000A1AB /* Products */,
 				86B90BDC25565A1400DC7D55 /* Frameworks */,
 			);
@@ -134,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				864E74D124B714B20000A1AB /* Semixel.app */,
+				869F4E01275EDE5A00328FBC /* Semixel-UIKIt.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -156,6 +185,23 @@
 				864E74DD24B714B30000A1AB /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		869F4E02275EDE5A00328FBC /* Semixel-UIKIt */ = {
+			isa = PBXGroup;
+			children = (
+				869F4E03275EDE5A00328FBC /* AppDelegate.swift */,
+				869F4E05275EDE5A00328FBC /* SceneDelegate.swift */,
+				869F4E07275EDE5A00328FBC /* ViewController.swift */,
+				869F4E19275EF77E00328FBC /* ColorPickerView.swift */,
+				869F4E15275EE12F00328FBC /* GridView.swift */,
+				869F4E17275EF43600328FBC /* ColorPalette.swift */,
+				869F4E09275EDE5A00328FBC /* Main.storyboard */,
+				869F4E0C275EDE5C00328FBC /* Assets.xcassets */,
+				869F4E0E275EDE5C00328FBC /* LaunchScreen.storyboard */,
+				869F4E11275EDE5C00328FBC /* Info.plist */,
+			);
+			path = "Semixel-UIKIt";
 			sourceTree = "<group>";
 		};
 		86ADB31C259013CB00F59A39 /* Core */ = {
@@ -243,18 +289,38 @@
 			productReference = 864E74D124B714B20000A1AB /* Semixel.app */;
 			productType = "com.apple.product-type.application";
 		};
+		869F4E00275EDE5A00328FBC /* Semixel-UIKIt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 869F4E14275EDE5C00328FBC /* Build configuration list for PBXNativeTarget "Semixel-UIKIt" */;
+			buildPhases = (
+				869F4DFD275EDE5A00328FBC /* Sources */,
+				869F4DFE275EDE5A00328FBC /* Frameworks */,
+				869F4DFF275EDE5A00328FBC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Semixel-UIKIt";
+			productName = "Semixel-UIKIt";
+			productReference = 869F4E01275EDE5A00328FBC /* Semixel-UIKIt.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		864E74C924B714B20000A1AB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1230;
+				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Andrew Thompson";
 				TargetAttributes = {
 					864E74D024B714B20000A1AB = {
 						CreatedOnToolsVersion = 11.5;
+					};
+					869F4E00275EDE5A00328FBC = {
+						CreatedOnToolsVersion = 13.1;
 					};
 				};
 			};
@@ -274,6 +340,7 @@
 			projectRoot = "";
 			targets = (
 				864E74D024B714B20000A1AB /* Semixel */,
+				869F4E00275EDE5A00328FBC /* Semixel-UIKIt */,
 			);
 		};
 /* End PBXProject section */
@@ -286,6 +353,16 @@
 				864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */,
 				866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */,
 				864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		869F4DFF275EDE5A00328FBC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				869F4E10275EDE5C00328FBC /* LaunchScreen.storyboard in Resources */,
+				869F4E0D275EDE5C00328FBC /* Assets.xcassets in Resources */,
+				869F4E0B275EDE5A00328FBC /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,7 +411,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		869F4DFD275EDE5A00328FBC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				869F4E18275EF43600328FBC /* ColorPalette.swift in Sources */,
+				869F4E08275EDE5A00328FBC /* ViewController.swift in Sources */,
+				869F4E1A275EF77E00328FBC /* ColorPickerView.swift in Sources */,
+				869F4E04275EDE5A00328FBC /* AppDelegate.swift in Sources */,
+				869F4E16275EE13000328FBC /* GridView.swift in Sources */,
+				869F4E06275EDE5A00328FBC /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		869F4E09275EDE5A00328FBC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				869F4E0A275EDE5A00328FBC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		869F4E0E275EDE5C00328FBC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				869F4E0F275EDE5C00328FBC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		864E74E324B714B30000A1AB /* Debug */ = {
@@ -497,6 +606,64 @@
 			};
 			name = Release;
 		};
+		869F4E12275EDE5C00328FBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 63J747E7ZH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Semixel-UIKIt/Info.plist";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "mrwerdo.Semixel-UIKIt";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		869F4E13275EDE5C00328FBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 63J747E7ZH;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Semixel-UIKIt/Info.plist";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "mrwerdo.Semixel-UIKIt";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -514,6 +681,15 @@
 			buildConfigurations = (
 				864E74E624B714B30000A1AB /* Debug */,
 				864E74E724B714B30000A1AB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		869F4E14275EDE5C00328FBC /* Build configuration list for PBXNativeTarget "Semixel-UIKIt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				869F4E12275EDE5C00328FBC /* Debug */,
+				869F4E13275EDE5C00328FBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
