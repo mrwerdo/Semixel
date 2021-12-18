@@ -9,7 +9,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "SemixelCore",
-            targets: ["SemixelCore"]),
+            targets: ["SemixelCore", "Geometry"]),
         .library(name: "Geometry",
                  targets: ["Geometry"])
     ],

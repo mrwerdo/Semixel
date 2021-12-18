@@ -7,12 +7,22 @@
 //
 
 import UIKit
+import SemixelCore
 
 class PixelView: UIView {
     
     private(set) var grid: GridView = GridView()
-    private(set) var imageView: UIImageView = UIImageView()
+    private var imageView: UIImageView = UIImageView()
     private(set) var cursor: UIImageView = UIImageView(image: UIImage(systemName: "pencil"))
+    
+    public var image: PixelImage<RGBA> = PixelImage(size: .zero, buffer: [])
+    {
+        didSet {
+            if let cgImage = image.convertToCGImage() {
+                imageView.image = UIImage(cgImage: cgImage)
+            }
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

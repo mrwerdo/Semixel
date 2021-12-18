@@ -31,14 +31,6 @@ public struct RGBA: Equatable, HasDefaultColor, Codable, Hashable {
         self.alpha = alpha
     }
     
-    @available(iOS 14.0, *)
-    public init?(_ color: Color) {
-        red = 0; green = 0; blue = 0; alpha = 0
-        guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
-            return nil
-        }
-    }
-    
     public init(red: UInt8, green: UInt8, blue: UInt8, alpha: UInt8) {
         self.init(
             red: CGFloat(red)/255,

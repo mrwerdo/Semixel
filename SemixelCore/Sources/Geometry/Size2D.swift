@@ -13,9 +13,14 @@ public struct Size2D : Codable, Equatable, Hashable {
     public var height: Int
     
     @inlinable
-    public init(width: Int, height: Int) {
+    public init(width: Int = 0, height: Int = 0) {
         self.width = width
         self.height = height
+    }
+    
+    @inlinable
+    public static var zero: Size2D {
+        return Size2D()
     }
 }
 

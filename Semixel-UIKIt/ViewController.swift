@@ -7,13 +7,20 @@
 //
 
 import UIKit
+import SemixelCore
+
+extension RGBA {
+    var uiColor: UIColor {
+        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
+}
 
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
     var pixelView: PixelView = PixelView()
     var colorPalette: UICollectionView!
     
-    var colors: [Color] = [
+    var colors: [RGBA] = [
         "655a7c","ab92bf","afc1d6","cef9f2","d6ca98",
         "ff6f59","254441","43aa8b","b2b09b","ef3054",
         "130303","2d080a","7c3626","f5853f","ffcdbc",
@@ -21,14 +28,16 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         "3891a6","4c5b5c","fde74c","db5461","e3655b",
         "8acdea","746d75","8c4843","9e643c","ede6f2",
         "eaeaea","cbc5ea","73628a","313d5a","183642"
-    ].compactMap({ Color(hex: $0) })
+    ].compactMap({ RGBA(hex: $0) })
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         pixelView.grid.lineWidth = 1
         pixelView.grid.color = .lightGray
-        pixelView.imageView.image = UIImage(named: "Coal 4")
+        if let image = UIImage(named: "Coal 4") {
+            pixelView.image = PixelImage<RGBA>(uiImage: image)
+        }
         pixelView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([

@@ -13,6 +13,15 @@ import SemixelCore
 
 public typealias ColorIdentifier = Int
 
+extension RGBA {
+    public init?(_ color: Color) {
+        self.init(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
+        guard UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+            return nil
+        }
+    }
+}
+
 public struct IdentifiableColor: Identifiable, Equatable, Codable {
     public var id: ColorIdentifier
     public var color: RGBA
