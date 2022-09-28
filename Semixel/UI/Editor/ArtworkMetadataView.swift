@@ -103,12 +103,6 @@ struct ArtworkMetadataView: View {
                     }
                 }
             }
-            .onAppear {
-                UITableView.appearance().isScrollEnabled = false
-            }
-            .onDisappear {
-                UITableView.appearance().isScrollEnabled = true
-            }
         }
         .listStyle(InsetGroupedListStyle())
         .accentColor(Color.black)

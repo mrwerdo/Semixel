@@ -68,7 +68,9 @@ struct ArtworkView: View {
                 }
             }
         }
-        .halfModalSheet(isPresented: $showAttributes, content: attributesView)
+        .sheet(isPresented: $showAttributes) {
+            attributesView.presentationDetents([PresentationDetent.medium, .large])
+        }
     }
     
     var attributesView: some View {
@@ -107,12 +109,6 @@ struct ArtworkView: View {
                            icon: "exclamationmark.arrow.triangle.2.circlepath",
                            callback: reset)
                 }
-            }
-            .onAppear {
-                UITableView.appearance().isScrollEnabled = false
-            }
-            .onDisappear {
-                UITableView.appearance().isScrollEnabled = true
             }
         }
         .listStyle(InsetGroupedListStyle())

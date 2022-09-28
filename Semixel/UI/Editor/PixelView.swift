@@ -179,9 +179,10 @@ struct PixelView: View {
             .ignoresSafeArea(.keyboard)
             .background(Color(UIColor.secondarySystemBackground).ignoresSafeArea())
         }
-        .halfModalSheet(isPresented: $showMetadataView,
-                        content: ArtworkMetadataView(isPresented: $showMetadataView,
-                                                     showGrid: $showGrid))
+        .sheet(isPresented: $showMetadataView) {
+            ArtworkMetadataView(isPresented: $showMetadataView, showGrid: $showGrid)
+                .presentationDetents([.medium, .large])
+        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 TextField("Title", text: $metadata.title) {
