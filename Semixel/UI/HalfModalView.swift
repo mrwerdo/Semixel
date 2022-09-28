@@ -44,7 +44,7 @@ private struct HalfModalSlider<Content: View, ModalContent: View, G1: Gesture, G
                             .zIndex(2)
                     }
                 }
-                .animation(Animation.easeInOut(duration: 0.3))
+                .animation(Animation.easeInOut(duration: 0.3), value: height)
             }
             .background(Color.black.ignoresSafeArea())
         }

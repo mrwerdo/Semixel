@@ -334,6 +334,7 @@
 			files = (
 				869F4E10275EDE5C00328FBC /* LaunchScreen.storyboard in Resources */,
 				869F4E0D275EDE5C00328FBC /* Assets.xcassets in Resources */,
+				861BAB0C276D7CA300E3877E /* Default Artwork in Resources */,
 				869F4E0B275EDE5A00328FBC /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -534,6 +535,7 @@
 				DEVELOPMENT_TEAM = 63J747E7ZH;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Semixel/Other/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -556,6 +558,7 @@
 				DEVELOPMENT_TEAM = 63J747E7ZH;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Semixel/Other/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
