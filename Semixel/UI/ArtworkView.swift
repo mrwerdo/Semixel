@@ -10,6 +10,25 @@ import SwiftUI
 import Geometry
 import SemixelCore
 
+struct ArtworkMetadataListView: View {
+    
+    @EnvironmentObject var store: ArtworkStore
+    @EnvironmentObject var artwork: ArtworkMetadata
+    
+    var body: some View {
+        NavigationLink(value: artwork.id) {
+            store.preview(for: artwork)
+                .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
+            VStack(alignment: .leading) {
+                Text(artwork.title)
+                Text(artwork.subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+        }
+    }
+}
+
 struct ArtworkView: View {
     
     @EnvironmentObject var store: ArtworkStore
@@ -28,31 +47,21 @@ struct ArtworkView: View {
         })
     }
     
-    func navigationLinkView(_ artwork: ArtworkMetadata) -> some View {
-        Group {
-            store.preview(for: artwork)
-                .padding(EdgeInsets(top: 4, leading: 5, bottom: 6, trailing: 5))
-            VStack(alignment: .leading) {
-                Text(artwork.title)
-                Text(artwork.subtitle)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-        }
-    }
-    
     var body: some View {
         NavigationStack {
             List {
                 ForEach(store.artwork) { (artwork: ArtworkMetadata) in
-                    NavigationLink(value: artwork.id, label: { navigationLinkView(artwork) })
-                }.onDelete(perform: delete(at:))
+                    ArtworkMetadataListView()
+                        .environmentObject(store)
+                        .environmentObject(artwork)
+                }
+                .onDelete(perform: delete(at:))
             }
-            .navigationDestination(for: String.self, destination: { artworkId in
+            .navigationDestination(for: String.self) { artworkId in
                 let metadata = store.artwork.first(where: { $0.id == artworkId })!
                 store.view(for: metadata)
                     .onDisappear(perform: { save(metadata) })
-            })
+            }
             .navigationTitle("Artwork")
             .listStyle(PlainListStyle())
             .toolbar {
