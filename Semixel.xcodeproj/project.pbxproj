@@ -10,6 +10,8 @@
 		86043AFE2592E9AB0057B747 /* PixelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86043AFD2592E9AB0057B747 /* PixelView.swift */; };
 		860FB303258AC6460014A0E1 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860FB302258AC6460014A0E1 /* CollectionView.swift */; };
 		8617E52A2592CF6600D7460B /* SemixelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8617E5292592CF6600D7460B /* SemixelApp.swift */; };
+		861BAB0C276D7CA300E3877E /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 866C99BB2581D60F00FAEF03 /* Default Artwork */; };
+		861BAB0E276D7CC800E3877E /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 861BAB0D276D7CC800E3877E /* Default Artwork */; };
 		862609A825B7BAEF00B325E4 /* ProjectSyncSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862609A625B7BAEF00B325E4 /* ProjectSyncSession.swift */; };
 		862609A925B7BAEF00B325E4 /* ProjectSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862609A725B7BAEF00B325E4 /* ProjectSyncService.swift */; };
 		864E74D924B714B20000A1AB /* ArtworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864E74D824B714B20000A1AB /* ArtworkView.swift */; };
@@ -18,7 +20,6 @@
 		8650E40625BAB9F70026AE24 /* ArtworkMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650E40525BAB9F70026AE24 /* ArtworkMetadataView.swift */; };
 		86554BAF259040B3001864D6 /* SemanticIdentifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86554BAE259040B3001864D6 /* SemanticIdentifierView.swift */; };
 		8660200025AC33B000BC6CC7 /* initialize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86601FFF25AC33B000BC6CC7 /* initialize.swift */; };
-		866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */ = {isa = PBXBuildFile; fileRef = 866C99BB2581D60F00FAEF03 /* Default Artwork */; };
 		866DE89E2594482B0036B3E3 /* ToolsMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866DE89D2594482B0036B3E3 /* ToolsMenu.swift */; };
 		867F396225CE50270047B714 /* DragView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867F396125CE50270047B714 /* DragView.swift */; };
 		869C823825902D7C00B0235E /* PixelGridImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869C823725902D7C00B0235E /* PixelGridImageView.swift */; };
@@ -51,6 +52,7 @@
 		86043AFD2592E9AB0057B747 /* PixelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelView.swift; sourceTree = "<group>"; };
 		860FB302258AC6460014A0E1 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		8617E5292592CF6600D7460B /* SemixelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SemixelApp.swift; sourceTree = "<group>"; };
+		861BAB0D276D7CC800E3877E /* Default Artwork */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Default Artwork"; sourceTree = "<group>"; };
 		862609A425B7BA5500B325E4 /* ProjectSync */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ProjectSync; sourceTree = "<group>"; };
 		862609A625B7BAEF00B325E4 /* ProjectSyncSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectSyncSession.swift; sourceTree = "<group>"; };
 		862609A725B7BAEF00B325E4 /* ProjectSyncService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectSyncService.swift; sourceTree = "<group>"; };
@@ -157,7 +159,7 @@
 				86ADB31D259013DA00F59A39 /* UI */,
 				86F5204C259017FC00C19E41 /* Support */,
 				86ADB31E2590142500F59A39 /* Other */,
-				866C99BB2581D60F00FAEF03 /* Default Artwork */,
+				861BAB0D276D7CC800E3877E /* Default Artwork */,
 			);
 			path = Semixel;
 			sourceTree = "<group>";
@@ -180,6 +182,7 @@
 				86CDD36B275F17E8009A2569 /* PixelView.swift */,
 				869F4E19275EF77E00328FBC /* ColorPickerView.swift */,
 				869F4E15275EE12F00328FBC /* GridView.swift */,
+				866C99BB2581D60F00FAEF03 /* Default Artwork */,
 				869F4E09275EDE5A00328FBC /* Main.storyboard */,
 				869F4E0C275EDE5C00328FBC /* Assets.xcassets */,
 				869F4E0E275EDE5C00328FBC /* LaunchScreen.storyboard */,
@@ -319,8 +322,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				861BAB0E276D7CC800E3877E /* Default Artwork in Resources */,
 				864E74DE24B714B30000A1AB /* Preview Assets.xcassets in Resources */,
-				866C99BC2581D60F00FAEF03 /* Default Artwork in Resources */,
 				864E74DB24B714B30000A1AB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
