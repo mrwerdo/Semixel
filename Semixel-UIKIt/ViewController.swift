@@ -15,6 +15,12 @@ extension RGBA {
     }
 }
 
+extension UIButton {
+    convenience init(title: String, systemImageName name: String, handler: @escaping UIActionHandler) {
+        self.init(primaryAction: UIAction(title: title, image: UIImage(systemName: name), identifier: nil, discoverabilityTitle: nil, attributes: [], state: .off, handler: handler))
+    }
+}
+
 class ViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
     var pixelView: PixelView = PixelView()
@@ -35,7 +41,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         
         pixelView.grid.lineWidth = 1
         pixelView.grid.color = .lightGray
-        if let image = UIImage(named: "Coal 4") {
+        
+        if let artworkUrls = Bundle.main.urls(forResourcesWithExtension: "png", subdirectory: "Default Artwork"),
+           let data = try? Data(contentsOf: artworkUrls[1]),
+           let image = UIImage(data: data) {
             pixelView.image = PixelImage<RGBA>(uiImage: image)
         }
         pixelView.translatesAutoresizingMaskIntoConstraints = false
@@ -48,6 +57,36 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         layout.itemSize = CGSize(width: 35, height: 45)
         layout.sectionInset = UIEdgeInsets(top: 12, left: 4, bottom: 12, right: 4)
         layout.minimumInteritemSpacing = 4
+        
+        let brushTool = UIButton(title: "Brush", systemImageName: "paintbrush") { action in
+            print("brush tool")
+        }
+        
+        let penTool = UIButton(title: "Pen", systemImageName: "pencil") { action in
+            print("pen tool")
+        }
+        
+        
+        
+        let leftSpacer = UIView()
+        let rightSpacer = UIView()
+                                                       
+        let tools = UIStackView()
+        tools.distribution = .equalCentering
+        tools.alignment = .center
+        tools.axis = .horizontal
+        tools.backgroundColor = .systemGray5
+        tools.translatesAutoresizingMaskIntoConstraints = false
+        tools.addArrangedSubview(leftSpacer)
+        tools.addArrangedSubview(penTool)
+        tools.addArrangedSubview(brushTool)
+        tools.addArrangedSubview(rightSpacer)
+        view.addSubview(tools)
+        NSLayoutConstraint.activate([
+            tools.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tools.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tools.heightAnchor.constraint(equalToConstant: 50)
+        ])
         
         colorPalette = UICollectionView(frame: .zero, collectionViewLayout: layout)
         colorPalette.backgroundColor = .systemGray4
@@ -77,7 +116,8 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             container.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             container.topAnchor.constraint(equalTo: view.topAnchor),
-            container.bottomAnchor.constraint(equalTo: colorPalette.topAnchor)
+            tools.bottomAnchor.constraint(equalTo: colorPalette.topAnchor),
+            container.bottomAnchor.constraint(equalTo: tools.topAnchor)
         ])
     }
     

@@ -47,7 +47,7 @@ class PixelView: UIView {
         cursor.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin,
                                    .flexibleLeftMargin, .flexibleRightMargin]
         cursor.frame.size = CGSize(width: 20, height: 20)
-        cursor.tintColor = .white
+        cursor.tintColor = .systemBlue
         addSubview(cursor)
         
         let drag = UIPanGestureRecognizer(target: self, action: #selector(PixelView.cursorMoved(_:)))
@@ -70,10 +70,9 @@ class PixelView: UIView {
     
     private func limitCursorToBounds() {
         let size = cursor.bounds.size
-        let rect = imageView.bounds.inset(by: UIEdgeInsets(top: size.height/2, left: size.width/2, bottom: size.height/2, right: size.width/2))
-        
-        cursor.center.x = max(rect.minX, min(cursor.center.x, rect.maxX))
-        cursor.center.y = max(rect.minY, min(cursor.center.y, rect.maxY))
+        let rect = imageView.bounds
+        cursor.center.x = max(rect.minX, min(cursor.center.x - size.width / 2, rect.maxX)) + size.width / 2
+        cursor.center.y = max(rect.minY, min(cursor.center.y + size.height / 2, rect.maxY)) - size.height / 2
     }
     
 }
