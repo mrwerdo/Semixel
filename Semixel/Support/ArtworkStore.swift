@@ -36,6 +36,7 @@ class ArtworkMetadata: Identifiable, Codable, ObservableObject {
         }
         set {
             _title = newValue != "" ? newValue : ""
+            objectWillChange.send()
         }
     }
 }

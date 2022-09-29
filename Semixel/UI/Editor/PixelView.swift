@@ -24,8 +24,6 @@ struct PixelView: View {
     @EnvironmentObject var metadata: ArtworkMetadata
     @EnvironmentObject var store: ArtworkStore
     
-    @State var editingTitle: Bool = false
-    
     @State var selectedSemanticIdentifierId: Int = 0
     @State var statusText: String = ""
     
@@ -143,7 +141,6 @@ struct PixelView: View {
                 Spacer()
                 overlay
                     .padding()
-                    .gesture(dismissKeyboard)
                 Text(statusText)
                     .frame(height: 30, alignment: .bottom)
                 VStack {
@@ -183,28 +180,14 @@ struct PixelView: View {
             ArtworkMetadataView(isPresented: $showMetadataView, showGrid: $showGrid)
                 .presentationDetents([.medium, .large])
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                TextField("Title", text: $metadata.title) {
-                    editingTitle = $0
-                } onCommit: {
-                    editingTitle = false
-                    ignoreErrors { try store.saveMetadata() }
-                }
-                .font(Font.system(size: 15, weight: .medium))
-            }
-        }
         .navigationBarItems(trailing: attributesButton)
         .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    var dismissKeyboard: some Gesture {
-        TapGesture()
-            .onEnded {
-                if editingTitle {
-                    hideKeyboard()
-                }
+        .navigationTitle($metadata.title)
+        .onChange(of: metadata.title) { newValue in
+            ignoreErrors {
+                try store.saveMetadata()
             }
+        }
     }
     
     var attributesButton: some View {
