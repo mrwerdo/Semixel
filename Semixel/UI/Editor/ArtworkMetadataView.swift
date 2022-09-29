@@ -18,6 +18,7 @@ struct ArtworkMetadataView: View {
     @Binding var isPresented: Bool
     @Binding var showGrid: Bool
     
+    // fixeme: remove ugly hack
     var toolOverride: Binding<Int> {
         Binding { () -> Int in
             if let tool = store.toolOverride(for: metadata), let index = ToolType.allCases.firstIndex(of: tool) {
@@ -86,17 +87,17 @@ struct ArtworkMetadataView: View {
                     field("Id", metadata.id)
                 }
                 Section {
-                    action(title: "Tool Override", icon: ToolType.selection.iconName, dismisses: false) {
+                    action(title: "Tool Override", icon: toolTypeSelectionIcon, dismisses: false) {
                         showToolTypePicker.toggle()
                     }
                     if showToolTypePicker {
                         Picker(selection: toolOverride, label: Text("Tool Override")) {
-                            ForEach(0..<(ToolType.allCases.count + 1)) {
-                                if $0 == 0 {
-                                    Text("None")
-                                } else {
-                                    Text(ToolType.allCases[$0 - 1].rawValue)
-                                }
+                            let data = Array(ToolType.allCases.enumerated())
+                            Text("None")
+                                .tag(0)
+                            ForEach(data, id: \.offset) { tool in
+                                Text(tool.element.rawValue)
+                                    .tag(tool.offset + 1)
                             }
                         }
                         .pickerStyle(WheelPickerStyle())
@@ -107,6 +108,14 @@ struct ArtworkMetadataView: View {
         .listStyle(InsetGroupedListStyle())
         .accentColor(Color.black)
         .background(Color(UIColor.secondarySystemBackground))
+    }
+    
+    var toolTypeSelectionIcon: String {
+        if let tool = store.toolOverride(for: metadata) {
+            return tool.iconName
+        } else {
+            return ToolType.selection.iconName
+        }
     }
     
     func field(_ title: String, _ value: String) -> some View {
