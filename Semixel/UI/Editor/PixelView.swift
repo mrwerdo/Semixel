@@ -101,9 +101,9 @@ struct PixelView: View {
     var overlay: some View {
         let size = CGSize(width: CGFloat(artwork.image.size.width), height: CGFloat(artwork.image.size.height))
         return GeometryReader() { geometry in
+            let length = floor(min(geometry.size.width / size.width, geometry.size.height / size.height))
             DragView(imageSize: artwork.image.size,
-                     pixelSize: CGSize(square: floor(min(geometry.size.width / size.width,
-                                                   geometry.size.height / size.height))),
+                     pixelSize: CGSize(square: length),
                      translating: tool == .translation,
                      shapeStartPosition: shapeStartPosition,
                      shapeEndPosition: shapeEndPosition,
@@ -114,8 +114,7 @@ struct PixelView: View {
                      __position: $__position,
                      onDrag: onDrag,
                      content:
-                        OverlayView(pixelSize: CGSize(square: zoomFactor * floor(min(geometry.size.width / size.width,
-                                                                  geometry.size.height / size.height))),
+                        OverlayView(pixelSize: CGSize(square: length),
                                     image: bitmapImage,
                                     position: position,
                                     showGrid: showGrid,
