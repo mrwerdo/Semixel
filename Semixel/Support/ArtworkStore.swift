@@ -142,6 +142,7 @@ class ArtworkStore: ObservableObject {
     }
     
     func remove(_ artwork: ArtworkMetadata) throws {
+        semanticArtworkCache[artwork.id] = nil
         try fs.delete(id: artwork.id)
         metadata.standaloneArtworks.removeAll { $0.id == artwork.id }
         try saveMetadata()

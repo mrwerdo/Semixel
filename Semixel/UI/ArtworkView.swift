@@ -52,7 +52,7 @@ struct ArtworkView: View {
             List {
                 ForEach(store.artwork) { (artwork: ArtworkMetadata) in
                     ArtworkMetadataListView()
-                        .environmentObject(store)
+//                        .environmentObject(store)
                         .environmentObject(artwork)
                 }
                 .onDelete(perform: delete(at:))
